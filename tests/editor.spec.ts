@@ -269,7 +269,7 @@ test.describe('Editor Conflict Resolution (Optional)', () => {
     await page.evaluate(async () => {
       // Mock a conflict by simulating another user's edit
       // In a real test, you'd modify the database directly
-      const _response = await fetch('/api/test/simulate-conflict', {
+      await fetch('/api/test/simulate-conflict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

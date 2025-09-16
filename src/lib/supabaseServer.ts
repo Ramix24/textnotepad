@@ -66,7 +66,9 @@ export function createServerClient() {
     throw new Error('Missing environment variable: NEXT_PUBLIC_SUPABASE_URL')
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { createServerClient } = require('@supabase/ssr')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { cookies } = require('next/headers')
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
@@ -83,7 +85,7 @@ export function createServerClient() {
           // user sessions.
         }
       },
-      remove(name: string, options: any) {
+      remove(name: string, _options: any) {
         try {
           cookies().delete(name)
         } catch {
