@@ -1,9 +1,11 @@
 {
-  "env": {
-    "NEXT_PUBLIC_SUPABASE_URL": "https://wokogphtzkarrodolmxd.supabase.co",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indva29ncGh0emthcnJvZG9sbXhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NjE1OTQsImV4cCI6MjA3MzUzNzU5NH0.2UhMPaKpoli0Ef2OyNRewFvbcKUvKzctu5SsGnYaS3c",
-    "SUPABASE_SERVICE_ROLE": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indva29ncGh0emthcnJvZG9sbXhkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1Nzk2MTU5NCwiZXhwIjoyMDczNTM3NTk0fQ.biYRS1EZdbaNDrzsaQVLbaPyqyslvjYkqQmz9yRGla8",
-    "NEXT_PUBLIC_APP_ENV": "production",
-    "NEXT_PUBLIC_APP_URL": "https://textnotepad.vercel.app"
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_SUPABASE_URL": "https://wokogphtzkarrodolmxd.supabase.co",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indva29ncGh0emthcnJvZG9sbXhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NjE1OTQsImV4cCI6MjA3MzUzNzU5NH0.2UhMPaKpoli0Ef2OyNRewFvbcKUvKzctu5SsGnYaS3c",
+      "SUPABASE_SERVICE_ROLE": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indva29ncGh0emthcnJvZG9sbXhkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1Nzk2MTU5NCwiZXhwIjoyMDczNTM3NTk0fQ.biYRS1EZdbaNDrzsaQVLbaPyqyslvjYkqQmz9yRGla8",
+      "NEXT_PUBLIC_APP_ENV": "production",
+      "NEXT_PUBLIC_APP_URL": "https://textnotepad.vercel.app"
+    }
   }
 }
