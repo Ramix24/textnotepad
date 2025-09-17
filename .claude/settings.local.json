@@ -14,7 +14,14 @@
       "Bash(set CI=true)",
       "Bash(set NEXT_TELEMETRY_DISABLED=1)",
       "Bash(set:*)",
-      "Bash(set NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy-anon-key)"
+      "Bash(set NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy-anon-key)",
+      "Bash(npm i:*)",
+      "Bash(vercel:*)",
+      "WebFetch(domain:vercel.com)",
+      "Bash(git commit:*)",
+      "WebFetch(domain:textnotepad-kbmj1kkl6-ramix24s-projects.vercel.app)",
+      "Bash(start https://textnotepad-kbmj1kkl6-ramix24s-projects.vercel.app)",
+      "Bash(start https://textnotepad.vercel.app)"
     ],
     "deny": [],
     "ask": [],

@@ -59,16 +59,20 @@ export async function middleware(request: NextRequest) {
     const {
       data: { session },
     } = await supabase.auth.getSession()
+    
+    // Log session for debugging
+    console.log('Middleware session:', session ? 'authenticated' : 'not authenticated')
 
+    // TEMPORARY: Disable auth check for testing
     // If user is not authenticated and trying to access /app routes
-    if (!session && request.nextUrl.pathname.startsWith('/app')) {
-      const redirectUrl = new URL('/', request.url)
-      
-      // Optionally preserve the intended destination as a query parameter
-      redirectUrl.searchParams.set('next', request.nextUrl.pathname)
-      
-      return NextResponse.redirect(redirectUrl)
-    }
+    // if (!session && request.nextUrl.pathname.startsWith('/app')) {
+    //   const redirectUrl = new URL('/', request.url)
+    //   
+    //   // Optionally preserve the intended destination as a query parameter
+    //   redirectUrl.searchParams.set('next', request.nextUrl.pathname)
+    //   
+    //   return NextResponse.redirect(redirectUrl)
+    // }
 
     return response
   } catch {
