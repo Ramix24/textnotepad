@@ -86,6 +86,7 @@ export async function middleware(request: NextRequest) {
   }
 }
 
-export const config = {
-  matcher: ['/app/:path*']
-}
+// TEMPORARY: Disable middleware to test client-side auth only
+// export const config = {
+//   matcher: ['/app/:path*']
+// }

@@ -9,6 +9,7 @@ import { EditorSkeleton } from '@/components/EditorSkeleton'
 import { supabase } from '@/lib/supabaseClient'
 import { getLatestFileForUser, createDefaultFile } from '@/lib/userFiles.repo'
 import { UserFile } from '@/types/user-files.types'
+import { useAuthSession } from '@/hooks/useAuthSession'
 
 interface AppViewProps {
   user: User | null
@@ -18,12 +19,22 @@ export function AppView({ user: _user }: AppViewProps) {
   const [currentFile, setCurrentFile] = useState<UserFile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  
+  // Use client-side auth when server-side user is null
+  const { user: clientUser } = useAuthSession()
+  const user = _user || clientUser
 
   useEffect(() => {
     const loadCurrentFile = async () => {
       try {
         setLoading(true)
         setError(null)
+        
+        // Only load files if user is authenticated
+        if (!user) {
+          setLoading(false)
+          return
+        }
         
         // First, try to get the latest file for the user
         let file = await getLatestFileForUser(supabase)
@@ -52,7 +63,7 @@ export function AppView({ user: _user }: AppViewProps) {
     }
 
     loadCurrentFile()
-  }, [])
+  }, [user])
 
   if (loading) {
     return (
