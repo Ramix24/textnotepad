@@ -55,13 +55,10 @@ export async function middleware(request: NextRequest) {
   )
 
   try {
-    // Get the current session
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
-    
-    // Log session for debugging
-    console.log('Middleware session:', session ? 'authenticated' : 'not authenticated')
+    // Get the current session (temporarily disabled)
+    // const {
+    //   data: { session },
+    // } = await supabase.auth.getSession()
 
     // TEMPORARY: Disable auth check for testing
     // If user is not authenticated and trying to access /app routes
