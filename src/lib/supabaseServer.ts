@@ -76,7 +76,7 @@ export function createServerClient() {
       get(name: string) {
         return cookies().get(name)?.value
       },
-      set(name: string, value: string, options: any) {
+      set(name: string, value: string, options?: Record<string, unknown>) {
         try {
           cookies().set(name, value, options)
         } catch {
@@ -85,7 +85,7 @@ export function createServerClient() {
           // user sessions.
         }
       },
-      remove(name: string, _options: any) {
+      remove(name: string, _options?: Record<string, unknown>) {
         try {
           cookies().delete(name)
         } catch {

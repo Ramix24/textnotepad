@@ -41,7 +41,7 @@ export class UserFileError extends Error {
   constructor(
     message: string,
     public code: 'NOT_FOUND' | 'UNAUTHORIZED' | 'VERSION_CONFLICT' | 'VALIDATION_ERROR',
-    public details?: any
+    public details?: Record<string, unknown>
   ) {
     super(message)
     this.name = 'UserFileError'

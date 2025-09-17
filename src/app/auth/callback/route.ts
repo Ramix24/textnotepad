@@ -17,10 +17,10 @@ export async function GET(request: NextRequest) {
           get(name: string) {
             return cookieStore.get(name)?.value
           },
-          set(name: string, value: string, _options: any) {
+          set(name: string, value: string, _options?: Record<string, unknown>) {
             cookieStore.set(name, value, _options)
           },
-          remove(name: string, _options: any) {
+          remove(name: string, _options?: Record<string, unknown>) {
             cookieStore.delete(name)
           },
         },
@@ -31,14 +31,14 @@ export async function GET(request: NextRequest) {
       const { error } = await supabase.auth.exchangeCodeForSession(code)
       
       if (error) {
-        console.error('Auth callback error:', error)
+        // Auth callback error
         return NextResponse.redirect(new URL('/?authError=1', requestUrl.origin))
       }
 
       // Success - redirect to app
       return NextResponse.redirect(new URL('/app', requestUrl.origin))
-    } catch (error) {
-      console.error('Auth callback unexpected error:', error)
+    } catch {
+      // Auth callback unexpected error
       return NextResponse.redirect(new URL('/?authError=1', requestUrl.origin))
     }
   }

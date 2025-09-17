@@ -5,14 +5,14 @@ import { calculateTextStats } from '@/lib/counters'
 
 // Error classes for better error handling
 export class ConflictError extends Error {
-  constructor(message: string, public details?: any) {
+  constructor(message: string, public details?: Record<string, unknown>) {
     super(message)
     this.name = 'ConflictError'
   }
 }
 
 export class NotFoundError extends Error {
-  constructor(message: string, public details?: any) {
+  constructor(message: string, public details?: Record<string, unknown>) {
     super(message)
     this.name = 'NotFoundError'
   }

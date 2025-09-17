@@ -71,8 +71,8 @@ export function Editor({ file, className, onFileUpdate }: EditorProps) {
         } else {
           throw new Error('Could not fetch latest file version')
         }
-      } catch (error) {
-        console.error('Error resolving conflict:', error)
+      } catch {
+        // Error resolving conflict
         toast.error('Conflict resolution failed', {
           description: 'Unable to fetch latest version. Please refresh the page.',
           duration: 5000,
@@ -98,8 +98,8 @@ export function Editor({ file, className, onFileUpdate }: EditorProps) {
       setIsLoadingStats(true)
       const newStats = await computeStats(newContent)
       setStats(newStats)
-    } catch (error) {
-      console.error('Error calculating stats:', error)
+    } catch {
+      // Error calculating stats
     } finally {
       setIsLoadingStats(false)
     }
@@ -115,9 +115,9 @@ export function Editor({ file, className, onFileUpdate }: EditorProps) {
         try {
           await forceSave()
           toast.success('File saved manually', { duration: 2000 })
-        } catch (error) {
+        } catch {
           toast.error('Manual save failed', {
-            description: error instanceof Error ? error.message : 'Unknown error',
+            description: 'Failed to save file',
           })
         }
       }
@@ -130,8 +130,8 @@ export function Editor({ file, className, onFileUpdate }: EditorProps) {
       try {
         const initialStats = await computeStats(content)
         setStats(initialStats)
-      } catch (error) {
-        console.error('Error initializing stats:', error)
+      } catch {
+        // Error initializing stats
       }
     }
     

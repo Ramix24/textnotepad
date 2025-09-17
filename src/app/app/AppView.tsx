@@ -40,8 +40,8 @@ export function AppView({ user: _user }: AppViewProps) {
         }
         
         setCurrentFile(file)
-      } catch (err) {
-        console.error('Error loading current file:', err)
+      } catch {
+        // Error loading current file
         setError('Failed to load document')
         toast.error('Failed to load document', {
           description: 'There was an error loading your document. Please try again.',

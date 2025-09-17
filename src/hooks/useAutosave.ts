@@ -142,7 +142,9 @@ export function useAutosave({
       // Handle specific error types
       if (error instanceof ConflictError) {
         // Version conflict - file was modified elsewhere
-        onConflict?.(error.details)
+        if (error.details) {
+          onConflict?.(error.details as UserFile)
+        }
         toast.error('File conflict detected', {
           description: 'The file was modified elsewhere. Please refresh to see latest changes.',
         })

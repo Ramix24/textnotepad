@@ -26,12 +26,12 @@ export function AutosaveExample({ file, onFileUpdate }: AutosaveExampleProps) {
     onSaved: (updatedFile) => {
       setLastSaved(new Date())
       onFileUpdate?.(updatedFile)
-      console.log('File saved successfully:', updatedFile)
+      // File saved successfully
     },
     onConflict: (conflictingFile) => {
       // Handle version conflict - refresh content with server version
       setContent(conflictingFile.content)
-      console.warn('File conflict detected, content refreshed:', conflictingFile)
+      // File conflict detected, content refreshed
     },
     config: {
       debounceMs: 1000,  // Wait 1 second after typing stops

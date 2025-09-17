@@ -28,7 +28,7 @@ export function StatsDisplay({ text, onStatsChange }: StatsDisplayProps) {
       onStatsChange?.(result)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to calculate statistics')
-      console.error('Stats calculation error:', err)
+      // Stats calculation error
     }
   }, [compute, onStatsChange])
 

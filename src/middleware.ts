@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
         get(name: string) {
           return request.cookies.get(name)?.value
         },
-        set(name: string, value: string, options: any) {
+        set(name: string, value: string, options?: Record<string, unknown>) {
           request.cookies.set({
             name,
             value,
@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
             ...options,
           })
         },
-        remove(name: string, options: any) {
+        remove(name: string, options?: Record<string, unknown>) {
           request.cookies.set({
             name,
             value: '',
@@ -71,9 +71,9 @@ export async function middleware(request: NextRequest) {
     }
 
     return response
-  } catch (error) {
+  } catch {
     // If there's an error checking auth, redirect to home for safety
-    console.error('Middleware auth error:', error)
+    // Middleware auth error
     return NextResponse.redirect(new URL('/', request.url))
   }
 }

@@ -1,9 +1,23 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(gh run list:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm build:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(set CI=true)",
+      "Bash(set NEXT_TELEMETRY_DISABLED=1)",
+      "Bash(set:*)",
+      "Bash(set NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy-anon-key)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "defaultMode": "acceptEdits"
   }
 }

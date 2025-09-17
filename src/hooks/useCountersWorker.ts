@@ -95,8 +95,8 @@ export function useCountersWorker(options: UseCountersWorkerOptions = {}) {
       }
 
       // Handle worker errors
-      workerRef.current.onerror = (error) => {
-        console.error('Worker error:', error)
+      workerRef.current.onerror = (_error) => {
+        // Worker error
         // Reject all pending calls
         pendingCallsRef.current.forEach(({ reject }) => {
           reject(new Error('Worker error occurred'))

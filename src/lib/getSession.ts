@@ -22,7 +22,7 @@ export async function getSession(): Promise<{
     } = await supabase.auth.getSession()
 
     if (error) {
-      console.error('Error getting session:', error)
+      // Error getting session
       return { session: null, user: null }
     }
 
@@ -30,8 +30,8 @@ export async function getSession(): Promise<{
       session,
       user: session?.user ?? null,
     }
-  } catch (error) {
-    console.error('Unexpected error getting session:', error)
+  } catch {
+    // Unexpected error getting session
     return { session: null, user: null }
   }
 }
