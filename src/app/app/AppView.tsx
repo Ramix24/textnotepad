@@ -11,7 +11,7 @@ import { getLatestFileForUser, createDefaultFile } from '@/lib/userFiles.repo'
 import { UserFile } from '@/types/user-files.types'
 
 interface AppViewProps {
-  user: User
+  user: User | null
 }
 
 export function AppView({ user: _user }: AppViewProps) {
