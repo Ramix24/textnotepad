@@ -9,6 +9,9 @@ export async function GET(request: NextRequest) {
   if (code) {
     const cookieStore = await cookies()
     
+    // Create response to properly set cookies
+    const response = NextResponse.redirect(new URL('/app', requestUrl.origin))
+    
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -17,11 +20,14 @@ export async function GET(request: NextRequest) {
           get(name: string) {
             return cookieStore.get(name)?.value
           },
-          set(name: string, value: string, _options?: Record<string, unknown>) {
-            cookieStore.set(name, value, _options)
+          set(name: string, value: string, options?: Record<string, unknown>) {
+            cookieStore.set(name, value, options)
+            // Also set in response cookies to ensure they're sent to browser
+            response.cookies.set(name, value, options)
           },
           remove(name: string, _options?: Record<string, unknown>) {
             cookieStore.delete(name)
+            response.cookies.delete(name)
           },
         },
       }
@@ -36,7 +42,7 @@ export async function GET(request: NextRequest) {
           // For clock skew errors, try to refresh the session
           const { error: refreshError } = await supabase.auth.refreshSession()
           if (!refreshError) {
-            return NextResponse.redirect(new URL('/app', requestUrl.origin))
+            return response
           }
         }
         return NextResponse.redirect(new URL('/?authError=1', requestUrl.origin))
@@ -44,8 +50,8 @@ export async function GET(request: NextRequest) {
 
       // Verify we have a valid session
       if (data.session && data.user) {
-        // Success - redirect to app
-        return NextResponse.redirect(new URL('/app', requestUrl.origin))
+        // Session established successfully, cookies should be set
+        return response
       }
 
       // No valid session established
