@@ -51,3 +51,6 @@ jobs:
           # Provide dummy values for build-time environment variables
           NEXT_PUBLIC_SUPABASE_URL: "https://dummy.supabase.co"
           NEXT_PUBLIC_SUPABASE_ANON_KEY: "dummy-anon-key"
+          SUPABASE_SERVICE_ROLE: "dummy-service-role"
+          NEXT_PUBLIC_APP_ENV: "ci"
+          NEXT_PUBLIC_APP_URL: "https://dummy-app.vercel.app"
