@@ -20,14 +20,16 @@ function HomeContent() {
       })
     }
     
-    // Auto-redirect to /app if authenticated
-    if (user) {
-      router.push('/app')
+    // Auto-redirect to /app if authenticated and no auth error
+    if (user && !searchParams.get('authError')) {
+      const nextPath = searchParams.get('next') || '/app'
+      router.push(nextPath)
     }
   }, [searchParams, user, router])
 
   const handleGoToApp = () => {
-    router.push('/app')
+    const nextPath = searchParams.get('next') || '/app'
+    router.push(nextPath)
   }
   return (
     <div className="min-h-screen">
