@@ -21,7 +21,8 @@
       "Bash(git commit:*)",
       "WebFetch(domain:textnotepad-kbmj1kkl6-ramix24s-projects.vercel.app)",
       "Bash(start https://textnotepad-kbmj1kkl6-ramix24s-projects.vercel.app)",
-      "Bash(start https://textnotepad.vercel.app)"
+      "Bash(start https://textnotepad.vercel.app)",
+      "Bash(mv:*)"
     ],
     "deny": [],
     "ask": [],
