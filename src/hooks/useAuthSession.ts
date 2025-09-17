@@ -15,17 +15,45 @@ export function useAuthSession(): AuthSession {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setLoading(false)
-    })
+    // Get initial session with error handling for clock skew
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) {
+          // Handle clock skew errors
+          if (error.message.includes('issued in the future') || error.message.includes('clock skew')) {
+            // Try refreshing the session for clock skew issues
+            const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession()
+            if (!refreshError && refreshData.session) {
+              setSession(refreshData.session)
+            } else {
+              setSession(null)
+            }
+          } else {
+            setSession(null)
+          }
+        } else {
+          setSession(session)
+        }
+      } catch {
+        setSession(null)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    getInitialSession()
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        setSession(session)
+      } else if (event === 'SIGNED_OUT') {
+        setSession(null)
+      }
       setLoading(false)
     })
 
