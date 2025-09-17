@@ -28,15 +28,28 @@ export async function GET(request: NextRequest) {
     )
 
     try {
-      const { error } = await supabase.auth.exchangeCodeForSession(code)
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code)
       
       if (error) {
-        // Auth callback error
+        // Check for clock skew errors specifically
+        if (error.message.includes('issued in the future') || error.message.includes('clock skew')) {
+          // For clock skew errors, try to refresh the session
+          const { error: refreshError } = await supabase.auth.refreshSession()
+          if (!refreshError) {
+            return NextResponse.redirect(new URL('/app', requestUrl.origin))
+          }
+        }
         return NextResponse.redirect(new URL('/?authError=1', requestUrl.origin))
       }
 
-      // Success - redirect to app
-      return NextResponse.redirect(new URL('/app', requestUrl.origin))
+      // Verify we have a valid session
+      if (data.session && data.user) {
+        // Success - redirect to app
+        return NextResponse.redirect(new URL('/app', requestUrl.origin))
+      }
+
+      // No valid session established
+      return NextResponse.redirect(new URL('/?authError=1', requestUrl.origin))
     } catch {
       // Auth callback unexpected error
       return NextResponse.redirect(new URL('/?authError=1', requestUrl.origin))
