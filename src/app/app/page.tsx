@@ -1,6 +1,9 @@
 import { getSession } from '@/lib/getSession'
 import { AppView } from './AppView'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export default async function AppPage() {
   // Server-side: Verify user session (middleware already protects this route)
   const { user } = await getSession()
