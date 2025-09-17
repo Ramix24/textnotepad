@@ -19,7 +19,12 @@ function HomeContent() {
         description: 'There was an error signing you in. Please try again.',
       })
     }
-  }, [searchParams])
+    
+    // Auto-redirect to /app if authenticated
+    if (user) {
+      router.push('/app')
+    }
+  }, [searchParams, user, router])
 
   const handleGoToApp = () => {
     router.push('/app')
