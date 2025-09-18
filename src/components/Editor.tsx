@@ -2,13 +2,17 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
+import { LogOut } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
+import { Button } from '@/components/ui/button'
 import { useCountersWorker, type CountResult } from '@/hooks/useCountersWorker'
 import { useAutosave } from '@/hooks/useAutosave'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { getFileById } from '@/lib/userFiles.repo'
 import { supabase } from '@/lib/supabaseClient'
 import { UserFile } from '@/types/user-files.types'
 import { cn } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 interface EditorProps {
   file: UserFile
@@ -36,6 +40,8 @@ export function Editor({ file, className, onFileUpdate }: EditorProps) {
   
   // Refs for managing focus and keyboard shortcuts
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const router = useRouter()
+  const { user } = useAuthSession()
   
   // Web Worker for live statistics
   const { compute: computeStats } = useCountersWorker({ debounceMs: 150 })
@@ -104,6 +110,25 @@ export function Editor({ file, className, onFileUpdate }: EditorProps) {
       setIsLoadingStats(false)
     }
   }, [markDirty, computeStats])
+
+  // Handle sign out
+  const handleSignOut = useCallback(async () => {
+    try {
+      const { error } = await supabase.auth.signOut()
+
+      if (error) {
+        toast.error('Authentication failed, please retry', {
+          description: 'Unable to sign out. Please try again.',
+        })
+      } else {
+        router.push('/')
+      }
+    } catch {
+      toast.error('Authentication failed, please retry', {
+        description: 'An unexpected error occurred during sign out.',
+      })
+    }
+  }, [router])
 
   // Keyboard shortcuts
   const handleKeyDown = useCallback(async (event: React.KeyboardEvent) => {
@@ -177,13 +202,27 @@ export function Editor({ file, className, onFileUpdate }: EditorProps) {
           </span>
         </div>
         
-        {/* Save status */}
+        {/* Save status, user email, and sign out */}
         <div className="flex items-center space-x-3">
           <span className={cn('text-sm font-medium', getSaveStatusColor())}>
             {getSaveStatus()}
           </span>
           
-          {/* Optional: Additional controls could go here */}
+          {user?.email && (
+            <span className="text-sm text-gray-500">
+              {user.email}
+            </span>
+          )}
+          
+          <Button
+            onClick={handleSignOut}
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign out
+          </Button>
         </div>
       </div>
 

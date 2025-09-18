@@ -20,13 +20,13 @@ export function AuthButton() {
       })
 
       if (error) {
-        toast.error('Sign in failed', {
-          description: error.message,
+        toast.error('Authentication failed, please retry', {
+          description: 'Unable to sign in with Google. Please check your connection and try again.',
         })
       }
     } catch {
-      toast.error('Sign in failed', {
-        description: 'An unexpected error occurred',
+      toast.error('Authentication failed, please retry', {
+        description: 'An unexpected error occurred during sign in.',
       })
     }
   }

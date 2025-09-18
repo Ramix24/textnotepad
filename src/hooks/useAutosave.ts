@@ -145,13 +145,13 @@ export function useAutosave({
         if (error.details) {
           onConflict?.(error.details as UserFile)
         }
-        toast.error('File conflict detected', {
-          description: 'The file was modified elsewhere. Please refresh to see latest changes.',
+        toast.warning('Content updated on server, reloaded', {
+          description: 'Your document was modified elsewhere and has been refreshed with the latest version.',
         })
       } else {
         // Generic save error
-        toast.error('Failed to save file', {
-          description: error instanceof Error ? error.message : 'An unexpected error occurred',
+        toast.error('Failed to save changes', {
+          description: 'Unable to save your changes. Please check your connection and try again.',
         })
       }
     },
