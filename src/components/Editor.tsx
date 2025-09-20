@@ -83,11 +83,14 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     // Update content immediately for responsive typing
     setContent(newContent)
     
-    // Set dirty state
-    if (!isDirty) {
-      setIsDirty(true)
-      onDirtyChange?.(file.id, true)
-    }
+    // Set dirty state (use callback to avoid dependency on isDirty)
+    setIsDirty(prevIsDirty => {
+      if (!prevIsDirty) {
+        onDirtyChange?.(file.id, true)
+        return true
+      }
+      return prevIsDirty
+    })
     
     // Calculate statistics asynchronously (don't await)
     computeStats(newContent).then(newStats => {
@@ -95,7 +98,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     }).catch(() => {
       // Ignore stats calculation errors
     })
-  }, [isDirty, file.id, onDirtyChange, computeStats])
+  }, [file.id, onDirtyChange, computeStats])
 
   // Handle sign out
   const handleSignOut = useCallback(async () => {
@@ -135,12 +138,13 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     }
   }, [isDirty, content, saveMutation])
 
-  // Reset content when file changes (for file switching)
+  // Reset content when file ID changes (for file switching) 
+  // Don't reset on content changes as that would interfere with typing
   useEffect(() => {
     setContent(file.content)
     setIsDirty(false)
     onDirtyChange?.(file.id, false)
-  }, [file.id, file.content, onDirtyChange])
+  }, [file.id, onDirtyChange]) // Remove file.content dependency
 
   // Initialize stats on mount
   useEffect(() => {
