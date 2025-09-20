@@ -83,35 +83,11 @@ export function useAutosave({
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
   const pendingContentRef = useRef<string | null>(null)
   const currentVersionRef = useRef(file.version)
-  const saveMutationRef = useRef<any>(null)
 
   // Update version ref when file changes
   React.useEffect(() => {
     currentVersionRef.current = file.version
   }, [file.version])
-
-  // Simple debounced save scheduler (declared before mutation to avoid circular dependency)
-  const scheduleDeboundedSave = useCallback((content: string) => {
-    // Always store the latest content
-    pendingContentRef.current = content
-    
-    // Clear existing timer to reset the debounce
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current)
-    }
-    
-    // Schedule new save - this will get the latest content from the ref
-    debounceTimerRef.current = setTimeout(() => {
-      const contentToSave = pendingContentRef.current
-      const mutation = saveMutationRef.current
-      if (contentToSave !== null && mutation && !mutation.isPending) {
-        // Clear pending content and start save
-        pendingContentRef.current = null
-        mutation.mutate(contentToSave)
-      }
-      // If save is in progress, onSettled will handle the retry
-    }, debounceMs)
-  }, [debounceMs]) // Remove saveMutation dependency to avoid circular reference
 
   // TanStack Query mutation for saving
   const saveMutation = useMutation({
@@ -170,8 +146,26 @@ export function useAutosave({
     }
   })
 
-  // Store mutation reference for use in callbacks
-  saveMutationRef.current = saveMutation
+  // Simple debounced save scheduler
+  const scheduleDeboundedSave = useCallback((content: string) => {
+    // Always store the latest content
+    pendingContentRef.current = content
+    
+    // Clear existing timer to reset the debounce
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+    
+    // Schedule new save - this will get the latest content from the ref
+    debounceTimerRef.current = setTimeout(() => {
+      const contentToSave = pendingContentRef.current
+      if (contentToSave !== null) {
+        // Clear pending content and start save
+        pendingContentRef.current = null
+        saveMutation.mutate(contentToSave)
+      }
+    }, debounceMs)
+  }, [debounceMs, saveMutation])
 
   // Main API function - mark content as dirty and trigger save
   const markDirty = useCallback((newContent: string) => {
