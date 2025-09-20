@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Session, User } from '@supabase/supabase-js'
-import { supabase } from '@/lib/supabaseClient'
+import { useSupabase } from '@/components/SupabaseProvider'
 
 interface AuthSession {
   session: Session | null
@@ -11,6 +11,7 @@ interface AuthSession {
 }
 
 export function useAuthSession(): AuthSession {
+  const { supabase } = useSupabase()
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -58,7 +59,7 @@ export function useAuthSession(): AuthSession {
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [supabase])
 
   return {
     session,
