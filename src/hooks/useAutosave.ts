@@ -106,13 +106,13 @@ export function useAutosave({
     },
     
     onMutate: async (content: string) => {
-      // Optimistic update: immediately bump version locally
-      currentVersionRef.current += 1
+      // Store current version for rollback (don't increment optimistically)
+      const previousVersion = currentVersionRef.current
       setIsDirty(false)
       
       // Return rollback data in case of error
       return {
-        previousVersion: currentVersionRef.current - 1,
+        previousVersion,
         content,
       }
     },
@@ -134,7 +134,7 @@ export function useAutosave({
     },
     
     onError: (error, content, context) => {
-      // Rollback optimistic update
+      // Rollback optimistic update (version should already be correct)
       if (context) {
         currentVersionRef.current = context.previousVersion
         setIsDirty(true) // Mark as dirty again since save failed
