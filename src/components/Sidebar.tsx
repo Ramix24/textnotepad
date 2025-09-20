@@ -106,7 +106,7 @@ function FileItem({
             onChange={(e) => setEditName(e.target.value)}
             onBlur={handleSaveRename}
             onKeyDown={handleKeyDown}
-            className="w-full text-sm font-medium bg-white border rounded px-2 py-1"
+            className="w-full text-sm font-medium bg-white text-gray-900 border border-primary/20 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
             maxLength={120}
           />
         </div>
