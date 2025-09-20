@@ -38,7 +38,8 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
   const [content, setContent] = useState(file.content)
   const [isDirty, setIsDirty] = useState(false)
   const [stats, setStats] = useState<CountResult | null>(null)
-  // Removed setIsLoadingStats since we don't track loading state anymore
+  // Ref to track if we're updating from external file change vs user typing
+  const isExternalUpdate = useRef(false)
   
   // Refs for managing focus and keyboard shortcuts
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -82,11 +83,18 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
   const handleContentChange = useCallback((newContent: string) => {
     console.log('Content changing to:', newContent) // Debug log
     
+    // Skip if this is an external update (from file change)
+    if (isExternalUpdate.current) {
+      console.log('Skipping dirty state update - external update')
+      return
+    }
+    
     // Update content immediately for responsive typing
     setContent(newContent)
     
     // Set dirty state
     if (!isDirty) {
+      console.log('Setting dirty state to true')
       setIsDirty(true)
       onDirtyChange?.(file.id, true)
     }
@@ -139,10 +147,19 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
 
   // Initialize content when file changes
   useEffect(() => {
+    console.log('File changed, updating content:', file.content)
+    isExternalUpdate.current = true // Mark as external update
+    
     setContent(file.content)
     setIsDirty(false)
     onDirtyChange?.(file.id, false)
-  }, [file.id, file.content, onDirtyChange]) // Include file.content for initialization
+    
+    // Reset external update flag after a short delay
+    setTimeout(() => {
+      isExternalUpdate.current = false
+      console.log('External update flag reset')
+    }, 100)
+  }, [file.id, file.content, onDirtyChange])
 
   // Initialize stats on mount
   useEffect(() => {
