@@ -27,7 +27,7 @@ export async function GET(
 ): Promise<NextResponse<ApiResponse<UserFile>>> {
   const { id } = await params
   try {
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()
@@ -76,7 +76,7 @@ export async function PATCH(
 ): Promise<NextResponse<ApiResponse<UserFile>>> {
   const { id } = await params
   try {
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()
@@ -155,7 +155,7 @@ export async function DELETE(
 ): Promise<NextResponse<ApiResponse<null>>> {
   const { id } = await params
   try {
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()

@@ -18,7 +18,7 @@ export async function GET() {
     })
 
     // Try to create server client
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     console.log('Debug: Server client created')
     
     // Check session

@@ -17,7 +17,7 @@ interface CreateFileRequest {
  */
 export async function GET(): Promise<NextResponse<ApiResponse<UserFile[]>>> {
   try {
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()
@@ -46,7 +46,7 @@ export async function GET(): Promise<NextResponse<ApiResponse<UserFile[]>>> {
  */
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<UserFile>>> {
   try {
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()

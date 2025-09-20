@@ -52,7 +52,7 @@ export const supabaseServer = createClient(supabaseUrl, supabaseServiceRole, {
  * 
  * @returns Supabase client with user context from cookies
  */
-export function createServerClient() {
+export async function createServerClient() {
   // Ensure we're in server context
   ensureServerContext('createServerClient')
   
@@ -71,14 +71,16 @@ export function createServerClient() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { cookies } = require('next/headers')
 
+  const cookieStore = await cookies()
+
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       get(name: string) {
-        return cookies().get(name)?.value
+        return cookieStore.get(name)?.value
       },
       set(name: string, value: string, options?: Record<string, unknown>) {
         try {
-          cookies().set(name, value, options)
+          cookieStore.set(name, value, options)
         } catch {
           // The `set` method was called from a Server Component.
           // This can be ignored if you have middleware refreshing
@@ -87,7 +89,7 @@ export function createServerClient() {
       },
       remove(name: string, _options?: Record<string, unknown>) {
         try {
-          cookies().delete(name)
+          cookieStore.delete(name)
         } catch {
           // The `delete` method was called from a Server Component.
           // This can be ignored if you have middleware refreshing
