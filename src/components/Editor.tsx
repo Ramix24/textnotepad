@@ -137,13 +137,24 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     }
   }, [isDirty, content, saveMutation])
 
-  // Initialize content when file ID changes (for file switching only)
+  // Initialize content when file prop changes (only run when file is actually different)
+  const prevFileRef = useRef<UserFile | null>(null)
+  
   useEffect(() => {
-    console.log('File ID changed, updating content:', file.content)
-    setContent(file.content)
-    setIsDirty(false)
-    onDirtyChange?.(file.id, false)
-  }, [file.id, onDirtyChange]) // Remove file.content to prevent infinite loop
+    // Only update if the file has actually changed (by ID and version)
+    if (!prevFileRef.current || 
+        prevFileRef.current.id !== file.id || 
+        prevFileRef.current.version !== file.version) {
+      
+      console.log('File changed, updating content:', file.id, file.version)
+      setContent(file.content)
+      setIsDirty(false)
+      onDirtyChange?.(file.id, false)
+      
+      // Update the ref to track the current file
+      prevFileRef.current = file
+    }
+  }, [file, onDirtyChange])
 
   // Initialize stats on mount
   useEffect(() => {
