@@ -6,9 +6,9 @@ import { LogOut } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { useCountersWorker, type CountResult } from '@/hooks/useCountersWorker'
-import { useAutosave } from '@/hooks/useAutosave'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { updateFileContent, calculateContentStats } from '@/lib/userFiles.repo'
 import { useAuthSession } from '@/hooks/useAuthSession'
-import { getFileById } from '@/lib/userFiles.repo'
 import { useSupabase } from '@/components/SupabaseProvider'
 import { UserFile } from '@/types/user-files.types'
 import { cn } from '@/lib/utils'
@@ -44,50 +44,37 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const router = useRouter()
   const { user } = useAuthSession()
+  const queryClient = useQueryClient()
   
   // Web Worker for live statistics
   const { compute: computeStats } = useCountersWorker({ debounceMs: 150 })
   
-  // Autosave functionality
-  const { isSaving, markDirty, forceSave } = useAutosave({
-    file,
-    onSaved: (updatedFile) => {
+  // Simple save mutation without complex autosave logic
+  const saveMutation = useMutation({
+    mutationFn: async (content: string) => {
+      const stats = calculateContentStats(content)
+      return updateFileContent(supabase, {
+        id: file.id,
+        content,
+        version: file.version,
+        ...stats,
+      })
+    },
+    onSuccess: (updatedFile) => {
       setIsDirty(false)
       onDirtyChange?.(file.id, false)
       onFileUpdate?.(updatedFile)
+      
+      // Invalidate related queries
+      queryClient.invalidateQueries({ queryKey: ['userFile', file.id] })
+      queryClient.invalidateQueries({ queryKey: ['userFiles', file.user_id] })
+      
+      toast.success('Saved', { duration: 1000 })
     },
-    onConflict: async (_conflictingFile) => {
-      try {
-        // Fetch latest file from server for conflict resolution
-        const latestFile = await getFileById(supabase, file.id)
-        
-        if (latestFile) {
-          // MVP: Last write wins - replace local content with server content
-          setContent(latestFile.content)
-          setIsDirty(false)
-        onDirtyChange?.(file.id, false)
-          
-          // Update parent component with latest file
-          onFileUpdate?.(latestFile)
-          
-          toast.warning('Content updated from server', {
-            description: 'Your changes were overwritten by a newer version. Please review the current content.',
-            duration: 5000,
-          })
-        } else {
-          throw new Error('Could not fetch latest file version')
-        }
-      } catch {
-        // Error resolving conflict
-        toast.error('Conflict resolution failed', {
-          description: 'Unable to fetch latest version. Please refresh the page.',
-          duration: 5000,
-        })
-      }
-    },
-    config: {
-      debounceMs: 1000,  // 1 second after typing stops
-      throttleMs: 2000,  // Max 1 save every 2 seconds
+    onError: (error) => {
+      toast.error('Failed to save', {
+        description: error instanceof Error ? error.message : 'Unknown error'
+      })
     }
   })
 
@@ -102,16 +89,13 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
       onDirtyChange?.(file.id, true)
     }
     
-    // Trigger autosave (debounced)
-    markDirty(newContent)
-    
     // Calculate statistics asynchronously (don't await)
     computeStats(newContent).then(newStats => {
       setStats(newStats)
     }).catch(() => {
       // Ignore stats calculation errors
     })
-  }, [isDirty, file.id, onDirtyChange, markDirty, computeStats])
+  }, [isDirty, file.id, onDirtyChange, computeStats])
 
   // Handle sign out
   const handleSignOut = useCallback(async () => {
@@ -138,18 +122,18 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     if ((event.ctrlKey || event.metaKey) && event.key === 's') {
       event.preventDefault()
       
-      if (isDirty) {
-        try {
-          await forceSave()
-          toast.success('File saved manually', { duration: 2000 })
-        } catch {
-          toast.error('Manual save failed', {
-            description: 'Failed to save file',
-          })
-        }
+      if (isDirty && !saveMutation.isPending) {
+        saveMutation.mutate(content)
       }
     }
-  }, [isDirty, forceSave])
+  }, [isDirty, content, saveMutation])
+
+  // Save on blur (when user clicks away or tabs out)
+  const handleBlur = useCallback(() => {
+    if (isDirty && !saveMutation.isPending) {
+      saveMutation.mutate(content)
+    }
+  }, [isDirty, content, saveMutation])
 
   // Reset content when file changes (for file switching)
   useEffect(() => {
@@ -174,14 +158,14 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
 
   // Save status text
   const getSaveStatus = () => {
-    if (isSaving) return 'Saving…'
-    if (isDirty) return 'Unsaved'
+    if (saveMutation.isPending) return 'Saving…'
+    if (isDirty) return 'Press Ctrl+S to save'
     return 'Saved'
   }
 
   // Save status color
   const getSaveStatusColor = () => {
-    if (isSaving) return 'text-blue-600'
+    if (saveMutation.isPending) return 'text-blue-600'
     if (isDirty) return 'text-amber-600'
     return 'text-green-600'
   }
@@ -242,6 +226,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
           value={content}
           onChange={(e) => handleContentChange(e.target.value)}
           onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
           className={cn(
             'flex-1 w-full p-4 bg-background text-foreground',
             'font-mono text-sm leading-relaxed', // Monospace for code-like editing
@@ -250,7 +235,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
           placeholder="Start typing your content here..."
-          disabled={isSaving}
+          disabled={saveMutation.isPending}
           aria-label="Text editor"
           aria-describedby="editor-stats"
           spellCheck={true}
