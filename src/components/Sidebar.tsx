@@ -16,21 +16,6 @@ interface SidebarProps {
   isDirtyMap?: Record<string, boolean>
 }
 
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInMs = now.getTime() - date.getTime()
-  const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
-  const diffInHours = Math.floor(diffInMinutes / 60)
-  const diffInDays = Math.floor(diffInHours / 24)
-  
-  if (diffInMinutes < 1) return 'just now'
-  if (diffInMinutes < 60) return `${diffInMinutes}m ago`
-  if (diffInHours < 24) return `${diffInHours}h ago`
-  if (diffInDays < 7) return `${diffInDays}d ago`
-  
-  return date.toLocaleDateString()
-}
 
 interface FileItemProps {
   file: UserFile
@@ -148,13 +133,10 @@ function FileItem({
                     title="Unsaved changes"
                   />
                 )}
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium text-foreground truncate">
                   {file.name}
                 </p>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
-                {formatRelativeTime(file.updated_at)}
-              </p>
             </div>
             <button
               onClick={(e) => {
@@ -241,11 +223,11 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
   }, [files, currentFileId])
 
   return (
-    <div className={`flex flex-col h-full bg-gray-50 border-r ${className}`} data-testid="sidebar">
+    <div className={`w-80 max-w-sm min-w-64 flex flex-col h-full bg-background border-r ${className}`} data-testid="sidebar">
       {/* Header */}
       <div className="p-4 border-b">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-gray-900">Notes</h2>
+          <h2 className="font-semibold text-foreground">Notes</h2>
           <Button 
             size="sm" 
             variant="outline"
@@ -256,7 +238,7 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
           </Button>
         </div>
         {user && (
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-muted-foreground">
             {user.email}
           </div>
         )}
@@ -276,11 +258,11 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
         ) : error ? (
           <div className="p-4 text-center text-red-600">
             <p className="text-sm">Failed to load files</p>
-            <p className="text-xs text-gray-500 mt-1">{error.message}</p>
+            <p className="text-xs text-muted-foreground mt-1">{error.message}</p>
           </div>
         ) : !files || files.length === 0 ? (
           <div className="p-4 text-center">
-            <p className="text-sm text-gray-500 mb-3">No notes yet</p>
+            <p className="text-sm text-muted-foreground mb-3">No notes yet</p>
             <Button 
               size="sm" 
               onClick={handleCreateFile}
@@ -318,7 +300,7 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
 
       {/* Footer */}
       <div className="p-4 border-t">
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-muted-foreground">
           {files ? `${files.length} note${files.length !== 1 ? 's' : ''}` : '0 notes'}
         </div>
       </div>
