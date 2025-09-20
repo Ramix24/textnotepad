@@ -1,111 +1,191 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { User } from '@supabase/supabase-js'
-import { toast } from 'sonner'
+import { useState, useEffect } from 'react'
 import { AppShell } from '@/components/AppShell'
 import { Editor } from '@/components/Editor'
 import { EditorSkeleton } from '@/components/EditorSkeleton'
-import { supabase } from '@/lib/supabaseClient'
-import { getLatestFileForUser, createDefaultFile } from '@/lib/userFiles.repo'
+import { Sidebar } from '@/components/Sidebar'
+import { QuickSwitchModal } from '@/components/QuickSwitchModal'
 import { UserFile } from '@/types/user-files.types'
+import { getOrCreateLatestFile, getFileById } from '@/lib/userFiles.repo'
+import { supabase } from '@/lib/supabaseClient'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { useCreateFile } from '@/hooks/useFiles'
+import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts'
+import { toast } from 'sonner'
 
 interface AppViewProps {
-  user: User | null
+  user: any
 }
 
 export function AppView({ user: _user }: AppViewProps) {
+  const [currentFileId, setCurrentFileId] = useState<string | null>(null)
   const [currentFile, setCurrentFile] = useState<UserFile | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [isLoadingFile, setIsLoadingFile] = useState(true)
+  const [isQuickSwitchOpen, setIsQuickSwitchOpen] = useState(false)
+  const [isDirtyMap, setIsDirtyMap] = useState<Record<string, boolean>>({})
+  const { user: clientUser, loading: authLoading } = useAuthSession()
+  const createFile = useCreateFile()
   
   // Use client-side auth when server-side user is null
-  const { user: clientUser } = useAuthSession()
   const user = _user || clientUser
 
+  // Load latest file on mount if user is authenticated
   useEffect(() => {
-    const loadCurrentFile = async () => {
+    const loadLatestFile = async () => {
+      if (authLoading || !user) {
+        setIsLoadingFile(false)
+        return
+      }
+
       try {
-        setLoading(true)
-        setError(null)
-        
-        // Only load files if user is authenticated
-        if (!user) {
-          setLoading(false)
-          return
-        }
-        
-        // First, try to get the latest file for the user
-        let file = await getLatestFileForUser(supabase)
-        
-        if (!file) {
-          // No existing file found, create a default "Untitled" document
-          file = await createDefaultFile(supabase)
-          
-          // Show toast for new file creation
-          toast.success('New note created', {
-            description: 'A new document has been created and is ready for editing.',
-            duration: 3000,
-          })
-        }
-        
+        setIsLoadingFile(true)
+        const file = await getOrCreateLatestFile(supabase)
         setCurrentFile(file)
-      } catch {
-        // Error loading current file
-        setError('Failed to load document')
-        toast.error('Failed to load document', {
-          description: 'There was an error loading your document. Please try again.',
+        setCurrentFileId(file.id)
+      } catch (error) {
+        console.error('Failed to load latest file:', error)
+        toast.error('Failed to load file', {
+          description: error instanceof Error ? error.message : 'Unknown error'
         })
       } finally {
-        setLoading(false)
+        setIsLoadingFile(false)
       }
     }
 
-    loadCurrentFile()
-  }, [user])
+    loadLatestFile()
+  }, [user, authLoading])
 
-  if (loading) {
+  // Handle file selection from sidebar
+  const handleFileSelect = async (fileId: string) => {
+    if (fileId === currentFileId) {
+      return // Already selected
+    }
+
+    try {
+      setIsLoadingFile(true)
+      const file = await getFileById(supabase, fileId)
+      setCurrentFile(file)
+      setCurrentFileId(fileId)
+      // Initialize dirty state for new file if not exists
+      if (!(fileId in isDirtyMap)) {
+        setIsDirtyMap(prev => ({
+          ...prev,
+          [fileId]: false
+        }))
+      }
+    } catch (error) {
+      console.error('Failed to load file:', error)
+      toast.error('Failed to load file', {
+        description: error instanceof Error ? error.message : 'File not found or access denied'
+      })
+    } finally {
+      setIsLoadingFile(false)
+    }
+  }
+
+  // Update currentFile when Editor saves changes
+  const handleFileUpdate = (updatedFile: UserFile) => {
+    setCurrentFile(updatedFile)
+    // Clear dirty state when file is saved
+    setIsDirtyMap(prev => ({
+      ...prev,
+      [updatedFile.id]: false
+    }))
+  }
+
+  // Handle dirty state changes from Editor
+  const handleDirtyChange = (fileId: string, isDirty: boolean) => {
+    setIsDirtyMap(prev => ({
+      ...prev,
+      [fileId]: isDirty
+    }))
+  }
+
+  // Handle new file creation via keyboard shortcut
+  const handleNewFile = async () => {
+    if (!user) return
+    
+    try {
+      const newFile = await createFile.mutateAsync({})
+      handleFileSelect(newFile.id)
+    } catch {
+      // Error handling is done in the hook
+    }
+  }
+
+  // Handle save via keyboard shortcut (delegate to Editor)
+  const handleSave = () => {
+    // The Editor component handles Ctrl+S internally
+    // This is here for completeness and future expansion
+  }
+
+  // Handle quick switch modal
+  const handleQuickSwitch = () => {
+    if (!user) return
+    setIsQuickSwitchOpen(true)
+  }
+
+  // Global keyboard shortcuts
+  useGlobalShortcuts({
+    onNewFile: handleNewFile,
+    onSave: handleSave,
+    onQuickSwitch: handleQuickSwitch,
+  })
+
+  // Show loading or auth states
+  if (authLoading) {
     return (
-      <AppShell>
-        <div className="h-full">
-          <EditorSkeleton className="h-full" />
-        </div>
-      </AppShell>
+      <AppShell
+        sidebar={<div className="p-4 text-center text-gray-500">Loading...</div>}
+        content={<EditorSkeleton className="h-full" />}
+      />
     )
   }
 
-  if (error || !currentFile) {
+  if (!user) {
     return (
-      <AppShell>
-        <div className="flex items-center justify-center h-full p-6">
-          <div className="text-center space-y-4">
-            <h1 className="text-3xl font-bold text-foreground">Error</h1>
-            <p className="text-muted-foreground">
-              {error || 'Unable to load document'}
-            </p>
-          </div>
-        </div>
-      </AppShell>
+      <AppShell
+        sidebar={<Sidebar />}
+        content={<div className="flex items-center justify-center h-full p-6 text-center text-gray-500">Please sign in to access your notes</div>}
+      />
     )
   }
 
   return (
-    <AppShell>
-      <div className="h-full">
-        <Editor 
-          file={currentFile}
-          onFileUpdate={setCurrentFile}
-          className="h-full"
-        />
-      </div>
-    </AppShell>
+    <>
+      <AppShell
+        sidebar={
+          <Sidebar 
+            currentFileId={currentFileId}
+            onSelect={handleFileSelect}
+            isDirtyMap={isDirtyMap}
+          />
+        }
+        content={
+          isLoadingFile ? (
+            <EditorSkeleton className="h-full" />
+          ) : currentFile ? (
+            <Editor 
+              key={currentFile.id} 
+              file={currentFile}
+              onFileUpdate={handleFileUpdate}
+              onDirtyChange={handleDirtyChange}
+              className="h-full"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full p-6 text-center text-gray-500">No file selected</div>
+          )
+        }
+      />
+      
+      {/* Quick Switch Modal */}
+      <QuickSwitchModal
+        isOpen={isQuickSwitchOpen}
+        onClose={() => setIsQuickSwitchOpen(false)}
+        onSelectFile={handleFileSelect}
+        currentFileId={currentFileId}
+      />
+    </>
   )
 }
-
-// TODO Sprint 5: Extract Editor component and implement:
-// - Real-time text editing with debounced auto-save
-// - Content statistics calculation on change
-// - Version conflict resolution UI
-// - Optimistic updates with rollback on error
-// - Keyboard shortcuts and formatting tools

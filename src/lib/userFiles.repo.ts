@@ -21,6 +21,48 @@ export class NotFoundError extends Error {
 type TypedSupabaseClient = SupabaseClient<Database>
 
 /**
+ * Validate and normalize file name
+ */
+function validateFileName(name?: string): string {
+  if (!name || !name.trim()) {
+    return 'Untitled'
+  }
+  
+  const trimmed = name.trim()
+  if (trimmed.length > 120) {
+    return trimmed.substring(0, 117) + '…'
+  }
+  
+  return trimmed
+}
+
+/**
+ * Get all files for a user (ordered by most recent, excluding deleted)
+ */
+export async function listFilesForUser(
+  supabase: TypedSupabaseClient
+): Promise<UserFile[]> {
+  const { data: session } = await supabase.auth.getSession()
+  
+  if (!session.session?.user?.id) {
+    throw new Error('User not authenticated')
+  }
+
+  const { data, error } = await supabase
+    .from('user_files')
+    .select('*')
+    .eq('user_id', session.session.user.id)
+    .is('deleted_at', null)
+    .order('updated_at', { ascending: false })
+
+  if (error) {
+    throw new Error(`Failed to list files: ${error.message}`)
+  }
+
+  return data || []
+}
+
+/**
  * Get the latest file for a user (most recently updated, not deleted)
  */
 export async function getLatestFileForUser(
@@ -46,17 +88,18 @@ export async function getLatestFileForUser(
     if (error.code === 'PGRST116') {
       return null
     }
-    throw error
+    throw new Error(`Failed to get latest file: ${error.message}`)
   }
 
   return data
 }
 
 /**
- * Create a default "Untitled" file for the user
+ * Create a new file with auto-generated name if none provided
  */
-export async function createDefaultFile(
-  supabase: TypedSupabaseClient
+export async function createFile(
+  supabase: TypedSupabaseClient,
+  params: { name?: string } = {}
 ): Promise<UserFile> {
   const { data: session } = await supabase.auth.getSession()
   
@@ -64,10 +107,20 @@ export async function createDefaultFile(
     throw new Error('User not authenticated')
   }
 
+  let fileName = validateFileName(params.name)
+  
+  // If no name provided or name is "Untitled", generate "Untitled N"
+  if (!params.name || fileName === 'Untitled') {
+    const existingFiles = await listFilesForUser(supabase)
+    const untitledFiles = existingFiles.filter(f => f.name.startsWith('Untitled'))
+    const nextNumber = untitledFiles.length > 0 ? untitledFiles.length + 1 : 1
+    fileName = nextNumber === 1 ? 'Untitled' : `Untitled ${nextNumber}`
+  }
+
   const defaultContent = ''
   const fileData: InsertUserFile = {
     user_id: session.session.user.id,
-    name: 'Untitled',
+    name: fileName,
     content: defaultContent,
     word_count: 0,
     char_count: 0,
@@ -84,7 +137,88 @@ export async function createDefaultFile(
     .single()
 
   if (error) {
-    throw error
+    throw new Error(`Failed to create file: ${error.message}`)
+  }
+
+  return data
+}
+
+/**
+ * Create a default "Untitled" file for the user
+ */
+export async function createDefaultFile(
+  supabase: TypedSupabaseClient
+): Promise<UserFile> {
+  return createFile(supabase)
+}
+
+/**
+ * Rename a file
+ */
+export async function renameFile(
+  supabase: TypedSupabaseClient,
+  params: { id: string; name: string }
+): Promise<UserFile> {
+  const { data: session } = await supabase.auth.getSession()
+  
+  if (!session.session?.user?.id) {
+    throw new Error('User not authenticated')
+  }
+
+  const validatedName = validateFileName(params.name)
+
+  const { data, error } = await supabase
+    .from('user_files')
+    .update({ 
+      name: validatedName,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', params.id)
+    .eq('user_id', session.session.user.id)
+    .is('deleted_at', null)
+    .select()
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      throw new Error('File not found or access denied')
+    }
+    throw new Error(`Failed to rename file: ${error.message}`)
+  }
+
+  return data
+}
+
+/**
+ * Soft delete a file (set deleted_at timestamp)
+ */
+export async function softDeleteFile(
+  supabase: TypedSupabaseClient,
+  params: { id: string }
+): Promise<UserFile> {
+  const { data: session } = await supabase.auth.getSession()
+  
+  if (!session.session?.user?.id) {
+    throw new Error('User not authenticated')
+  }
+
+  const { data, error } = await supabase
+    .from('user_files')
+    .update({ 
+      deleted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', params.id)
+    .eq('user_id', session.session.user.id)
+    .is('deleted_at', null)
+    .select()
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      throw new Error('File not found or access denied')
+    }
+    throw new Error(`Failed to delete file: ${error.message}`)
   }
 
   return data
@@ -96,7 +230,7 @@ export async function createDefaultFile(
 export async function getFileById(
   supabase: TypedSupabaseClient,
   id: string
-): Promise<UserFile | null> {
+): Promise<UserFile> {
   const { data: session } = await supabase.auth.getSession()
   
   if (!session.session?.user?.id) {
@@ -113,9 +247,9 @@ export async function getFileById(
 
   if (error) {
     if (error.code === 'PGRST116') {
-      return null
+      throw new Error('File not found or access denied')
     }
-    throw error
+    throw new Error(`Failed to get file: ${error.message}`)
   }
 
   return data
@@ -172,7 +306,7 @@ export async function updateFileContent(
         { id, version }
       )
     }
-    throw error
+    throw new Error(`Failed to update file content: ${error.message}`)
   }
 
   return data

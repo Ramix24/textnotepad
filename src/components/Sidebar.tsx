@@ -1,242 +1,329 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { ChevronLeft, ChevronRight, FileText, Folder, Plus, Settings } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { AuthButton } from '@/components/AuthButton'
+import { useAuthSession } from '@/hooks/useAuthSession'
+import { useFilesList, useCreateFile, useRenameFile, useDeleteFile } from '@/hooks/useFiles'
+import { UserFile } from '@/types/user-files.types'
+import { Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 
-export function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const [width, setWidth] = useState(256) // Default width in pixels
-  const sidebarRef = useRef<HTMLDivElement>(null)
-  const isResizing = useRef(false)
+interface SidebarProps {
+  className?: string
+  currentFileId?: string | null
+  onSelect?: (id: string) => void
+  isDirtyMap?: Record<string, boolean>
+}
 
-  const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed)
+function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffInMs = now.getTime() - date.getTime()
+  const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
+  const diffInHours = Math.floor(diffInMinutes / 60)
+  const diffInDays = Math.floor(diffInHours / 24)
+  
+  if (diffInMinutes < 1) return 'just now'
+  if (diffInMinutes < 60) return `${diffInMinutes}m ago`
+  if (diffInHours < 24) return `${diffInHours}h ago`
+  if (diffInDays < 7) return `${diffInDays}d ago`
+  
+  return date.toLocaleDateString()
+}
+
+interface FileItemProps {
+  file: UserFile
+  isSelected: boolean
+  isCurrent: boolean
+  isDirty: boolean
+  onSelect: (id: string) => void
+  onRename: (id: string, newName: string) => void
+  onDelete: (id: string) => void
+  selectedIndex: number
+  itemIndex: number
+}
+
+function FileItem({ 
+  file, 
+  isSelected, 
+  isCurrent, 
+  isDirty, 
+  onSelect, 
+  onRename, 
+  onDelete,
+  selectedIndex,
+  itemIndex
+}: FileItemProps) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [editName, setEditName] = useState(file.name)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.select()
+    }
+  }, [isEditing])
+
+  useEffect(() => {
+    if (selectedIndex === itemIndex && buttonRef.current) {
+      buttonRef.current.focus()
+    }
+  }, [selectedIndex, itemIndex])
+
+  const handleDoubleClick = () => {
+    setIsEditing(true)
+    setEditName(file.name)
   }
 
-  const startResize = useCallback((e: React.MouseEvent) => {
-    if (isCollapsed) return
-    
-    isResizing.current = true
-    e.preventDefault()
-    e.stopPropagation()
-    
-    const startX = e.clientX
-    const startWidth = width
-    
-    // Add user-select none to prevent text selection during resize
-    document.body.style.userSelect = 'none'
-    document.body.style.cursor = 'col-resize'
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing.current) return
-      
-      const deltaX = e.clientX - startX
-      const newWidth = Math.min(Math.max(startWidth + deltaX, 224), window.innerWidth * 0.5) // Min 224px, Max 50vw
-      setWidth(newWidth)
+  const handleSaveRename = () => {
+    if (editName.trim() && editName !== file.name) {
+      onRename(file.id, editName.trim())
     }
+    setIsEditing(false)
+  }
 
-    const handleMouseUp = () => {
-      isResizing.current = false
-      document.body.style.userSelect = ''
-      document.body.style.cursor = ''
-      
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
+  const handleCancelRename = () => {
+    setIsEditing(false)
+    setEditName(file.name)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSaveRename()
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      handleCancelRename()
     }
-
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
-  }, [width, isCollapsed])
+  }
 
   return (
-    <div className="relative flex h-full">
-      {/* Main sidebar container */}
-      <div 
-        ref={sidebarRef}
-        className={`flex flex-col h-full bg-card transition-all duration-300 ${
-          isCollapsed ? 'w-12' : ''
-        }`}
-        style={isCollapsed ? {} : { width: `${width}px` }}
-      >
-        {/* Header with collapse button */}
-        <div className="flex items-center justify-between h-12 px-4 border-b border-border/50">
-          {!isCollapsed && (
-            <h2 className="text-sm font-medium text-foreground">Explorer</h2>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleCollapse}
-            className="h-7 w-7 hover:bg-muted/50 transition-colors"
-            aria-expanded={!isCollapsed}
-            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+    <div
+      className={`group relative rounded-lg transition-colors ${
+        isSelected
+          ? 'bg-blue-100 border border-blue-200'
+          : 'hover:bg-gray-100'
+      }`}
+      role="option"
+      aria-selected={isSelected}
+      data-testid="file-item"
+    >
+      {isEditing ? (
+        <div className="p-3">
+          <input
+            ref={inputRef}
+            type="text"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            onBlur={handleSaveRename}
+            onKeyDown={handleKeyDown}
+            className="w-full text-sm font-medium bg-white border rounded px-2 py-1"
+            maxLength={120}
+          />
+        </div>
+      ) : (
+        <button
+          ref={buttonRef}
+          onClick={() => onSelect(file.id)}
+          onDoubleClick={handleDoubleClick}
+          className="w-full text-left p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset rounded-lg"
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                {isCurrent && (
+                  <span 
+                    className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                      isDirty ? 'bg-orange-500' : 'bg-blue-500'
+                    }`}
+                    title={isDirty ? 'Unsaved changes' : 'Current file'}
+                  />
+                )}
+                {isDirty && !isCurrent && (
+                  <span 
+                    className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0"
+                    title="Unsaved changes"
+                  />
+                )}
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {file.name}
+                </p>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                {formatRelativeTime(file.updated_at)}
+              </p>
+            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onDelete(file.id)
+              }}
+              className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 rounded transition-opacity"
+              title="Delete file"
+            >
+              <Trash2 className="w-3 h-3 text-gray-400 hover:text-red-600" />
+            </button>
+          </div>
+        </button>
+      )}
+    </div>
+  )
+}
+
+export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }: SidebarProps) {
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const { user } = useAuthSession()
+  const { data: files, isLoading, error } = useFilesList()
+  const createFile = useCreateFile()
+  const renameFile = useRenameFile()
+  const deleteFile = useDeleteFile()
+  const listRef = useRef<HTMLDivElement>(null)
+
+  const handleCreateFile = async () => {
+    try {
+      const newFile = await createFile.mutateAsync({})
+      onSelect?.(newFile.id)
+    } catch {
+      // Error handling is done in the hook
+    }
+  }
+
+  const handleSelectFile = (id: string) => {
+    onSelect?.(id)
+    const index = files?.findIndex(f => f.id === id) ?? 0
+    setSelectedIndex(index)
+  }
+
+  const handleRename = (id: string, newName: string) => {
+    renameFile.mutate({ id, name: newName })
+  }
+
+  const handleDelete = (id: string) => {
+    if (files && files.length === 1) {
+      toast.error('Cannot delete the last remaining file')
+      return
+    }
+    deleteFile.mutate(id)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!files || files.length === 0) return
+
+    switch (e.key) {
+      case 'ArrowUp':
+        e.preventDefault()
+        setSelectedIndex(prev => Math.max(0, prev - 1))
+        break
+      case 'ArrowDown':
+        e.preventDefault()
+        setSelectedIndex(prev => Math.min(files.length - 1, prev + 1))
+        break
+      case 'Enter':
+        e.preventDefault()
+        if (files[selectedIndex]) {
+          handleSelectFile(files[selectedIndex].id)
+        }
+        break
+    }
+  }
+
+  // Update selected index when currentFileId changes
+  useEffect(() => {
+    if (files && currentFileId) {
+      const index = files.findIndex(f => f.id === currentFileId)
+      if (index !== -1) {
+        setSelectedIndex(index)
+      }
+    }
+  }, [files, currentFileId])
+
+  return (
+    <div className={`flex flex-col h-full bg-gray-50 border-r ${className}`} data-testid="sidebar">
+      {/* Header */}
+      <div className="p-4 border-b">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold text-gray-900">Notes</h2>
+          <Button 
+            size="sm" 
+            variant="outline"
+            onClick={handleCreateFile}
+            disabled={createFile.isPending}
           >
-            {isCollapsed ? (
-              <ChevronRight className="h-3.5 w-3.5" />
-            ) : (
-              <ChevronLeft className="h-3.5 w-3.5" />
-            )}
+            {createFile.isPending ? 'Creating...' : 'New'}
           </Button>
         </div>
-
-        {/* Action buttons */}
-        {!isCollapsed && (
-          <div className="px-4 py-3 space-y-1.5">
-            <Button 
-              variant="secondary" 
-              size="sm" 
-              className="w-full justify-start h-8 text-xs font-normal"
-            >
-              <Plus className="h-3.5 w-3.5 mr-2" />
-              New Document
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="w-full justify-start h-8 text-xs font-normal hover:bg-muted/50"
-            >
-              <Folder className="h-3.5 w-3.5 mr-2" />
-              Open Folder
-            </Button>
+        {user && (
+          <div className="text-xs text-gray-500 mb-2">
+            {user.email}
           </div>
         )}
-
-        {/* File list */}
-        <div className="flex-1 overflow-auto">
-          {isCollapsed ? (
-            <div className="flex flex-col items-center py-4 space-y-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 hover:bg-muted/50"
-                aria-label="Document"
-              >
-                <FileText className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 hover:bg-muted/50"
-                aria-label="Settings"
-              >
-                <Settings className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          ) : (
-            <div className="px-4 py-2">
-              <div 
-                className="mb-3 px-2"
-                style={{
-                  fontSize: '11px',
-                  fontWeight: '500',
-                  color: '#9ca3af',
-                  letterSpacing: '0.05em',
-                  textTransform: 'uppercase'
-                }}
-              >
-                RECENT FILES
-              </div>
-              <div className="space-y-0.5">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start h-7 px-2 text-xs font-normal hover:bg-muted/50"
-                >
-                  <FileText className="h-3.5 w-3.5 mr-2.5 shrink-0 text-muted-foreground" />
-                  <span className="truncate">Untitled Document.md</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start h-7 px-2 text-xs font-normal hover:bg-muted/50"
-                >
-                  <FileText className="h-3.5 w-3.5 mr-2.5 shrink-0 text-muted-foreground" />
-                  <span className="truncate">Meeting Notes.txt</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-start h-7 px-2 text-xs font-normal hover:bg-muted/50"
-                >
-                  <FileText className="h-3.5 w-3.5 mr-2.5 shrink-0 text-muted-foreground" />
-                  <span className="truncate">Project Ideas.md</span>
-                </Button>
-              </div>
-              
-              <Separator className="my-4" />
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start h-7 px-2 text-xs font-normal hover:bg-muted/50"
-              >
-                <Settings className="h-3.5 w-3.5 mr-2.5 shrink-0 text-muted-foreground" />
-                <span className="truncate">Settings</span>
-              </Button>
-            </div>
-          )}
-        </div>
+        <AuthButton />
       </div>
 
-      {/* WORKING RESIZE HANDLE - GUARANTEED VISIBLE */}
-      {!isCollapsed && (
-        <div
-          onMouseDown={startResize}
-          role="separator"
-          aria-label="Resize sidebar"
-          aria-orientation="vertical"
-          title="DRAG HERE TO RESIZE SIDEBAR"
-          style={{
-            width: '6px',
-            height: '100%',
-            cursor: 'col-resize',
-            flexShrink: 0,
-            position: 'relative',
-            backgroundColor: 'transparent',
-            borderRight: '1px solid #e5e7eb',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#f3f4f6'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent'
-          }}
-        >
-          {/* Subtle grip indicator */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '2px',
-            alignItems: 'center',
-            opacity: '0.4'
-          }}>
-            <div style={{
-              width: '1px',
-              height: '4px',
-              backgroundColor: '#9ca3af',
-              borderRadius: '0.5px'
-            }} />
-            <div style={{
-              width: '1px',
-              height: '4px',
-              backgroundColor: '#9ca3af',
-              borderRadius: '0.5px'
-            }} />
-            <div style={{
-              width: '1px',
-              height: '4px',
-              backgroundColor: '#9ca3af',
-              borderRadius: '0.5px'
-            }} />
+      {/* File List */}
+      <div className="flex-1 overflow-y-auto p-2">
+        {isLoading ? (
+          <div className="space-y-3">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="p-3">
+                <Skeleton className="h-4 w-3/4 mb-2" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            ))}
           </div>
+        ) : error ? (
+          <div className="p-4 text-center text-red-600">
+            <p className="text-sm">Failed to load files</p>
+            <p className="text-xs text-gray-500 mt-1">{error.message}</p>
+          </div>
+        ) : !files || files.length === 0 ? (
+          <div className="p-4 text-center">
+            <p className="text-sm text-gray-500 mb-3">No notes yet</p>
+            <Button 
+              size="sm" 
+              onClick={handleCreateFile}
+              disabled={createFile.isPending}
+            >
+              {createFile.isPending ? 'Creating...' : 'New note'}
+            </Button>
+          </div>
+        ) : (
+          <div 
+            ref={listRef}
+            className="space-y-1"
+            role="listbox"
+            aria-label="Files list"
+            tabIndex={0}
+            onKeyDown={handleKeyDown}
+          >
+            {files.map((file, index) => (
+              <FileItem
+                key={file.id}
+                file={file}
+                isSelected={selectedIndex === index}
+                isCurrent={currentFileId === file.id}
+                isDirty={isDirtyMap[file.id] || false}
+                onSelect={handleSelectFile}
+                onRename={handleRename}
+                onDelete={handleDelete}
+                selectedIndex={selectedIndex}
+                itemIndex={index}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="p-4 border-t">
+        <div className="text-xs text-gray-500">
+          {files ? `${files.length} note${files.length !== 1 ? 's' : ''}` : '0 notes'}
         </div>
-      )}
+      </div>
     </div>
   )
 }

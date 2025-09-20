@@ -1,17 +1,17 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { Sidebar } from './Sidebar'
 
 interface AppShellProps {
-  children: ReactNode
+  sidebar: ReactNode
+  content: ReactNode
 }
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ sidebar, content }: AppShellProps) {
   return (
     <div className="fixed inset-0 flex overflow-hidden bg-background">
       {/* Sidebar with resize handle */}
-      <Sidebar />
+      {sidebar}
       
       {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
@@ -29,7 +29,7 @@ export function AppShell({ children }: AppShellProps) {
         
         {/* Main content */}
         <main className="flex-1 overflow-auto bg-background">
-          {children}
+          {content}
         </main>
       </div>
     </div>

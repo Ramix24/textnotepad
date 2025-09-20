@@ -18,6 +18,7 @@ interface EditorProps {
   file: UserFile
   className?: string
   onFileUpdate?: (updatedFile: UserFile) => void
+  onDirtyChange?: (fileId: string, isDirty: boolean) => void
 }
 
 /**
@@ -31,7 +32,7 @@ interface EditorProps {
  * - Accessible design with proper ARIA labels
  * - Monospace font for code editing or clean sans-serif for prose
  */
-export function Editor({ file, className, onFileUpdate }: EditorProps) {
+export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorProps) {
   // Local state management
   const [content, setContent] = useState(file.content)
   const [isDirty, setIsDirty] = useState(false)
@@ -51,6 +52,7 @@ export function Editor({ file, className, onFileUpdate }: EditorProps) {
     file,
     onSaved: (updatedFile) => {
       setIsDirty(false)
+      onDirtyChange?.(file.id, false)
       onFileUpdate?.(updatedFile)
       toast.success('File saved', {
         description: `Saved at ${new Date().toLocaleTimeString()}`,
@@ -66,6 +68,7 @@ export function Editor({ file, className, onFileUpdate }: EditorProps) {
           // MVP: Last write wins - replace local content with server content
           setContent(latestFile.content)
           setIsDirty(false)
+        onDirtyChange?.(file.id, false)
           
           // Update parent component with latest file
           onFileUpdate?.(latestFile)
@@ -95,6 +98,7 @@ export function Editor({ file, className, onFileUpdate }: EditorProps) {
   const handleContentChange = useCallback(async (newContent: string) => {
     setContent(newContent)
     setIsDirty(true)
+    onDirtyChange?.(file.id, true)
     
     // Trigger autosave
     markDirty(newContent)
@@ -148,6 +152,13 @@ export function Editor({ file, className, onFileUpdate }: EditorProps) {
       }
     }
   }, [isDirty, forceSave])
+
+  // Reset content when file changes (for file switching)
+  useEffect(() => {
+    setContent(file.content)
+    setIsDirty(false)
+    onDirtyChange?.(file.id, false)
+  }, [file.id, file.content, onDirtyChange])
 
   // Initialize stats on mount
   useEffect(() => {
@@ -246,6 +257,7 @@ export function Editor({ file, className, onFileUpdate }: EditorProps) {
           aria-describedby="editor-stats"
           spellCheck={true}
           autoComplete="off"
+          data-testid="editor-textarea"
           autoCorrect="off"
           autoCapitalize="sentences"
         />
