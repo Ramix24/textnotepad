@@ -80,17 +80,16 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
 
   // Handle content changes
   const handleContentChange = useCallback((newContent: string) => {
+    console.log('Content changing to:', newContent) // Debug log
+    
     // Update content immediately for responsive typing
     setContent(newContent)
     
-    // Set dirty state (use callback to avoid dependency on isDirty)
-    setIsDirty(prevIsDirty => {
-      if (!prevIsDirty) {
-        onDirtyChange?.(file.id, true)
-        return true
-      }
-      return prevIsDirty
-    })
+    // Set dirty state
+    if (!isDirty) {
+      setIsDirty(true)
+      onDirtyChange?.(file.id, true)
+    }
     
     // Calculate statistics asynchronously (don't await)
     computeStats(newContent).then(newStats => {
@@ -98,7 +97,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     }).catch(() => {
       // Ignore stats calculation errors
     })
-  }, [file.id, onDirtyChange, computeStats])
+  }, [isDirty, file.id, onDirtyChange, computeStats])
 
   // Handle sign out
   const handleSignOut = useCallback(async () => {
@@ -138,13 +137,12 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     }
   }, [isDirty, content, saveMutation])
 
-  // Reset content when file ID changes (for file switching) 
-  // Don't reset on content changes as that would interfere with typing
+  // Initialize content when file changes
   useEffect(() => {
     setContent(file.content)
     setIsDirty(false)
     onDirtyChange?.(file.id, false)
-  }, [file.id, onDirtyChange]) // Remove file.content dependency
+  }, [file.id, file.content, onDirtyChange]) // Include file.content for initialization
 
   // Initialize stats on mount
   useEffect(() => {
