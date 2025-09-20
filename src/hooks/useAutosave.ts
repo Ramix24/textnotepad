@@ -172,28 +172,28 @@ export function useAutosave({
     // Update last save time
     lastSaveTimeRef.current = Date.now()
     
-    // Clear pending content since we're saving now
-    pendingContentRef.current = null
-    
     // Perform the save
     await saveMutation.mutateAsync(content)
+    
+    // Clear pending content AFTER successful save
+    pendingContentRef.current = null
   }, [saveMutation])
 
   // Debounced save scheduler
   const scheduleDeboundedSave = useCallback((content: string) => {
-    // Store the latest content
+    // Always store the latest content
     pendingContentRef.current = content
     
-    // Clear existing timer
+    // Clear existing timer to reset the debounce
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current)
     }
     
-    // Schedule new save with the latest content
-    debounceTimerRef.current = setTimeout(() => {
-      // Use the most recent content from the ref
-      if (pendingContentRef.current !== null) {
-        performSave(pendingContentRef.current)
+    // Schedule new save - this will get the latest content from the ref
+    debounceTimerRef.current = setTimeout(async () => {
+      const contentToSave = pendingContentRef.current
+      if (contentToSave !== null) {
+        await performSave(contentToSave)
       }
     }, debounceMs)
   }, [debounceMs, performSave])
