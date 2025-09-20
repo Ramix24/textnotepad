@@ -1,9 +1,26 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabaseServer'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     console.log('Debug: Starting auth check...')
+    
+    // Check what cookies are being sent
+    const cookies = request.cookies
+    const cookieNames: string[] = []
+    
+    // Get all cookie names
+    const cookieEntries = cookies.getAll()
+    for (const cookie of cookieEntries) {
+      cookieNames.push(cookie.name)
+    }
+    console.log('Debug: Cookies received:', cookieNames.length, 'cookies')
+    
+    // Look for Supabase auth cookies specifically
+    const authCookies = cookieNames.filter(name => 
+      name.includes('supabase') || name.includes('auth') || name.includes('sb-')
+    )
+    console.log('Debug: Auth-related cookies:', authCookies)
     
     // Check environment variables
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -41,6 +58,11 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
+      cookies: {
+        total: cookieNames.length,
+        authCookies: authCookies,
+        allCookieNames: cookieNames
+      },
       environment: {
         hasUrl: !!supabaseUrl,
         hasAnonKey: !!supabaseAnonKey,
