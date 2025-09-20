@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AuthButton } from '@/components/AuthButton'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useFilesList, useCreateFile, useRenameFile, useDeleteFile } from '@/hooks/useFiles'
 import { UserFile } from '@/types/user-files.types'
@@ -257,11 +256,10 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
           </Button>
         </div>
         {user && (
-          <div className="text-xs text-gray-500 mb-2">
+          <div className="text-xs text-gray-500">
             {user.email}
           </div>
         )}
-        <AuthButton />
       </div>
 
       {/* File List */}
