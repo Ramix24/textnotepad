@@ -167,49 +167,34 @@ export function useAutosave({
     }
   })
 
-  // Internal save function with concurrency protection
+  // Simple save function - just save the content, no complex queuing
   const performSave = useCallback(async (content: string) => {
-    // Prevent concurrent saves - if save is already in progress, queue the content
-    if (saveMutation.isPending) {
-      pendingContentRef.current = content
-      return
-    }
-    
-    // Always save the most recent content (either passed or pending)
-    const contentToSave = pendingContentRef.current || content
-    pendingContentRef.current = null
-    
     // Update last save time
     lastSaveTimeRef.current = Date.now()
     
+    // Clear pending content since we're saving now
+    pendingContentRef.current = null
+    
     // Perform the save
-    try {
-      await saveMutation.mutateAsync(contentToSave)
-      
-      // After save completes, check if there's pending content to save
-      if (pendingContentRef.current && !saveMutation.isPending) {
-        // Recursive call to save any content that came in during the save
-        performSave(pendingContentRef.current)
-      }
-    } catch (error) {
-      // Save failed, keep the content as pending
-      if (!pendingContentRef.current) {
-        pendingContentRef.current = contentToSave
-      }
-      throw error
-    }
+    await saveMutation.mutateAsync(content)
   }, [saveMutation])
 
   // Debounced save scheduler
   const scheduleDeboundedSave = useCallback((content: string) => {
+    // Store the latest content
+    pendingContentRef.current = content
+    
     // Clear existing timer
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current)
     }
     
-    // Schedule new save
+    // Schedule new save with the latest content
     debounceTimerRef.current = setTimeout(() => {
-      performSave(content)
+      // Use the most recent content from the ref
+      if (pendingContentRef.current !== null) {
+        performSave(pendingContentRef.current)
+      }
     }, debounceMs)
   }, [debounceMs, performSave])
 
