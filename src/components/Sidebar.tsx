@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useAuthSession } from '@/hooks/useAuthSession'
 import { useFilesList, useCreateFile, useRenameFile, useDeleteFile } from '@/hooks/useFiles'
 import { UserFile } from '@/types/user-files.types'
 import { Trash2, Clock, SortAsc, Edit2 } from 'lucide-react'
@@ -171,10 +170,9 @@ function FileItem({
 
 export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }: SidebarProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
-  const [sortBy, setSortBy] = useState<SortOption>('time')
+  const [sortBy, setSortBy] = useState<SortOption>('name')
   const [sidebarWidth, setSidebarWidth] = useState(320) // Default 320px (w-80)
   const [isResizing, setIsResizing] = useState(false)
-  const { user } = useAuthSession()
   const { data: files, isLoading, error } = useFilesList()
   const createFile = useCreateFile()
   const renameFile = useRenameFile()
@@ -337,12 +335,6 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
             Name
           </Button>
         </div>
-        
-        {user && (
-          <div className="text-xs text-muted-foreground">
-            {user.email}
-          </div>
-        )}
       </div>
 
       {/* File List */}
