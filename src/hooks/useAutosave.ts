@@ -81,7 +81,6 @@ export function useAutosave({
   
   // Refs for managing timers and state
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const lastSaveTimeRef = useRef<number>(0)
   const pendingContentRef = useRef<string | null>(null)
   const currentVersionRef = useRef(file.version)
 
@@ -103,17 +102,6 @@ export function useAutosave({
       })
     },
     
-    onMutate: async (content: string) => {
-      // Store current version for rollback (don't increment optimistically)
-      const previousVersion = currentVersionRef.current
-      
-      // Return rollback data in case of error
-      return {
-        previousVersion,
-        content,
-      }
-    },
-    
     onSuccess: (updatedFile) => {
       // Update our version reference with the server version
       currentVersionRef.current = updatedFile.version
@@ -130,12 +118,7 @@ export function useAutosave({
       onSaved?.(updatedFile)
     },
     
-    onError: (error, content, context) => {
-      // Rollback optimistic update (version should already be correct)
-      if (context) {
-        currentVersionRef.current = context.previousVersion
-      }
-      
+    onError: (error) => {
       // Handle specific error types
       if (error instanceof ConflictError) {
         // Version conflict - file was modified elsewhere
@@ -153,29 +136,9 @@ export function useAutosave({
       }
     },
     
-    onSettled: () => {
-      // If there's pending content, try to save it
-      if (pendingContentRef.current) {
-        const nextContent = pendingContentRef.current
-        pendingContentRef.current = null
-        scheduleDeboundedSave(nextContent)
-      }
-    }
   })
 
-  // Simple save function - just save the content, no complex queuing
-  const performSave = useCallback(async (content: string) => {
-    // Update last save time
-    lastSaveTimeRef.current = Date.now()
-    
-    // Perform the save
-    await saveMutation.mutateAsync(content)
-    
-    // Clear pending content AFTER successful save
-    pendingContentRef.current = null
-  }, [saveMutation])
-
-  // Debounced save scheduler
+  // Simple debounced save scheduler
   const scheduleDeboundedSave = useCallback((content: string) => {
     // Always store the latest content
     pendingContentRef.current = content
@@ -186,32 +149,33 @@ export function useAutosave({
     }
     
     // Schedule new save - this will get the latest content from the ref
-    debounceTimerRef.current = setTimeout(async () => {
+    debounceTimerRef.current = setTimeout(() => {
       const contentToSave = pendingContentRef.current
-      if (contentToSave !== null) {
-        await performSave(contentToSave)
+      if (contentToSave !== null && !saveMutation.isPending) {
+        pendingContentRef.current = null // Clear before save to prevent double-save
+        saveMutation.mutate(contentToSave)
       }
     }, debounceMs)
-  }, [debounceMs, performSave])
+  }, [debounceMs, saveMutation])
 
   // Main API function - mark content as dirty and trigger save
   const markDirty = useCallback((newContent: string) => {
     scheduleDeboundedSave(newContent)
   }, [scheduleDeboundedSave])
 
-  // Force immediate save (bypasses debounce/throttle)
+  // Force immediate save (bypasses debounce)
   const forceSave = useCallback(async () => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current)
       debounceTimerRef.current = null
     }
     
-    if (pendingContentRef.current) {
+    if (pendingContentRef.current && !saveMutation.isPending) {
       const content = pendingContentRef.current
       pendingContentRef.current = null
-      await performSave(content)
+      await saveMutation.mutateAsync(content)
     }
-  }, [performSave])
+  }, [saveMutation])
 
   // Cancel any pending save
   const cancelPendingSave = useCallback(() => {
