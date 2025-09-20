@@ -79,14 +79,11 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
 
   // Handle content changes
   const handleContentChange = useCallback((newContent: string) => {
-    console.log('Content changing to:', newContent) // Debug log
-    
     // Update content immediately for responsive typing
     setContent(newContent)
     
     // Set dirty state
     if (!isDirty) {
-      console.log('Setting dirty state to true')
       setIsDirty(true)
       onDirtyChange?.(file.id, true)
     }
@@ -146,7 +143,6 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
         prevFileRef.current.id !== file.id || 
         prevFileRef.current.version !== file.version) {
       
-      console.log('File changed, updating content:', file.id, file.version)
       setContent(file.content)
       setIsDirty(false)
       onDirtyChange?.(file.id, false)
