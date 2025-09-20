@@ -1,49 +1,17 @@
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-if (!supabaseUrl) {
-  throw new Error('Missing environment variable: NEXT_PUBLIC_SUPABASE_URL')
-}
-
-if (!supabaseAnonKey) {
-  throw new Error('Missing environment variable: NEXT_PUBLIC_SUPABASE_ANON_KEY')
-}
-
 /**
- * Client-side Supabase client with SSR cookie support
+ * @deprecated Use SupabaseProvider and useSupabase hook instead
+ * This file is kept for backward compatibility but should not be used directly
  * 
- * This client runs in the browser and uses the anonymous key.
- * It respects Row Level Security (RLS) policies and user sessions.
- * Configured to work with server-side rendering and cookie sharing.
+ * The proper way to use Supabase client is:
+ * 1. Import { useSupabase } from '@/components/SupabaseProvider'
+ * 2. Use const { supabase } = useSupabase() in your components
+ * 
+ * This ensures proper SSR cookie handling and prevents multiple client instances.
  */
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce'
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'supabase-js-web'
-    }
-  }
-})
 
-/**
- * Create browser client for SSR
- * This ensures cookies are properly set for server-side access
- */
-export function createBrowserClient() {
-  if (typeof window === 'undefined') {
-    throw new Error('createBrowserClient should only be called in browser context')
-  }
-  
-  // Import createBrowserClient from @supabase/ssr
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { createBrowserClient: createSSRBrowserClient } = require('@supabase/ssr')
-  
-  return createSSRBrowserClient(supabaseUrl, supabaseAnonKey)
-}
+// Re-export for legacy compatibility only
+export { useSupabase } from '@/components/SupabaseProvider'
+
+// Legacy export - DO NOT USE in new code
+// This creates multiple client instances and should be avoided
+export const supabase = null as any

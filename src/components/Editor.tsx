@@ -9,7 +9,7 @@ import { useCountersWorker, type CountResult } from '@/hooks/useCountersWorker'
 import { useAutosave } from '@/hooks/useAutosave'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { getFileById } from '@/lib/userFiles.repo'
-import { supabase } from '@/lib/supabaseClient'
+import { useSupabase } from '@/components/SupabaseProvider'
 import { UserFile } from '@/types/user-files.types'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
@@ -34,6 +34,7 @@ interface EditorProps {
  */
 export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorProps) {
   // Local state management
+  const { supabase } = useSupabase()
   const [content, setContent] = useState(file.content)
   const [isDirty, setIsDirty] = useState(false)
   const [stats, setStats] = useState<CountResult | null>(null)

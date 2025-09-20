@@ -3,7 +3,7 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { supabase } from '@/lib/supabaseClient'
+import { useSupabase } from '@/components/SupabaseProvider'
 import { updateFileContent, calculateContentStats, ConflictError } from '@/lib/userFiles.repo'
 import { UserFile } from '@/types/user-files.types'
 
@@ -76,6 +76,7 @@ export function useAutosave({
   config = {}
 }: UseAutosaveOptions): UseAutosaveReturn {
   const { debounceMs = 1000, throttleMs = 2000 } = config
+  const { supabase } = useSupabase()
   
   const queryClient = useQueryClient()
   const [isDirty, setIsDirty] = useState(false)

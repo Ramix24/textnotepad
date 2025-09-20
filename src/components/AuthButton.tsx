@@ -4,9 +4,10 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useAuthSession } from '@/hooks/useAuthSession'
-import { supabase } from '@/lib/supabaseClient'
+import { useSupabase } from '@/components/SupabaseProvider'
 
 export function AuthButton() {
+  const { supabase } = useSupabase()
   const { user, loading } = useAuthSession()
   const router = useRouter()
 

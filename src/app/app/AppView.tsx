@@ -8,7 +8,7 @@ import { Sidebar } from '@/components/Sidebar'
 import { QuickSwitchModal } from '@/components/QuickSwitchModal'
 import { UserFile } from '@/types/user-files.types'
 import { getOrCreateLatestFile, getFileById } from '@/lib/userFiles.repo'
-import { supabase } from '@/lib/supabaseClient'
+import { useSupabase } from '@/components/SupabaseProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useCreateFile } from '@/hooks/useFiles'
 import { useGlobalShortcuts } from '@/hooks/useGlobalShortcuts'
@@ -19,6 +19,7 @@ interface AppViewProps {
 }
 
 export function AppView({ user: _user }: AppViewProps) {
+  const { supabase } = useSupabase()
   const [currentFileId, setCurrentFileId] = useState<string | null>(null)
   const [currentFile, setCurrentFile] = useState<UserFile | null>(null)
   const [isLoadingFile, setIsLoadingFile] = useState(true)
