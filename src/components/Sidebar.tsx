@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useFilesList, useCreateFile, useRenameFile, useDeleteFile } from '@/hooks/useFiles'
 import { UserFile } from '@/types/user-files.types'
-import { Trash2, Clock, SortAsc } from 'lucide-react'
+import { Trash2, Clock, SortAsc, Edit2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 type SortOption = 'name' | 'time'
@@ -140,16 +140,28 @@ function FileItem({
                 </p>
               </div>
             </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onDelete(file.id)
-              }}
-              className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-100 rounded transition-opacity"
-              title="Delete file"
-            >
-              <Trash2 className="w-3 h-3 text-gray-400 hover:text-red-600" />
-            </button>
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleDoubleClick()
+                }}
+                className="p-1 hover:bg-blue-100 rounded"
+                title="Rename file"
+              >
+                <Edit2 className="w-3 h-3 text-gray-400 hover:text-blue-600" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete(file.id)
+                }}
+                className="p-1 hover:bg-red-100 rounded"
+                title="Delete file"
+              >
+                <Trash2 className="w-3 h-3 text-gray-400 hover:text-red-600" />
+              </button>
+            </div>
           </div>
         </button>
       )}
