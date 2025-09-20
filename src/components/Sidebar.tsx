@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useFilesList, useCreateFile, useRenameFile, useDeleteFile } from '@/hooks/useFiles'
 import { UserFile } from '@/types/user-files.types'
-import { Trash2 } from 'lucide-react'
+import { Trash2, Clock, SortAsc } from 'lucide-react'
 import { toast } from 'sonner'
+
+type SortOption = 'name' | 'time'
 
 interface SidebarProps {
   className?: string
@@ -89,8 +91,8 @@ function FileItem({
     <div
       className={`group relative rounded-lg transition-colors ${
         isSelected
-          ? 'bg-blue-100 border border-blue-200'
-          : 'hover:bg-gray-100'
+          ? 'bg-primary/10 border border-primary/20'
+          : 'hover:bg-muted/50'
       }`}
       role="option"
       aria-selected={isSelected}
@@ -157,12 +159,32 @@ function FileItem({
 
 export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }: SidebarProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [sortBy, setSortBy] = useState<SortOption>('time')
+  const [sidebarWidth, setSidebarWidth] = useState(320) // Default 320px (w-80)
+  const [isResizing, setIsResizing] = useState(false)
   const { user } = useAuthSession()
   const { data: files, isLoading, error } = useFilesList()
   const createFile = useCreateFile()
   const renameFile = useRenameFile()
   const deleteFile = useDeleteFile()
   const listRef = useRef<HTMLDivElement>(null)
+  const sidebarRef = useRef<HTMLDivElement>(null)
+
+  // Sort files based on current sort option
+  const sortedFiles = useMemo(() => {
+    if (!files) return []
+    
+    const sorted = [...files].sort((a, b) => {
+      if (sortBy === 'name') {
+        return a.name.localeCompare(b.name)
+      } else {
+        // Sort by time (newest first)
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      }
+    })
+    
+    return sorted
+  }, [files, sortBy])
 
   const handleCreateFile = async () => {
     try {
@@ -175,8 +197,8 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
 
   const handleSelectFile = (id: string) => {
     onSelect?.(id)
-    const index = files?.findIndex(f => f.id === id) ?? 0
-    setSelectedIndex(index)
+    const index = sortedFiles.findIndex(f => f.id === id)
+    setSelectedIndex(index >= 0 ? index : 0)
   }
 
   const handleRename = (id: string, newName: string) => {
@@ -184,7 +206,7 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
   }
 
   const handleDelete = (id: string) => {
-    if (files && files.length === 1) {
+    if (sortedFiles && sortedFiles.length === 1) {
       toast.error('Cannot delete the last remaining file')
       return
     }
@@ -192,7 +214,7 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!files || files.length === 0) return
+    if (!sortedFiles || sortedFiles.length === 0) return
 
     switch (e.key) {
       case 'ArrowUp':
@@ -201,12 +223,12 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
         break
       case 'ArrowDown':
         e.preventDefault()
-        setSelectedIndex(prev => Math.min(files.length - 1, prev + 1))
+        setSelectedIndex(prev => Math.min(sortedFiles.length - 1, prev + 1))
         break
       case 'Enter':
         e.preventDefault()
-        if (files[selectedIndex]) {
-          handleSelectFile(files[selectedIndex].id)
+        if (sortedFiles[selectedIndex]) {
+          handleSelectFile(sortedFiles[selectedIndex].id)
         }
         break
     }
@@ -214,16 +236,59 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
 
   // Update selected index when currentFileId changes
   useEffect(() => {
-    if (files && currentFileId) {
-      const index = files.findIndex(f => f.id === currentFileId)
+    if (sortedFiles && currentFileId) {
+      const index = sortedFiles.findIndex(f => f.id === currentFileId)
       if (index !== -1) {
         setSelectedIndex(index)
       }
     }
-  }, [files, currentFileId])
+  }, [sortedFiles, currentFileId])
+
+  // Handle resize functionality
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsResizing(true)
+    e.preventDefault()
+  }
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return
+      
+      const newWidth = e.clientX
+      const minWidth = 256 // min-w-64
+      const maxWidth = 600 // reasonable max width
+      
+      if (newWidth >= minWidth && newWidth <= maxWidth) {
+        setSidebarWidth(newWidth)
+      }
+    }
+
+    const handleMouseUp = () => {
+      setIsResizing(false)
+    }
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = 'col-resize'
+      document.body.style.userSelect = 'none'
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+  }, [isResizing])
 
   return (
-    <div className={`w-80 max-w-sm min-w-64 flex flex-col h-full bg-background border-r ${className}`} data-testid="sidebar">
+    <div 
+      ref={sidebarRef}
+      className={`relative flex flex-col h-full bg-background border-r ${className}`}
+      style={{ width: `${sidebarWidth}px` }}
+      data-testid="sidebar"
+    >
       {/* Header */}
       <div className="p-4 border-b">
         <div className="flex items-center justify-between mb-3">
@@ -237,6 +302,30 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
             {createFile.isPending ? 'Creating...' : 'New'}
           </Button>
         </div>
+        
+        {/* Sort options */}
+        <div className="flex items-center gap-1 mb-3">
+          <span className="text-xs text-muted-foreground mr-2">Sort:</span>
+          <Button
+            size="sm"
+            variant={sortBy === 'time' ? 'default' : 'ghost'}
+            onClick={() => setSortBy('time')}
+            className="h-6 px-2 text-xs"
+          >
+            <Clock className="w-3 h-3 mr-1" />
+            Time
+          </Button>
+          <Button
+            size="sm"
+            variant={sortBy === 'name' ? 'default' : 'ghost'}
+            onClick={() => setSortBy('name')}
+            className="h-6 px-2 text-xs"
+          >
+            <SortAsc className="w-3 h-3 mr-1" />
+            Name
+          </Button>
+        </div>
+        
         {user && (
           <div className="text-xs text-muted-foreground">
             {user.email}
@@ -260,7 +349,7 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
             <p className="text-sm">Failed to load files</p>
             <p className="text-xs text-muted-foreground mt-1">{error.message}</p>
           </div>
-        ) : !files || files.length === 0 ? (
+        ) : !sortedFiles || sortedFiles.length === 0 ? (
           <div className="p-4 text-center">
             <p className="text-sm text-muted-foreground mb-3">No notes yet</p>
             <Button 
@@ -280,7 +369,7 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
             tabIndex={0}
             onKeyDown={handleKeyDown}
           >
-            {files.map((file, index) => (
+            {sortedFiles.map((file, index) => (
               <FileItem
                 key={file.id}
                 file={file}
@@ -301,9 +390,18 @@ export function Sidebar({ className, currentFileId, onSelect, isDirtyMap = {} }:
       {/* Footer */}
       <div className="p-4 border-t">
         <div className="text-xs text-muted-foreground">
-          {files ? `${files.length} note${files.length !== 1 ? 's' : ''}` : '0 notes'}
+          {sortedFiles ? `${sortedFiles.length} note${sortedFiles.length !== 1 ? 's' : ''}` : '0 notes'}
         </div>
       </div>
+
+      {/* Resize Handle */}
+      <div
+        className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/20 transition-colors ${
+          isResizing ? 'bg-primary/30' : ''
+        }`}
+        onMouseDown={handleMouseDown}
+        title="Resize sidebar"
+      />
     </div>
   )
 }
