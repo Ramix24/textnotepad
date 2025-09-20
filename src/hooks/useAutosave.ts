@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useSupabase } from '@/components/SupabaseProvider'
@@ -21,7 +21,6 @@ export interface UseAutosaveOptions {
 
 export interface UseAutosaveReturn {
   isSaving: boolean
-  isDirty: boolean
   markDirty: (newContent: string) => void
   forceSave: () => Promise<void>
   cancelPendingSave: () => void
@@ -79,7 +78,6 @@ export function useAutosave({
   const { supabase } = useSupabase()
   
   const queryClient = useQueryClient()
-  const [isDirty, setIsDirty] = useState(false)
   
   // Refs for managing timers and state
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
@@ -108,7 +106,6 @@ export function useAutosave({
     onMutate: async (content: string) => {
       // Store current version for rollback (don't increment optimistically)
       const previousVersion = currentVersionRef.current
-      setIsDirty(false)
       
       // Return rollback data in case of error
       return {
@@ -137,7 +134,6 @@ export function useAutosave({
       // Rollback optimistic update (version should already be correct)
       if (context) {
         currentVersionRef.current = context.previousVersion
-        setIsDirty(true) // Mark as dirty again since save failed
       }
       
       // Handle specific error types
@@ -200,7 +196,6 @@ export function useAutosave({
 
   // Main API function - mark content as dirty and trigger save
   const markDirty = useCallback((newContent: string) => {
-    setIsDirty(true)
     scheduleDeboundedSave(newContent)
   }, [scheduleDeboundedSave])
 
@@ -225,7 +220,6 @@ export function useAutosave({
       debounceTimerRef.current = null
     }
     pendingContentRef.current = null
-    setIsDirty(false)
   }, [])
 
   // Cleanup on unmount
@@ -239,7 +233,6 @@ export function useAutosave({
 
   return {
     isSaving: saveMutation.isPending,
-    isDirty,
     markDirty,
     forceSave,
     cancelPendingSave,

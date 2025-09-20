@@ -21,7 +21,7 @@ export function AutosaveExample({ file, onFileUpdate }: AutosaveExampleProps) {
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
 
   // Initialize autosave hook
-  const { isSaving, isDirty, markDirty, forceSave, cancelPendingSave } = useAutosave({
+  const { isSaving, markDirty, forceSave, cancelPendingSave } = useAutosave({
     file,
     onSaved: (updatedFile) => {
       setLastSaved(new Date())
@@ -48,7 +48,6 @@ export function AutosaveExample({ file, onFileUpdate }: AutosaveExampleProps) {
   // Status indicator
   const getStatus = () => {
     if (isSaving) return { text: 'Saving...', color: 'text-blue-600' }
-    if (isDirty) return { text: 'Unsaved changes', color: 'text-amber-600' }
     if (lastSaved) return { 
       text: `Saved at ${lastSaved.toLocaleTimeString()}`, 
       color: 'text-green-600' 
@@ -86,7 +85,7 @@ export function AutosaveExample({ file, onFileUpdate }: AutosaveExampleProps) {
         <div className="flex gap-2 text-sm">
           <button
             onClick={() => forceSave()}
-            disabled={!isDirty || isSaving}
+            disabled={isSaving}
             className="px-3 py-1 bg-blue-600 text-white rounded disabled:opacity-50"
           >
             Force Save
@@ -94,7 +93,7 @@ export function AutosaveExample({ file, onFileUpdate }: AutosaveExampleProps) {
           
           <button
             onClick={cancelPendingSave}
-            disabled={!isDirty || isSaving}
+            disabled={isSaving}
             className="px-3 py-1 bg-gray-600 text-white rounded disabled:opacity-50"
           >
             Cancel Changes
@@ -105,7 +104,7 @@ export function AutosaveExample({ file, onFileUpdate }: AutosaveExampleProps) {
         <div className="text-xs text-muted-foreground space-y-1">
           <div>📄 File ID: {file.id}</div>
           <div>🔄 Version: {file.version}</div>
-          <div>💾 Auto-save: {isDirty ? 'Pending' : 'Idle'}</div>
+          <div>💾 Auto-save: {isSaving ? 'Active' : 'Idle'}</div>
           <div>⚡ Status: {isSaving ? 'Saving...' : 'Ready'}</div>
         </div>
         

@@ -38,7 +38,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
   const [content, setContent] = useState(file.content)
   const [isDirty, setIsDirty] = useState(false)
   const [stats, setStats] = useState<CountResult | null>(null)
-  const [isLoadingStats, setIsLoadingStats] = useState(false)
+  // Removed setIsLoadingStats since we don't track loading state anymore
   
   // Refs for managing focus and keyboard shortcuts
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -55,10 +55,6 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
       setIsDirty(false)
       onDirtyChange?.(file.id, false)
       onFileUpdate?.(updatedFile)
-      toast.success('File saved', {
-        description: `Saved at ${new Date().toLocaleTimeString()}`,
-        duration: 2000,
-      })
     },
     onConflict: async (_conflictingFile) => {
       try {
@@ -96,25 +92,26 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
   })
 
   // Handle content changes
-  const handleContentChange = useCallback(async (newContent: string) => {
+  const handleContentChange = useCallback((newContent: string) => {
+    // Update content immediately for responsive typing
     setContent(newContent)
-    setIsDirty(true)
-    onDirtyChange?.(file.id, true)
     
-    // Trigger autosave
+    // Set dirty state
+    if (!isDirty) {
+      setIsDirty(true)
+      onDirtyChange?.(file.id, true)
+    }
+    
+    // Trigger autosave (debounced)
     markDirty(newContent)
     
-    // Calculate statistics asynchronously
-    try {
-      setIsLoadingStats(true)
-      const newStats = await computeStats(newContent)
+    // Calculate statistics asynchronously (don't await)
+    computeStats(newContent).then(newStats => {
       setStats(newStats)
-    } catch {
-      // Error calculating stats
-    } finally {
-      setIsLoadingStats(false)
-    }
-  }, [markDirty, computeStats])
+    }).catch(() => {
+      // Ignore stats calculation errors
+    })
+  }, [isDirty, file.id, onDirtyChange, markDirty, computeStats])
 
   // Handle sign out
   const handleSignOut = useCallback(async () => {
@@ -133,7 +130,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
         description: 'An unexpected error occurred during sign out.',
       })
     }
-  }, [router])
+  }, [router, supabase.auth])
 
   // Keyboard shortcuts
   const handleKeyDown = useCallback(async (event: React.KeyboardEvent) => {
@@ -272,9 +269,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
           aria-live="polite"
           aria-atomic="true"
         >
-          {isLoadingStats ? (
-            <span className="animate-pulse">Calculating...</span>
-          ) : stats ? (
+          {stats ? (
             <>
               <span>Words: {stats.word_count.toLocaleString()}</span>
               <Separator orientation="vertical" className="h-4" />
