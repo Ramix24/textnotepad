@@ -19,7 +19,7 @@ export default function AuthPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-800 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -61,11 +61,11 @@ export default function AuthPage() {
         <div className="text-center">
           <p className="text-xs text-gray-400">
             By signing in, you agree to our{' '}
-            <a href="/terms" className="text-indigo-600 hover:underline">
+            <a href="/terms" className="text-blue-800 hover:underline">
               Terms of Service
             </a>{' '}
             and{' '}
-            <a href="/privacy" className="text-indigo-600 hover:underline">
+            <a href="/privacy" className="text-blue-800 hover:underline">
               Privacy Policy
             </a>
           </p>

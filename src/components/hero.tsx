@@ -6,8 +6,11 @@ import { Container } from "@/components/ui/container"
 import { Section } from "@/components/ui/section"
 import { MotionDiv, animations } from "@/components/ui/motion"
 import { Shield, Globe, Lock } from "lucide-react"
+import { useAuthSession } from "@/hooks/useAuthSession"
 
 export function Hero() {
+  const { user } = useAuthSession()
+  
   return (
     <Section className="pt-16 pb-8 lg:pt-24 lg:pb-16">
       <Container>
@@ -29,9 +32,15 @@ export function Hero() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-blue-600 focus:ring-tn-accent/60">
-                <Link href="/auth">Activate Free Year</Link>
-              </Button>
+              {user ? (
+                <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-blue-800 focus:ring-tn-accent/60">
+                  <Link href="/app">Open Editor</Link>
+                </Button>
+              ) : (
+                <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-blue-800 focus:ring-tn-accent/60">
+                  <Link href="/auth">Activate Free Year</Link>
+                </Button>
+              )}
               <Button size="lg" variant="outline" asChild className="bg-transparent border-tn-accent text-tn-accent hover:bg-tn-accent/10">
                 <Link href="/demo">Open Live Demo</Link>
               </Button>

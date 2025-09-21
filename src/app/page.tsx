@@ -51,7 +51,7 @@ const jsonLd = {
         {
           "@type": "Offer",
           "name": "Secure Saver",
-          "price": "59",
+          "price": "54",
           "priceCurrency": "USD",
           "priceValidUntil": "2025-12-31",
           "availability": "https://schema.org/InStock",

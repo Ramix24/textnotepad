@@ -4,8 +4,11 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Container } from "@/components/ui/container"
 import { MotionDiv, animations } from "@/components/ui/motion"
+import { useAuthSession } from "@/hooks/useAuthSession"
 
 export function Header() {
+  const { user } = useAuthSession()
+  
   return (
     <MotionDiv
       initial={animations.fadeIn.initial}
@@ -58,12 +61,20 @@ export function Header() {
             </nav>
 
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" asChild className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">
-                <Link href="/auth">Sign In</Link>
-              </Button>
-              <Button size="sm" asChild className="bg-tn-accent text-white hover:bg-blue-600">
-                <Link href="/auth">Activate Free Year</Link>
-              </Button>
+              {user ? (
+                <Button size="sm" asChild className="bg-tn-accent text-white hover:bg-blue-800">
+                  <Link href="/app">Open Editor</Link>
+                </Button>
+              ) : (
+                <>
+                  <Button variant="ghost" size="sm" asChild className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                    <Link href="/auth">Sign In</Link>
+                  </Button>
+                  <Button size="sm" asChild className="bg-tn-accent text-white hover:bg-blue-800">
+                    <Link href="/auth">Activate Free Year</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </Container>

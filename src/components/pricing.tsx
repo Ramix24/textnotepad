@@ -8,6 +8,7 @@ import { Container } from "@/components/ui/container"
 import { Section } from "@/components/ui/section"
 import { MotionDiv, animations } from "@/components/ui/motion"
 import { Check, Star } from "lucide-react"
+import { useAuthSession } from "@/hooks/useAuthSession"
 
 const features = [
   "Full End-to-End Encryption (E2EE)",
@@ -23,6 +24,8 @@ const features = [
 ]
 
 export function Pricing() {
+  const { user } = useAuthSession()
+  
   return (
     <Section id="pricing">
       <Container>
@@ -51,7 +54,8 @@ export function Pricing() {
               price="FREE"
               period="until Dec 31, 2026"
               description="Perfect for individual writers"
-              buttonText="Activate Free Year"
+              buttonText={user ? "Open Editor" : "Activate Free Year"}
+              buttonHref={user ? "/app" : "/auth"}
               badge="Founders Promo"
               popular={true}
               promoFreeUntil={new Date('2026-12-31')}
@@ -67,13 +71,14 @@ export function Pricing() {
             transition={{ ...animations.fadeInUp.transition, delay: 0.2 }}
           >
             <PricingCard
-              title="Secure Saver — 59 USD / 3 years"
-              price="59"
+              title="Secure Saver — 54 USD / 3 years"
+              price="54"
               period="USD / 3 years"
               description="Best value for long-term privacy"
-              buttonText="Choose 3-Year Plan"
-              yearlyEquivalent="≈ $1.6 / month"
-              renewalInfo="Billed 59 USD every 3 years"
+              buttonText={user ? "Open Editor" : "Choose 3-Year Plan"}
+              buttonHref={user ? "/app" : "/auth"}
+              yearlyEquivalent="≈ $1.5 / month"
+              renewalInfo="Billed 54 USD every 3 years"
               noPromo={true}
             />
           </MotionDiv>
@@ -139,6 +144,7 @@ interface PricingCardProps {
   originalPrice?: string
   description: string
   buttonText: string
+  buttonHref?: string
   popular?: boolean
   badge?: string
   yearlyEquivalent?: string
@@ -157,6 +163,7 @@ export function PricingCard({
   originalPrice,
   description,
   buttonText,
+  buttonHref = "/auth",
   popular = false,
   badge,
   yearlyEquivalent,
@@ -216,11 +223,11 @@ export function PricingCard({
       <CardContent className="space-y-6">
         <div className="space-y-2">
           <Button 
-            className={`w-full ${popular ? 'bg-tn-accent text-white hover:bg-blue-600 focus:ring-tn-accent/60' : 'bg-transparent border-tn-accent text-tn-accent hover:bg-tn-accent/10'}`}
+            className={`w-full ${popular ? 'bg-tn-accent text-white hover:bg-blue-800 focus:ring-tn-accent/60' : 'bg-transparent border-tn-accent text-tn-accent hover:bg-tn-accent/10'}`}
             size="lg"
             asChild
           >
-            <Link href="/auth">{buttonText}</Link>
+            <Link href={buttonHref}>{buttonText}</Link>
           </Button>
           {promoBadge && (
             <p className="text-xs text-gray-500 text-center">

@@ -17,7 +17,7 @@ const faqs = [
   },
   {
     question: "Can I choose the 3-year plan with promo?",
-    answer: "No. The Founders Promo applies only to the 1-year plan. The 3-year plan is billed at 59 USD / 3 years."
+    answer: "No. The Founders Promo applies only to the 1-year plan. The 3-year plan is billed at 54 USD / 3 years."
   },
   {
     question: "What if I don't want to pay later?",
