@@ -32,10 +32,10 @@ export function Pricing() {
           transition={animations.fadeInUp.transition}
           className="text-center space-y-4 mb-16"
         >
-          <h2 className="text-3xl lg:text-4xl font-bold text-white">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
             Founders Promo 2025
           </h2>
-          <p className="text-xl text-gray-200 max-w-3xl mx-auto leading-7">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-7">
             Get the 1-year plan completely free if you sign up by Dec 31, 2025.
           </p>
         </MotionDiv>
@@ -85,13 +85,13 @@ export function Pricing() {
           transition={{ ...animations.fadeInUp.transition, delay: 0.3 }}
           className="text-center mt-12 space-y-2"
         >
-          <p className="text-gray-400">
+          <p className="text-gray-500">
             Promo valid only for new accounts created by Dec 31, 2025. No hidden fees. Cancel anytime before renewal. Full data export (GDPR) guaranteed.
           </p>
           
-          <div className="mt-8 p-6 bg-tn-surface/50 rounded-2xl border border-white/[0.06]">
-            <h3 className="font-semibold mb-3 text-white">Included in both plans:</h3>
-            <div className="grid sm:grid-cols-2 gap-2 text-sm text-gray-200">
+          <div className="mt-8 p-6 bg-gray-50 rounded-2xl border border-gray-200">
+            <h3 className="font-semibold mb-3 text-gray-900">Included in both plans:</h3>
+            <div className="grid sm:grid-cols-2 gap-2 text-sm text-gray-700">
               <div className="flex items-center space-x-2">
                 <Check className="h-3 w-3 text-tn-accent flex-shrink-0" />
                 <span>E2E encryption</span>
@@ -168,7 +168,7 @@ export function PricingCard({
   noPromo
 }: PricingCardProps) {
   return (
-    <Card className={`h-full relative bg-tn-surface border border-white/[0.06] shadow-lg ${popular ? 'border-tn-accent' : ''}`}>
+    <Card className={`h-full relative bg-white border border-gray-200 shadow-lg ${popular ? 'border-tn-accent shadow-blue-100' : ''}`}>
       {badge && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
           <div className="bg-tn-accent text-white text-xs px-3 py-1 rounded-full flex items-center space-x-1">
@@ -186,7 +186,7 @@ export function PricingCard({
       )}
       
       <CardHeader className="text-center space-y-4 pb-6">
-        <CardTitle className="text-xl text-white">{title}</CardTitle>
+        <CardTitle className="text-xl text-gray-900">{title}</CardTitle>
         <div className="space-y-2">
           <div className="flex items-baseline justify-center space-x-1">
             {originalPrice && (
@@ -194,48 +194,48 @@ export function PricingCard({
                 ${originalPrice}
               </span>
             )}
-            <span className="text-4xl font-bold text-white">{price}</span>
-            <span className="text-gray-400">{period}</span>
+            <span className="text-4xl font-bold text-gray-900">{price}</span>
+            <span className="text-gray-500">{period}</span>
           </div>
           {promoFreeUntil && (
             <p className="text-sm text-tn-accent font-medium">FREE until {promoFreeUntil.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
           )}
           {renewsOn && renewPriceLabel && (
-            <p className="text-sm text-gray-400">Renews on {renewsOn.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} → {renewPriceLabel}</p>
+            <p className="text-sm text-gray-500">Renews on {renewsOn.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} → {renewPriceLabel}</p>
           )}
           {yearlyEquivalent && (
-            <p className="text-sm text-gray-400">{yearlyEquivalent}</p>
+            <p className="text-sm text-gray-500">{yearlyEquivalent}</p>
           )}
           {renewalInfo && (
-            <p className="text-sm text-gray-400 mt-2 p-2 bg-tn-bg rounded">{renewalInfo}</p>
+            <p className="text-sm text-gray-500 mt-2 p-2 bg-gray-50 rounded">{renewalInfo}</p>
           )}
         </div>
-        <p className="text-gray-200">{description}</p>
+        <p className="text-gray-600">{description}</p>
       </CardHeader>
 
       <CardContent className="space-y-6">
         <div className="space-y-2">
           <Button 
-            className={`w-full ${popular ? 'bg-tn-accent text-white hover:brightness-110 focus:ring-tn-accent/60' : 'bg-transparent border-tn-accent/50 text-gray-200 hover:bg-tn-accent/20'}`}
+            className={`w-full ${popular ? 'bg-tn-accent text-white hover:bg-blue-600 focus:ring-tn-accent/60' : 'bg-transparent border-tn-accent text-tn-accent hover:bg-tn-accent/10'}`}
             size="lg"
             asChild
           >
             <Link href="/auth">{buttonText}</Link>
           </Button>
           {promoBadge && (
-            <p className="text-xs text-gray-400 text-center">
+            <p className="text-xs text-gray-500 text-center">
               Founders Promo automatically applied at checkout.
             </p>
           )}
         </div>
 
         <div className="space-y-3">
-          <p className="font-medium text-sm text-white">Everything included:</p>
+          <p className="font-medium text-sm text-gray-900">Everything included:</p>
           <ul className="space-y-2">
             {features.map((feature, index) => (
               <li key={index} className="flex items-start space-x-3 text-sm">
                 <Check className="h-4 w-4 text-tn-accent mt-0.5 flex-shrink-0" />
-                <span className="text-gray-200">{feature}</span>
+                <span className="text-gray-700">{feature}</span>
               </li>
             ))}
           </ul>

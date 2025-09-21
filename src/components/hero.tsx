@@ -19,29 +19,29 @@ export function Hero() {
             className="space-y-8"
           >
             <div className="space-y-4">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900">
                 Write in peace. Keep your notes{" "}
                 <span className="text-tn-accent">ultra-secure</span>.
               </h1>
-              <p className="text-xl text-gray-200 max-w-lg leading-7">
+              <p className="text-xl text-gray-600 max-w-lg leading-7">
                 Founders Promo 2025: Get the 1-year plan completely free if you sign up by Dec 31, 2025.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" asChild className="bg-tn-accent text-white hover:brightness-110 focus:ring-tn-accent/60">
+              <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-blue-600 focus:ring-tn-accent/60">
                 <Link href="/auth">Activate Free Year</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="bg-transparent border-tn-accent/50 text-gray-200 hover:bg-tn-accent/20">
+              <Button size="lg" variant="outline" asChild className="bg-transparent border-tn-accent text-tn-accent hover:bg-tn-accent/10">
                 <Link href="/demo">Open Live Demo</Link>
               </Button>
             </div>
             
-            <div className="text-sm text-gray-400">
+            <div className="text-sm text-gray-500">
               Free until Dec 31, 2026. Renews Jan 1, 2027 → $29/year.
             </div>
 
-            <div className="flex items-center space-x-6 text-sm text-gray-400">
+            <div className="flex items-center space-x-6 text-sm text-gray-500">
               <div className="flex items-center space-x-2">
                 <Shield className="h-4 w-4" />
                 <span>Open Source</span>
@@ -73,35 +73,35 @@ export function Hero() {
 function EditorMockup() {
   return (
     <div className="relative">
-      <div className="bg-tn-surface rounded-2xl shadow-2xl border border-white/[0.06] overflow-hidden">
-        <div className="flex items-center space-x-2 px-4 py-3 bg-tn-bg/50 border-b border-white/[0.06]">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+        <div className="flex items-center space-x-2 px-4 py-3 bg-gray-50 border-b border-gray-200">
           <div className="flex space-x-2">
-            <div className="w-3 h-3 rounded-full bg-red-500/60" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-            <div className="w-3 h-3 rounded-full bg-green-500/60" />
+            <div className="w-3 h-3 rounded-full bg-red-500" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500" />
+            <div className="w-3 h-3 rounded-full bg-green-500" />
           </div>
-          <div className="text-sm text-gray-400 ml-4">TextNotepad</div>
+          <div className="text-sm text-gray-600 ml-4">TextNotepad</div>
         </div>
         
-        <div className="p-6 space-y-4 min-h-[400px] bg-gradient-to-br from-tn-surface to-tn-bg/20">
+        <div className="p-6 space-y-4 min-h-[400px] bg-gradient-to-br from-white to-gray-50">
           <div className="space-y-2">
-            <div className="h-4 bg-white/20 rounded w-3/4" />
-            <div className="h-4 bg-white/15 rounded w-full" />
-            <div className="h-4 bg-white/15 rounded w-5/6" />
+            <div className="h-4 bg-gray-200 rounded w-3/4" />
+            <div className="h-4 bg-gray-100 rounded w-full" />
+            <div className="h-4 bg-gray-100 rounded w-5/6" />
           </div>
           
           <div className="space-y-2 pt-4">
-            <div className="h-4 bg-white/15 rounded w-4/5" />
-            <div className="h-4 bg-white/10 rounded w-full" />
-            <div className="h-4 bg-white/10 rounded w-2/3" />
+            <div className="h-4 bg-gray-100 rounded w-4/5" />
+            <div className="h-4 bg-gray-50 rounded w-full" />
+            <div className="h-4 bg-gray-50 rounded w-2/3" />
           </div>
           
           <div className="space-y-2 pt-4">
-            <div className="h-4 bg-white/10 rounded w-3/4" />
-            <div className="h-4 bg-white/8 rounded w-5/6" />
+            <div className="h-4 bg-gray-50 rounded w-3/4" />
+            <div className="h-4 bg-gray-50 rounded w-5/6" />
           </div>
           
-          <div className="absolute bottom-6 right-6 flex items-center space-x-2 text-xs text-gray-400">
+          <div className="absolute bottom-6 right-6 flex items-center space-x-2 text-xs text-gray-500">
             <Lock className="h-3 w-3" />
             <span>End-to-end encrypted</span>
           </div>

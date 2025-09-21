@@ -55,7 +55,7 @@ const faqs = [
 
 export function FAQ() {
   return (
-    <Section id="faq" className="bg-tn-surface/20 py-20">
+    <Section id="faq" className="bg-gray-50 py-20">
       <Container>
         <MotionDiv
           initial={animations.fadeInUp.initial}
@@ -63,10 +63,10 @@ export function FAQ() {
           transition={animations.fadeInUp.transition}
           className="text-center space-y-4 mb-16"
         >
-          <h2 className="text-3xl lg:text-4xl font-bold text-white">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
             Frequently asked questions
           </h2>
-          <p className="text-xl text-gray-200 max-w-3xl mx-auto leading-7">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-7">
             Everything you need to know about Founders Promo 2025 and TextNotepad&apos;s privacy.
           </p>
         </MotionDiv>
@@ -102,25 +102,25 @@ function FAQItem({ question, answer }: FAQItemProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="bg-tn-surface rounded-2xl border border-white/[0.06] shadow-sm">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
       <button
         className="w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-tn-accent/60 rounded-2xl"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
       >
         <div className="flex justify-between items-center">
-          <h3 className="font-semibold text-lg pr-4 text-white">{question}</h3>
+          <h3 className="font-semibold text-lg pr-4 text-gray-900">{question}</h3>
           {isOpen ? (
-            <ChevronUp className="h-5 w-5 text-gray-400 flex-shrink-0" />
+            <ChevronUp className="h-5 w-5 text-gray-500 flex-shrink-0" />
           ) : (
-            <ChevronDown className="h-5 w-5 text-gray-400 flex-shrink-0" />
+            <ChevronDown className="h-5 w-5 text-gray-500 flex-shrink-0" />
           )}
         </div>
       </button>
       
       {isOpen && (
         <div className="px-6 pb-6">
-          <div className="pt-2 text-gray-200 leading-7">
+          <div className="pt-2 text-gray-600 leading-7">
             {answer}
           </div>
         </div>

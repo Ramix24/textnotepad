@@ -44,9 +44,9 @@ module.exports = {
           foreground: 'hsl(var(--card-foreground))',
         },
         tn: {
-          bg: '#15202b',
-          surface: '#192734',
-          accent: '#22303c',
+          bg: '#ffffff',
+          surface: '#f8fafc',
+          accent: '#3b82f6',
         },
       },
       borderRadius: {
