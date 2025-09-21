@@ -55,7 +55,8 @@
 }
 
 body {
-  background-color: var(--background);
+  background-color: #15202b;
+  color: #f1f5f9;
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 

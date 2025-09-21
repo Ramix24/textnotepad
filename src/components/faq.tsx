@@ -9,15 +9,19 @@ import { ChevronDown, ChevronUp } from "lucide-react"
 const faqs = [
   {
     question: "What is Founders Promo 2025?",
-    answer: "If you sign up before Dec 31, 2025, you get the paid plan for free — 1 year (Personal) or 3 years (Secure Saver)."
+    answer: "If you create an account by Dec 31, 2025, you can activate the 1-year plan for free. Your free period runs until Dec 31, 2026."
   },
   {
     question: "Will I be charged automatically later?",
-    answer: "Yes, only after your free period ends: Jan 1, 2026 for Personal; Jan 1, 2029 for Secure Saver. You can cancel anytime before renewal."
+    answer: "Yes — only after your free period ends. The 1-year plan renews on Jan 1, 2027 for 29 USD / year. You can cancel anytime before renewal."
+  },
+  {
+    question: "Can I choose the 3-year plan with promo?",
+    answer: "No. The Founders Promo applies only to the 1-year plan. The 3-year plan is billed at 59 USD / 3 years."
   },
   {
     question: "What if I don't want to pay later?",
-    answer: "Cancel before renewal. Your account switches to a free read-only mode with full export."
+    answer: "Cancel before renewal. Your account becomes free read-only with full export."
   },
   {
     question: "Is my data portable and encrypted?",
@@ -51,7 +55,7 @@ const faqs = [
 
 export function FAQ() {
   return (
-    <Section id="faq" className="bg-muted/20">
+    <Section id="faq" className="bg-tn-surface/20 py-20">
       <Container>
         <MotionDiv
           initial={animations.fadeInUp.initial}
@@ -59,10 +63,10 @@ export function FAQ() {
           transition={animations.fadeInUp.transition}
           className="text-center space-y-4 mb-16"
         >
-          <h2 className="text-3xl lg:text-4xl font-bold">
+          <h2 className="text-3xl lg:text-4xl font-bold text-white">
             Frequently asked questions
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-xl text-gray-200 max-w-3xl mx-auto leading-7">
             Everything you need to know about Founders Promo 2025 and TextNotepad&apos;s privacy.
           </p>
         </MotionDiv>
@@ -98,25 +102,25 @@ function FAQItem({ question, answer }: FAQItemProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="bg-card rounded-2xl border shadow-sm">
+    <div className="bg-tn-surface rounded-2xl border border-white/[0.06] shadow-sm">
       <button
-        className="w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-ring rounded-2xl"
+        className="w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-tn-accent/60 rounded-2xl"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
       >
         <div className="flex justify-between items-center">
-          <h3 className="font-semibold text-lg pr-4">{question}</h3>
+          <h3 className="font-semibold text-lg pr-4 text-white">{question}</h3>
           {isOpen ? (
-            <ChevronUp className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+            <ChevronUp className="h-5 w-5 text-gray-400 flex-shrink-0" />
           ) : (
-            <ChevronDown className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+            <ChevronDown className="h-5 w-5 text-gray-400 flex-shrink-0" />
           )}
         </div>
       </button>
       
       {isOpen && (
         <div className="px-6 pb-6">
-          <div className="pt-2 text-muted-foreground leading-relaxed">
+          <div className="pt-2 text-gray-200 leading-7">
             {answer}
           </div>
         </div>

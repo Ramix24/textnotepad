@@ -52,15 +52,15 @@ export function PromoBanner() {
   if (!isVisible) return null
 
   return (
-    <div className="bg-primary text-primary-foreground py-3 px-4 relative">
+    <div className="bg-tn-accent text-white py-3 px-4 relative">
       <div className="max-w-7xl mx-auto flex items-center justify-center text-center">
         <div className="flex items-center space-x-2 text-sm font-medium">
           <span>🎉</span>
           <span>
-            Founders Promo 2025: Activate a 1-year plan FREE until Dec 31, 2025, or a 3-year plan FREE until Dec 31, 2028.
+            Founders Promo 2025: 1-year plan is FREE for accounts created by Dec 31, 2025. Free period lasts until Dec 31, 2026.
           </span>
           {timeLeft && (
-            <span className="hidden sm:inline bg-primary-foreground/20 px-2 py-1 rounded text-xs">
+            <span className="hidden sm:inline bg-white/20 px-2 py-1 rounded text-xs">
               {timeLeft}
             </span>
           )}
@@ -70,7 +70,7 @@ export function PromoBanner() {
           variant="ghost"
           size="sm"
           onClick={handleDismiss}
-          className="absolute right-2 h-6 w-6 p-0 hover:bg-primary-foreground/20"
+          className="absolute right-2 h-6 w-6 p-0 hover:bg-white/20"
           aria-label="Dismiss banner"
         >
           <X className="h-3 w-3" />

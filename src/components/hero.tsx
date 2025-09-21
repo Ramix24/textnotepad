@@ -19,29 +19,29 @@ export function Hero() {
             className="space-y-8"
           >
             <div className="space-y-4">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white">
                 Write in peace. Keep your notes{" "}
-                <span className="text-primary">ultra-secure</span>.
+                <span className="text-tn-accent">ultra-secure</span>.
               </h1>
-              <p className="text-xl text-muted-foreground max-w-lg">
-                Founders Promo 2025: Get TextNotepad completely free — 1 year or 3 years depending on your plan.
+              <p className="text-xl text-gray-200 max-w-lg leading-7">
+                Founders Promo 2025: Get the 1-year plan completely free if you sign up by Dec 31, 2025.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" asChild>
-                <Link href="/auth">Create Free Account</Link>
+              <Button size="lg" asChild className="bg-tn-accent text-white hover:brightness-110 focus:ring-tn-accent/60">
+                <Link href="/auth">Activate Free Year</Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              <Button size="lg" variant="outline" asChild className="bg-transparent border-tn-accent/50 text-gray-200 hover:bg-tn-accent/20">
                 <Link href="/demo">Open Live Demo</Link>
               </Button>
             </div>
             
-            <div className="text-sm text-muted-foreground">
-              Choose 1-year free (renews 2026) or 3-year free (renews 2029).
+            <div className="text-sm text-gray-400">
+              Free until Dec 31, 2026. Renews Jan 1, 2027 → $29/year.
             </div>
 
-            <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+            <div className="flex items-center space-x-6 text-sm text-gray-400">
               <div className="flex items-center space-x-2">
                 <Shield className="h-4 w-4" />
                 <span>Open Source</span>

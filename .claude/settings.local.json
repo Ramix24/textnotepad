@@ -29,7 +29,10 @@
       "Bash(npm run dev:*)",
       "Bash(npm run typecheck:*)",
       "Bash(pnpm add:*)",
-      "Bash(pnpm test:run:*)"
+      "Bash(pnpm test:run:*)",
+      "Bash(pkill:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd /c:*)"
     ],
     "deny": [],
     "ask": [],
