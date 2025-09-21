@@ -25,7 +25,7 @@ This is a fully functional demo of TextNotepad's editor interface.
 ✅ **Full end-to-end encryption** - Your notes are encrypted before leaving your device
 ✅ **Cloud sync** - Access your notes from any device
 ✅ **Offline mode** - Write even without internet connection
-✅ **Auto-save** - Never lose your work
+✅ **Real-time sync** - Your notes sync instantly
 ✅ **File organization** - Create folders and organize your notes
 ✅ **Search** - Find any note instantly
 ✅ **Export options** - Download as Markdown, PDF, or plain text

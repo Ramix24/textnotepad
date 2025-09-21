@@ -16,7 +16,7 @@ const features = [
   "Self-destruct notes",
   "Offline mode & auto-sync",
   "Distraction-free writing",
-  "Auto-save",
+  "Real-time sync",
   "Open-source client",
   "GDPR compliant, EU hosting",
   "Email support",
@@ -43,11 +43,27 @@ export function Pricing() {
           </p>
         </MotionDiv>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <MotionDiv
             initial={animations.fadeInUp.initial}
             animate={animations.fadeInUp.animate}
             transition={{ ...animations.fadeInUp.transition, delay: 0.1 }}
+          >
+            <PricingCard
+              title="14-Day Trial"
+              price="FREE"
+              period="for 14 days"
+              description="Try all premium features"
+              buttonText={user ? "Open Editor" : "Start Free Trial"}
+              buttonHref={user ? "/app" : "/auth"}
+              badge="Try It Free"
+            />
+          </MotionDiv>
+
+          <MotionDiv
+            initial={animations.fadeInUp.initial}
+            animate={animations.fadeInUp.animate}
+            transition={{ ...animations.fadeInUp.transition, delay: 0.2 }}
           >
             <PricingCard
               title="Personal — 29 USD / year"
@@ -68,7 +84,7 @@ export function Pricing() {
           <MotionDiv
             initial={animations.fadeInUp.initial}
             animate={animations.fadeInUp.animate}
-            transition={{ ...animations.fadeInUp.transition, delay: 0.2 }}
+            transition={{ ...animations.fadeInUp.transition, delay: 0.3 }}
           >
             <PricingCard
               title="Secure Saver — 54 USD / 3 years"
@@ -87,7 +103,7 @@ export function Pricing() {
         <MotionDiv
           initial={animations.fadeInUp.initial}
           animate={animations.fadeInUp.animate}
-          transition={{ ...animations.fadeInUp.transition, delay: 0.3 }}
+          transition={{ ...animations.fadeInUp.transition, delay: 0.4 }}
           className="text-center mt-12 space-y-2"
         >
           <p className="text-gray-500">
@@ -119,7 +135,7 @@ export function Pricing() {
               </div>
               <div className="flex items-center space-x-2">
                 <Check className="h-3 w-3 text-tn-accent flex-shrink-0" />
-                <span>Auto-save</span>
+                <span>Real-time sync</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Check className="h-3 w-3 text-tn-accent flex-shrink-0" />

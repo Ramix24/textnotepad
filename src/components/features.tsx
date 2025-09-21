@@ -34,14 +34,14 @@ const features = [
   },
   {
     icon: Save,
-    title: "Auto-Save",
-    description: "Never lose your work again. Every keystroke is automatically saved and encrypted."
+    title: "Real-time Sync",
+    description: "Your notes sync seamlessly across all devices with instant encryption."
   }
 ]
 
 export function Features() {
   return (
-    <Section id="features" className="bg-muted/20">
+    <Section id="features" className="bg-gray-50">
       <Container>
         <MotionDiv
           initial={animations.fadeInUp.initial}
@@ -49,10 +49,10 @@ export function Features() {
           transition={animations.fadeInUp.transition}
           className="text-center space-y-4 mb-16"
         >
-          <h2 className="text-3xl lg:text-4xl font-bold">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
             Privacy-first features for modern writers
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Everything you need to write securely, privately, and productively.
           </p>
         </MotionDiv>
@@ -68,14 +68,14 @@ export function Features() {
                 delay: 0.1 * index
               }}
             >
-              <Card className="h-full">
+              <Card className="h-full bg-white border-gray-200">
                 <CardContent className="p-6 space-y-4">
-                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <feature.icon className="h-6 w-6 text-primary" />
+                  <div className="h-12 w-12 rounded-xl bg-tn-accent/10 flex items-center justify-center">
+                    <feature.icon className="h-6 w-6 text-tn-accent" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">{feature.title}</h3>
-                    <p className="text-muted-foreground">{feature.description}</p>
+                    <h3 className="text-lg font-semibold text-gray-900">{feature.title}</h3>
+                    <p className="text-gray-600">{feature.description}</p>
                   </div>
                 </CardContent>
               </Card>

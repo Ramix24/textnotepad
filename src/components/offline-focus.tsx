@@ -7,7 +7,7 @@ import { WifiOff, Focus, Save, RotateCcw } from "lucide-react"
 
 export function OfflineFocus() {
   return (
-    <Section className="bg-muted/20">
+    <Section className="bg-gray-50">
       <Container>
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <MotionDiv
@@ -17,46 +17,46 @@ export function OfflineFocus() {
             className="space-y-8"
           >
             <div className="space-y-4">
-              <h2 className="text-3xl lg:text-4xl font-bold">
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
                 Write anywhere, sync everywhere
               </h2>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-xl text-gray-600">
                 Offline-first design means you never lose momentum.
               </p>
             </div>
 
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
-                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center mt-1">
-                  <WifiOff className="h-5 w-5 text-primary" />
+                <div className="h-10 w-10 rounded-xl bg-tn-accent/10 flex items-center justify-center mt-1">
+                  <WifiOff className="h-5 w-5 text-tn-accent" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold">Work Offline</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="font-semibold text-gray-900">Work Offline</h3>
+                  <p className="text-gray-600">
                     No internet? No problem. Keep writing and your notes will sync when you&apos;re back online.
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center mt-1">
-                  <Save className="h-5 w-5 text-primary" />
+                <div className="h-10 w-10 rounded-xl bg-tn-accent/10 flex items-center justify-center mt-1">
+                  <Save className="h-5 w-5 text-tn-accent" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold">Auto-Save Everything</h3>
-                  <p className="text-muted-foreground">
-                    Every keystroke is automatically saved locally and encrypted, so you never lose your work.
+                  <h3 className="font-semibold text-gray-900">Real-time Sync</h3>
+                  <p className="text-gray-600">
+                    Your notes sync instantly across all devices with seamless encryption.
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center mt-1">
-                  <RotateCcw className="h-5 w-5 text-primary" />
+                <div className="h-10 w-10 rounded-xl bg-tn-accent/10 flex items-center justify-center mt-1">
+                  <RotateCcw className="h-5 w-5 text-tn-accent" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold">Seamless Sync</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="font-semibold text-gray-900">Seamless Sync</h3>
+                  <p className="text-gray-600">
                     Intelligent conflict resolution ensures your notes are always up-to-date across all devices.
                   </p>
                 </div>
@@ -71,50 +71,50 @@ export function OfflineFocus() {
             className="space-y-8"
           >
             <div className="space-y-4">
-              <h2 className="text-3xl lg:text-4xl font-bold">
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
                 Distraction-free by design
               </h2>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-xl text-gray-600">
                 Clean interface that gets out of your way.
               </p>
             </div>
 
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
-                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center mt-1">
-                  <Focus className="h-5 w-5 text-primary" />
+                <div className="h-10 w-10 rounded-xl bg-tn-accent/10 flex items-center justify-center mt-1">
+                  <Focus className="h-5 w-5 text-tn-accent" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold">Focus Mode</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="font-semibold text-gray-900">Focus Mode</h3>
+                  <p className="text-gray-600">
                     Hide everything except your text. Perfect for deep writing sessions.
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center mt-1">
+                <div className="h-10 w-10 rounded-xl bg-tn-accent/10 flex items-center justify-center mt-1">
                   <div className="h-5 w-5 flex items-center justify-center">
-                    <div className="h-3 w-3 rounded-full bg-primary" />
+                    <div className="h-3 w-3 rounded-full bg-tn-accent" />
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold">Minimal UI</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="font-semibold text-gray-900">Minimal UI</h3>
+                  <p className="text-gray-600">
                     No cluttered toolbars or distracting buttons. Just you and your words.
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center mt-1">
+                <div className="h-10 w-10 rounded-xl bg-tn-accent/10 flex items-center justify-center mt-1">
                   <div className="h-5 w-5 flex items-center justify-center">
-                    <div className="h-2 w-2 rounded-full bg-primary" />
+                    <div className="h-2 w-2 rounded-full bg-tn-accent" />
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold">Dark Mode</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="font-semibold text-gray-900">Dark Mode</h3>
+                  <p className="text-gray-600">
                     Easy on the eyes for those late-night writing sessions.
                   </p>
                 </div>

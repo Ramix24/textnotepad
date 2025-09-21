@@ -69,7 +69,7 @@ const jsonLd = {
         "Self-destruct notes",
         "Offline mode & auto-sync",
         "Distraction-free writing",
-        "Auto-save",
+        "Real-time sync",
         "Open-source client",
         "GDPR compliant, EU hosting"
       ]
