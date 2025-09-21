@@ -73,42 +73,42 @@ export function Hero() {
 function EditorMockup() {
   return (
     <div className="relative">
-      <div className="bg-card rounded-2xl shadow-2xl border overflow-hidden">
-        <div className="flex items-center space-x-2 px-4 py-3 bg-muted/50 border-b">
+      <div className="bg-tn-surface rounded-2xl shadow-2xl border border-white/[0.06] overflow-hidden">
+        <div className="flex items-center space-x-2 px-4 py-3 bg-tn-bg/50 border-b border-white/[0.06]">
           <div className="flex space-x-2">
             <div className="w-3 h-3 rounded-full bg-red-500/60" />
             <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
             <div className="w-3 h-3 rounded-full bg-green-500/60" />
           </div>
-          <div className="text-sm text-muted-foreground ml-4">TextNotepad</div>
+          <div className="text-sm text-gray-400 ml-4">TextNotepad</div>
         </div>
         
-        <div className="p-6 space-y-4 min-h-[400px] bg-gradient-to-br from-background to-muted/20">
+        <div className="p-6 space-y-4 min-h-[400px] bg-gradient-to-br from-tn-surface to-tn-bg/20">
           <div className="space-y-2">
-            <div className="h-4 bg-muted/40 rounded w-3/4" />
-            <div className="h-4 bg-muted/30 rounded w-full" />
-            <div className="h-4 bg-muted/30 rounded w-5/6" />
+            <div className="h-4 bg-white/20 rounded w-3/4" />
+            <div className="h-4 bg-white/15 rounded w-full" />
+            <div className="h-4 bg-white/15 rounded w-5/6" />
           </div>
           
           <div className="space-y-2 pt-4">
-            <div className="h-4 bg-muted/30 rounded w-4/5" />
-            <div className="h-4 bg-muted/25 rounded w-full" />
-            <div className="h-4 bg-muted/25 rounded w-2/3" />
+            <div className="h-4 bg-white/15 rounded w-4/5" />
+            <div className="h-4 bg-white/10 rounded w-full" />
+            <div className="h-4 bg-white/10 rounded w-2/3" />
           </div>
           
           <div className="space-y-2 pt-4">
-            <div className="h-4 bg-muted/25 rounded w-3/4" />
-            <div className="h-4 bg-muted/20 rounded w-5/6" />
+            <div className="h-4 bg-white/10 rounded w-3/4" />
+            <div className="h-4 bg-white/8 rounded w-5/6" />
           </div>
           
-          <div className="absolute bottom-6 right-6 flex items-center space-x-2 text-xs text-muted-foreground">
+          <div className="absolute bottom-6 right-6 flex items-center space-x-2 text-xs text-gray-400">
             <Lock className="h-3 w-3" />
             <span>End-to-end encrypted</span>
           </div>
         </div>
       </div>
       
-      <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+      <div className="absolute -top-2 -right-2 bg-tn-accent text-white text-xs px-2 py-1 rounded-full">
         Secure
       </div>
     </div>
