@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://textnotepad.com/sitemap.xml
+
+# Disallow sensitive areas
+Disallow: /api/
+Disallow: /app/
+Disallow: /auth/
+
+# Allow important pages
+Allow: /
+Allow: /demo
+Allow: /privacy
+Allow: /terms
+Allow: /security
