@@ -33,16 +33,16 @@ export function Hero() {
 
             <div className="flex flex-col sm:flex-row gap-4">
               {user ? (
-                <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-blue-800 focus:ring-tn-accent/60">
+                <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-gray-800 focus:ring-tn-accent/60">
                   <Link href="/app">Open Editor</Link>
                 </Button>
               ) : (
-                <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-blue-800 focus:ring-tn-accent/60">
+                <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-gray-800 focus:ring-tn-accent/60">
                   <Link href="/auth">Activate Free Year</Link>
                 </Button>
               )}
               <Button size="lg" variant="outline" asChild className="bg-transparent border-tn-accent text-tn-accent hover:bg-tn-accent/10">
-                <Link href="/demo">Open Live Demo</Link>
+                <Link href="/demo">Free Trial</Link>
               </Button>
             </div>
             

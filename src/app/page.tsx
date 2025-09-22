@@ -3,11 +3,8 @@ import { Header } from '@/components/header'
 import { Hero } from '@/components/hero'
 import { Features } from '@/components/features'
 import { PrivacySecurity } from '@/components/privacy-security'
-import { OfflineFocus } from '@/components/offline-focus'
 import { Pricing } from '@/components/pricing'
-import { DemoCTA } from '@/components/demo-cta'
 import { Testimonials } from '@/components/testimonials'
-import { FAQ } from '@/components/faq'
 import { Footer } from '@/components/footer'
 
 const jsonLd = {
@@ -66,11 +63,7 @@ const jsonLd = {
       "featureList": [
         "Full End-to-End Encryption (E2EE)",
         "Zero-knowledge storage",
-        "Self-destruct notes",
-        "Offline mode & auto-sync",
         "Distraction-free writing",
-        "Real-time sync",
-        "Open-source client",
         "GDPR compliant, EU hosting"
       ]
     },
@@ -101,11 +94,8 @@ export default function Home() {
         <Hero />
         <Features />
         <PrivacySecurity />
-        <OfflineFocus />
         <Pricing />
-        <DemoCTA />
         <Testimonials />
-        <FAQ />
       </main>
       <Footer />
     </div>

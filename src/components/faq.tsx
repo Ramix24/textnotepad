@@ -29,19 +29,11 @@ const faqs = [
   },
   {
     question: "How secure is the encryption really?",
-    answer: "We use AES-256 encryption with client-side key generation. Your encryption keys never leave your device, so even if our servers were compromised, your notes would remain unreadable. Our open-source client allows security experts to verify our claims."
+    answer: "We use AES-256 encryption with client-side key generation. Your encryption keys never leave your device, so even if our servers were compromised, your notes would remain unreadable."
   },
   {
     question: "Can I export my notes if I want to leave?",
     answer: "Absolutely. You can export all your notes as plain text, Markdown, or JSON at any time. We believe in data portability - your notes are yours, not ours."
-  },
-  {
-    question: "Does offline mode really work everywhere?",
-    answer: "Yes! TextNotepad works completely offline. You can create, edit, and organize notes without any internet connection. When you're back online, everything syncs automatically with intelligent conflict resolution."
-  },
-  {
-    question: "Why is the client open source?",
-    answer: "Transparency builds trust. Security experts can audit our encryption implementation, and you can verify that we're doing exactly what we claim. The client handles all encryption/decryption, so you can see exactly how your data is protected."
   },
   {
     question: "What does 'EU hosting' mean for my privacy?",

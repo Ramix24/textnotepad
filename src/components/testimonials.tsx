@@ -17,7 +17,7 @@ const testimonials = [
     title: "Research Scientist"
   },
   {
-    quote: "The offline mode is a game-changer. I can write anywhere - on planes, in remote locations - and everything syncs perfectly when I'm back online.",
+    quote: "The clean, distraction-free interface helps me focus entirely on my writing. Perfect for long writing sessions.",
     name: "Emma Rodriguez",
     title: "Travel Writer"
   }

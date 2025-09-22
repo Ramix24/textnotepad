@@ -11,7 +11,6 @@ const securityFeatures = [
   "AES-256 encryption with client-side key generation",
   "Zero-knowledge architecture - we never see your plaintext",
   "Regular third-party security audits",
-  "Open-source client for full transparency",
   "GDPR compliant with EU data centers",
   "No tracking, no analytics, no data mining",
   "No auto-charge during 2025 — renewals start only after your free period ends"

@@ -13,11 +13,7 @@ import { useAuthSession } from "@/hooks/useAuthSession"
 const features = [
   "Full End-to-End Encryption (E2EE)",
   "Zero-knowledge storage",
-  "Self-destruct notes",
-  "Offline mode & auto-sync",
   "Distraction-free writing",
-  "Real-time sync",
-  "Open-source client",
   "GDPR compliant, EU hosting",
   "Email support",
   "30-day money-back guarantee"
@@ -123,23 +119,7 @@ export function Pricing() {
               </div>
               <div className="flex items-center space-x-2">
                 <Check className="h-3 w-3 text-tn-accent flex-shrink-0" />
-                <span>Self-destruct notes</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Check className="h-3 w-3 text-tn-accent flex-shrink-0" />
-                <span>Offline & auto-sync</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Check className="h-3 w-3 text-tn-accent flex-shrink-0" />
                 <span>Distraction-free interface</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Check className="h-3 w-3 text-tn-accent flex-shrink-0" />
-                <span>Real-time sync</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Check className="h-3 w-3 text-tn-accent flex-shrink-0" />
-                <span>Open-source client</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Check className="h-3 w-3 text-tn-accent flex-shrink-0" />

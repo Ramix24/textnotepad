@@ -4,7 +4,7 @@ import { Container } from "@/components/ui/container"
 import { Section } from "@/components/ui/section"
 import { Card, CardContent } from "@/components/ui/card"
 import { MotionDiv, animations } from "@/components/ui/motion"
-import { Shield, Lock, Timer, Wifi, Focus, Save } from "lucide-react"
+import { Shield, Lock, Focus } from "lucide-react"
 
 const features = [
   {
@@ -18,24 +18,9 @@ const features = [
     description: "Not even we can read your notes. Complete privacy by design."
   },
   {
-    icon: Timer,
-    title: "Self-Destruct Notes",
-    description: "Set expiration dates for sensitive notes that automatically delete themselves."
-  },
-  {
-    icon: Wifi,
-    title: "Offline Mode & Auto-Sync",
-    description: "Write anywhere, anytime. Your notes sync seamlessly when you're back online."
-  },
-  {
     icon: Focus,
     title: "Distraction-Free Writing",
     description: "Clean, minimalist interface designed to help you focus on what matters most."
-  },
-  {
-    icon: Save,
-    title: "Real-time Sync",
-    description: "Your notes sync seamlessly across all devices with instant encryption."
   }
 ]
 

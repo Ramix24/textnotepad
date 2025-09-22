@@ -46,7 +46,7 @@ module.exports = {
         tn: {
           bg: '#ffffff',
           surface: '#f8fafc',
-          accent: '#1e40af',
+          accent: '#1a1a1a',
         },
       },
       borderRadius: {
