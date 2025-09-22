@@ -48,7 +48,7 @@ export function FAQShort() {
             Quick FAQ
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Common questions about Promo 2025 and TextNotepad&apos;s privacy.
+            Common questions about Promo 2025 and TextNotepad.com&apos;s privacy.
           </p>
         </MotionDiv>
 

@@ -22,7 +22,7 @@ export function Header() {
               <div className="h-8 w-8 rounded-lg bg-tn-accent flex items-center justify-center">
                 <span className="text-white font-bold text-sm">T</span>
               </div>
-              <span className="text-xl font-semibold text-gray-900">TextNotepad</span>
+              <span className="text-xl font-semibold text-gray-900">TextNotepad.com</span>
             </Link>
 
             <nav className="hidden md:flex items-center space-x-8">

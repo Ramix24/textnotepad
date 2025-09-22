@@ -59,7 +59,7 @@ export function FAQ() {
             Frequently asked questions
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-7">
-            Everything you need to know about Promo 2025 and TextNotepad&apos;s privacy.
+            Everything you need to know about Promo 2025 and TextNotepad.com&apos;s privacy.
           </p>
         </MotionDiv>
 

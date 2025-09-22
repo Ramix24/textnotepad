@@ -35,7 +35,7 @@ export function PrivacySecurity() {
                 Not even we can read your notes.
               </p>
               <p className="text-lg text-gray-600">
-                TextNotepad uses end-to-end encryption with a zero-knowledge architecture. 
+                TextNotepad.com uses end-to-end encryption with a zero-knowledge architecture. 
                 Your notes are encrypted on your device before they ever leave it, and we 
                 never have access to your encryption keys.
               </p>
@@ -138,7 +138,7 @@ function SecurityDiagram() {
                 <Shield className="h-5 w-5 text-red-600" />
               </div>
               <div>
-                <div className="font-medium text-sm text-gray-900">TextNotepad Team</div>
+                <div className="font-medium text-sm text-gray-900">TextNotepad.com Team</div>
                 <div className="text-xs text-gray-600">Cannot decrypt</div>
               </div>
             </div>

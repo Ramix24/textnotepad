@@ -68,7 +68,7 @@ export function Pricing() {
               description="Perfect for individual writers"
               buttonText={user ? "Open Editor" : "Activate Free Year"}
               buttonHref={user ? "/app" : "/auth"}
-              badge="Promo"
+              badge="Limited Time - Free Until 2026"
               popular={true}
               promoFreeUntil={new Date('2026-12-31')}
               renewsOn={new Date('2027-01-01')}
@@ -174,16 +174,16 @@ export function PricingCard({
     <Card className={`h-full relative bg-white border border-gray-200 shadow-lg ${popular ? 'border-tn-accent shadow-blue-100' : ''}`}>
       {badge && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-          <div className="bg-tn-accent text-white text-xs px-3 py-1 rounded-full flex items-center space-x-1">
+          <div className="bg-blue-900 text-white text-xs px-4 py-2 rounded-full flex items-center space-x-2 shadow-lg border border-blue-800">
             <Star className="h-3 w-3" />
-            <span>{badge}</span>
+            <span className="font-medium">{badge}</span>
           </div>
         </div>
       )}
       {noPromo && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
           <div className="bg-gray-600 text-white text-xs px-3 py-1 rounded-full">
-            No Founders Promo
+            No Promo
           </div>
         </div>
       )}

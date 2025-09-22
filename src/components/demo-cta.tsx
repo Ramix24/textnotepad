@@ -19,7 +19,7 @@ export function DemoCTA() {
         >
           <div className="space-y-4">
             <h2 className="text-3xl lg:text-4xl font-bold">
-              See TextNotepad in action
+              See TextNotepad.com in action
             </h2>
             <p className="text-xl text-muted-foreground">
               Try it now — no signup required.

@@ -12,7 +12,7 @@ const testimonials = [
     title: "Journalist"
   },
   {
-    quote: "I write sensitive research notes daily. TextNotepad's zero-knowledge approach means I can focus on my work without worrying about data breaches.",
+    quote: "I write sensitive research notes daily. TextNotepad.com's zero-knowledge approach means I can focus on my work without worrying about data breaches.",
     name: "Dr. Marcus Webb", 
     title: "Research Scientist"
   },

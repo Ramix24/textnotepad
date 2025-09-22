@@ -23,7 +23,7 @@ export function Footer() {
                   <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
                     <span className="text-primary-foreground font-bold text-sm">T</span>
                   </div>
-                  <span className="text-xl font-semibold">TextNotepad</span>
+                  <span className="text-xl font-semibold">TextNotepad.com</span>
                 </div>
                 <p className="text-muted-foreground text-sm max-w-xs">
                   A modern web-based text editor built for privacy-conscious writers who demand simplicity and focus.
@@ -127,7 +127,7 @@ export function Footer() {
             <div className="border-t pt-8">
               <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                 <div className="text-sm text-muted-foreground">
-                  © 2024 TextNotepad. All rights reserved.
+                  © 2024 TextNotepad.com. All rights reserved.
                 </div>
                 
                 <div className="flex items-center space-x-4">
