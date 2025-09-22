@@ -32,7 +32,7 @@ export function DemoCTA() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" asChild className="group">
+            <Button size="lg" asChild className="group bg-tn-accent text-white hover:bg-gray-800">
               <Link href="/demo">
                 <Play className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
                 Open Live Demo

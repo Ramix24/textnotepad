@@ -57,7 +57,7 @@ export function PromoBanner() {
         <div className="flex items-center space-x-2 text-sm font-medium">
           <span>🎉</span>
           <span>
-            Founders Promo 2025: 1-year plan is FREE for accounts created by Dec 31, 2025. Free period lasts until Dec 31, 2026.
+            Promo 2025: 1-year plan is FREE for accounts created by Dec 31, 2025. Free period lasts until Dec 31, 2026.
           </span>
           {timeLeft && (
             <span className="hidden sm:inline bg-white/20 px-2 py-1 rounded text-xs">

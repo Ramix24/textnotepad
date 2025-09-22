@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Container } from "@/components/ui/container"
 import { MotionDiv, animations } from "@/components/ui/motion"
 import { Github, Twitter, Mail } from "lucide-react"
-import { FAQ } from "@/components/faq"
+import { FAQShort } from "@/components/faq-short"
 
 export function Footer() {
   return (
@@ -13,7 +13,7 @@ export function Footer() {
       animate={animations.fadeIn.animate}
       transition={animations.fadeIn.transition}
     >
-      <FAQ />
+      <FAQShort />
       <footer className="border-t bg-muted/20">
         <Container>
           <div className="py-16 space-y-12">
@@ -51,6 +51,16 @@ export function Footer() {
                   <li>
                     <Link href="/security" className="text-muted-foreground hover:text-foreground transition-colors">
                       Security
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/faq" className="text-muted-foreground hover:text-foreground transition-colors">
+                      FAQ
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/transparency" className="text-muted-foreground hover:text-foreground transition-colors">
+                      Transparency
                     </Link>
                   </li>
                 </ul>

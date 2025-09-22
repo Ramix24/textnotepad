@@ -50,19 +50,11 @@ export function Header() {
               >
                 FAQ
               </Link>
-              <Link
-                href="https://github.com/yourusername/textnotepad"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Open Source
-              </Link>
             </nav>
 
             <div className="flex items-center space-x-4">
               {user ? (
-                <Button size="sm" asChild className="bg-tn-accent text-white hover:bg-blue-800">
+                <Button size="sm" asChild className="bg-tn-accent text-white hover:bg-gray-800">
                   <Link href="/app">Open Editor</Link>
                 </Button>
               ) : (
@@ -70,7 +62,7 @@ export function Header() {
                   <Button variant="ghost" size="sm" asChild className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">
                     <Link href="/auth">Sign In</Link>
                   </Button>
-                  <Button size="sm" asChild className="bg-tn-accent text-white hover:bg-blue-800">
+                  <Button size="sm" asChild className="bg-tn-accent text-white hover:bg-gray-800">
                     <Link href="/auth">Activate Free Year</Link>
                   </Button>
                 </>

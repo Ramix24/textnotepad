@@ -27,7 +27,7 @@ export function Hero() {
                 <span className="text-tn-accent">ultra-secure</span>.
               </h1>
               <p className="text-xl text-gray-600 max-w-lg leading-7">
-                Founders Promo 2025: Get the 1-year plan completely free if you sign up by Dec 31, 2025.
+                Promo 2025: Get the 1-year plan completely free if you sign up by Dec 31, 2025.
               </p>
             </div>
 

@@ -32,7 +32,7 @@ export function Pricing() {
           className="text-center space-y-4 mb-16"
         >
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
-            Founders Promo 2025
+            Promo 2025
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-7">
             Get the 1-year plan completely free if you sign up by Dec 31, 2025.
@@ -68,7 +68,7 @@ export function Pricing() {
               description="Perfect for individual writers"
               buttonText={user ? "Open Editor" : "Activate Free Year"}
               buttonHref={user ? "/app" : "/auth"}
-              badge="Founders Promo"
+              badge="Promo"
               popular={true}
               promoFreeUntil={new Date('2026-12-31')}
               renewsOn={new Date('2027-01-01')}
@@ -219,7 +219,7 @@ export function PricingCard({
       <CardContent className="space-y-6">
         <div className="space-y-2">
           <Button 
-            className={`w-full ${popular ? 'bg-tn-accent text-white hover:bg-blue-800 focus:ring-tn-accent/60' : 'bg-transparent border-tn-accent text-tn-accent hover:bg-tn-accent/10'}`}
+            className={`w-full ${popular ? 'bg-tn-accent text-white hover:bg-gray-800 focus:ring-tn-accent/60' : 'bg-transparent border-tn-accent text-tn-accent hover:bg-tn-accent/10'}`}
             size="lg"
             asChild
           >
@@ -227,7 +227,7 @@ export function PricingCard({
           </Button>
           {promoBadge && (
             <p className="text-xs text-gray-500 text-center">
-              Founders Promo automatically applied at checkout.
+              Promo automatically applied at checkout.
             </p>
           )}
         </div>

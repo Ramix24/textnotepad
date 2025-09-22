@@ -50,11 +50,32 @@ export function PrivacySecurity() {
               ))}
             </ul>
 
-            <Button variant="outline" asChild className="border-tn-accent text-tn-accent hover:bg-tn-accent/10">
-              <Link href="/security">
-                Read Security Whitepaper
-              </Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 items-start">
+              <Button variant="outline" asChild className="border-tn-accent text-tn-accent hover:bg-tn-accent/10">
+                <Link href="/security">
+                  Read Security Whitepaper
+                </Link>
+              </Button>
+              
+              <div className="flex flex-wrap gap-3 items-center">
+                <div className="flex items-center space-x-2 bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+                  <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                    <Check className="h-2.5 w-2.5 text-white" />
+                  </div>
+                  <span className="text-xs font-medium text-green-700">GDPR Compliant</span>
+                </div>
+                
+                <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
+                  <Lock className="h-3 w-3 text-blue-600" />
+                  <span className="text-xs font-medium text-blue-700">Zero-Knowledge</span>
+                </div>
+                
+                <div className="flex items-center space-x-2 bg-purple-50 px-3 py-2 rounded-lg border border-purple-200">
+                  <Shield className="h-3 w-3 text-purple-600" />
+                  <span className="text-xs font-medium text-purple-700">E2E Encrypted</span>
+                </div>
+              </div>
+            </div>
           </MotionDiv>
 
           <MotionDiv
