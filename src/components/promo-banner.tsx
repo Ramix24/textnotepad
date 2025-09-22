@@ -52,12 +52,12 @@ export function PromoBanner() {
   if (!isVisible) return null
 
   return (
-    <div className="bg-tn-accent text-white py-3 px-4 relative">
+    <div className="bg-blue-900 text-white py-3 px-4 relative">
       <div className="max-w-7xl mx-auto flex items-center justify-center text-center">
         <div className="flex items-center space-x-2 text-sm font-medium">
           <span>🎉</span>
           <span>
-            Promo 2025: 1-year plan is FREE for accounts created by Dec 31, 2025. Free period lasts until Dec 31, 2026.
+            🚀 LIMITED TIME: Get TextNotepad.com 1-year plan completely FREE until Dec 31, 2026! No payment required until 2027.
           </span>
           {timeLeft && (
             <span className="hidden sm:inline bg-white/20 px-2 py-1 rounded text-xs">
