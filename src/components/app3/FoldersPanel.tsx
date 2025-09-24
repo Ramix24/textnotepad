@@ -167,8 +167,8 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
   
   const listboxRef = useRef<HTMLDivElement>(null)
   
-  // Check feature flag
-  const isFeatureEnabled = process.env.NEXT_PUBLIC_FEATURE_FOLDERS === 'true'
+  // Check feature flag - default to true if not set
+  const isFeatureEnabled = process.env.NEXT_PUBLIC_FEATURE_FOLDERS !== 'false'
 
   const handleCreateFolder = () => {
     const name = prompt('Enter folder name:')
