@@ -149,13 +149,13 @@ export function Footer() {
                   >
                     <Twitter className="h-5 w-5" />
                   </Link>
-                  <Link
-                    href="mailto:hello@textnotepad.com"
+                  <a
+                    href="mailto:support@textnotepad.com"
                     className="text-muted-foreground hover:text-foreground transition-colors"
                     aria-label="Email"
                   >
                     <Mail className="h-5 w-5" />
-                  </Link>
+                  </a>
                 </div>
               </div>
             </div>

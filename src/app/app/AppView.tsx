@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { AppShell } from '@/components/AppShell'
+import { AppShell3 } from '@/components/app3'
+import { isThreeCol } from '@/lib/flags'
 import { Editor } from '@/components/Editor'
 import { EditorSkeleton } from '@/components/EditorSkeleton'
 import { Sidebar } from '@/components/Sidebar'
@@ -134,10 +136,13 @@ export function AppView({ user: _user }: AppViewProps) {
     onQuickSwitch: handleQuickSwitch,
   })
 
+  // Determine which shell to use
+  const AppShellComponent = isThreeCol() ? AppShell3 : AppShell
+
   // Show loading or auth states
   if (authLoading) {
     return (
-      <AppShell
+      <AppShellComponent
         sidebar={<div className="p-4 text-center text-gray-500">Loading...</div>}
         content={<EditorSkeleton className="h-full" />}
       />
@@ -146,7 +151,7 @@ export function AppView({ user: _user }: AppViewProps) {
 
   if (!user) {
     return (
-      <AppShell
+      <AppShellComponent
         sidebar={<Sidebar />}
         content={<div className="flex items-center justify-center h-full p-6 text-center text-gray-500">Please sign in to access your notes</div>}
       />
@@ -155,30 +160,34 @@ export function AppView({ user: _user }: AppViewProps) {
 
   return (
     <>
-      <AppShell
-        sidebar={
-          <Sidebar 
-            currentFileId={currentFileId}
-            onSelect={handleFileSelect}
-            isDirtyMap={isDirtyMap}
-          />
-        }
-        content={
-          isLoadingFile ? (
-            <EditorSkeleton className="h-full" />
-          ) : currentFile ? (
-            <Editor 
-              key={currentFile.id} 
-              file={currentFile}
-              onFileUpdate={handleFileUpdate}
-              onDirtyChange={handleDirtyChange}
-              className="h-full"
+      {isThreeCol() ? (
+        <AppShell3 />
+      ) : (
+        <AppShell
+          sidebar={
+            <Sidebar 
+              currentFileId={currentFileId}
+              onSelect={handleFileSelect}
+              isDirtyMap={isDirtyMap}
             />
-          ) : (
-            <div className="flex items-center justify-center h-full p-6 text-center text-gray-500">No file selected</div>
-          )
-        }
-      />
+          }
+          content={
+            isLoadingFile ? (
+              <EditorSkeleton className="h-full" />
+            ) : currentFile ? (
+              <Editor 
+                key={currentFile.id} 
+                file={currentFile}
+                onFileUpdate={handleFileUpdate}
+                onDirtyChange={handleDirtyChange}
+                className="h-full"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full p-6 text-center text-gray-500">No file selected</div>
+            )
+          }
+        />
+      )}
       
       {/* Quick Switch Modal */}
       <QuickSwitchModal

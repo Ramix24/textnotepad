@@ -71,6 +71,22 @@ async function renameFile(params: { id: string; name: string }): Promise<UserFil
   return data.data
 }
 
+async function fetchFileById(id: string): Promise<UserFile> {
+  const response = await fetch(`/api/files/${id}`)
+  
+  if (!response.ok) {
+    const errorData: ApiResponse = await response.json()
+    throw new Error(errorData.error || 'Failed to fetch file')
+  }
+  
+  const data: ApiResponse<UserFile> = await response.json()
+  if (!data.data) {
+    throw new Error('No data returned from fetch file')
+  }
+  
+  return data.data
+}
+
 async function deleteFile(id: string): Promise<void> {
   const response = await fetch(`/api/files/${id}`, {
     method: 'DELETE',
@@ -99,6 +115,18 @@ export function useFilesList() {
     queryKey: filesKeys.lists(),
     queryFn: fetchFiles,
     staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}
+
+/**
+ * Hook for fetching a single file by ID
+ */
+export function useFileById(id?: string | null) {
+  return useQuery({
+    queryKey: filesKeys.detail(id!),
+    queryFn: () => fetchFileById(id!),
+    enabled: !!id, // Only run query if id is provided
+    staleTime: 2 * 60 * 1000, // 2 minutes
   })
 }
 
