@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, useRef, useEffect, KeyboardEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import type { Mode, AppSelection } from './types'
 
@@ -44,6 +44,8 @@ interface DefaultFoldersContentProps {
 }
 
 function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }: DefaultFoldersContentProps) {
+  const toolbarRef = useRef<HTMLDivElement>(null)
+  const modes: Mode[] = ['notes', 'messages', 'trash']
   
   const handleModeChange = (mode: Mode) => {
     onSelectionChange({ mode, folderId: null, fileId: null })
@@ -55,16 +57,48 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
     onMobileAdvance?.() // Auto-advance to pane 2 on mobile
   }
 
+  const handleToolbarKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    const { key } = e
+    const currentIndex = modes.indexOf(selection.mode)
+    
+    if (key === 'ArrowLeft' || key === 'ArrowRight') {
+      e.preventDefault()
+      const direction = key === 'ArrowRight' ? 1 : -1
+      const newIndex = Math.max(0, Math.min(modes.length - 1, currentIndex + direction))
+      const newMode = modes[newIndex]
+      
+      // Skip disabled messages mode
+      if (newMode === 'messages') {
+        const nextIndex = direction > 0 ? newIndex + 1 : newIndex - 1
+        if (nextIndex >= 0 && nextIndex < modes.length) {
+          handleModeChange(modes[nextIndex])
+        }
+      } else {
+        handleModeChange(newMode)
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Header toolbar */}
       <header className="flex-shrink-0 p-2 border-b border-border bg-card/20 sticky top-0 z-10">
-        <div className="flex gap-1">
+        <div 
+          ref={toolbarRef}
+          className="flex gap-1"
+          role="tablist"
+          aria-label="Content modes"
+          onKeyDown={handleToolbarKeyDown}
+        >
           <Button
             onClick={() => handleModeChange('notes')}
             variant={selection.mode === 'notes' ? 'default' : 'ghost'}
             size="sm"
             className="h-8 text-xs font-medium flex-1"
+            role="tab"
+            aria-selected={selection.mode === 'notes'}
+            aria-controls="folders-content"
+            id="tab-notes"
           >
             All Notes
           </Button>
@@ -74,6 +108,11 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
             size="sm"
             disabled
             className="h-8 text-xs font-medium flex-1 opacity-50 cursor-not-allowed"
+            role="tab"
+            aria-selected={selection.mode === 'messages'}
+            aria-controls="folders-content"
+            id="tab-messages"
+            aria-disabled="true"
           >
             Messages
           </Button>
@@ -82,6 +121,10 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
             variant={selection.mode === 'trash' ? 'default' : 'ghost'}
             size="sm"
             className="h-8 text-xs font-medium flex-1"
+            role="tab"
+            aria-selected={selection.mode === 'trash'}
+            aria-controls="folders-content"
+            id="tab-trash"
           >
             Trash
           </Button>
@@ -89,7 +132,12 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
       </header>
       
       {/* Folders list or mode-specific content */}
-      <div className="flex-1 overflow-auto">
+      <div 
+        id="folders-content"
+        className="flex-1 overflow-auto"
+        role="tabpanel"
+        aria-labelledby={`tab-${selection.mode}`}
+      >
         {selection.mode === 'notes' ? (
           <FoldersList 
             selection={selection}
@@ -118,16 +166,79 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
     { id: 'projects', name: 'Projects', count: 8 },
   ]
 
+  const listboxRef = useRef<HTMLDivElement>(null)
+  const allFolders = [{ id: null, name: 'All Notes', count: 0 }, ...mockFolders]
+  
+  // Find current selected index
+  const selectedIndex = allFolders.findIndex(folder => folder.id === selection.folderId)
+  const currentIndex = selectedIndex >= 0 ? selectedIndex : 0
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    const { key } = e
+    
+    if (key === 'ArrowDown' || key === 'ArrowUp') {
+      e.preventDefault()
+      const direction = key === 'ArrowDown' ? 1 : -1
+      const newIndex = Math.max(0, Math.min(allFolders.length - 1, currentIndex + direction))
+      const newFolder = allFolders[newIndex]
+      onFolderSelect(newFolder.id)
+      
+      // Focus the newly selected item
+      const items = listboxRef.current?.querySelectorAll('[role="option"]')
+      if (items && items[newIndex]) {
+        ;(items[newIndex] as HTMLElement).focus()
+      }
+    } else if (key === 'Enter' || key === ' ') {
+      e.preventDefault()
+      // Enter/Space is already handled by the button click
+    } else if (key === 'Home') {
+      e.preventDefault()
+      onFolderSelect(allFolders[0].id)
+      const items = listboxRef.current?.querySelectorAll('[role="option"]')
+      if (items && items[0]) {
+        ;(items[0] as HTMLElement).focus()
+      }
+    } else if (key === 'End') {
+      e.preventDefault()
+      const lastFolder = allFolders[allFolders.length - 1]
+      onFolderSelect(lastFolder.id)
+      const items = listboxRef.current?.querySelectorAll('[role="option"]')
+      if (items && items[allFolders.length - 1]) {
+        ;(items[allFolders.length - 1] as HTMLElement).focus()
+      }
+    }
+  }
+
+  // Focus management
+  useEffect(() => {
+    if (listboxRef.current && selectedIndex >= 0) {
+      const items = listboxRef.current.querySelectorAll('[role="option"]')
+      if (items[selectedIndex]) {
+        ;(items[selectedIndex] as HTMLElement).focus()
+      }
+    }
+  }, [selectedIndex])
+
   return (
     <div className="p-2">
       {/* All Notes option */}
-      <div role="listbox" className="space-y-1">
+      <div 
+        ref={listboxRef}
+        role="listbox"
+        className="space-y-1"
+        onKeyDown={handleKeyDown}
+        aria-label="Folders"
+        aria-activedescendant={`folder-${selection.folderId || 'all'}`}
+        tabIndex={0}
+      >
         <button
+          id="folder-all"
           role="option"
           aria-selected={selection.folderId === null}
           onClick={() => onFolderSelect(null)}
+          tabIndex={-1}
           className={`
-            w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm
+            w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
             ${selection.folderId === null
               ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
               : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
@@ -144,11 +255,13 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
         {mockFolders.map((folder) => (
           <button
             key={folder.id}
+            id={`folder-${folder.id}`}
             role="option"
             aria-selected={selection.folderId === folder.id}
             onClick={() => onFolderSelect(folder.id)}
+            tabIndex={-1}
             className={`
-              w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm
+              w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
               ${selection.folderId === folder.id
                 ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
                 : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
