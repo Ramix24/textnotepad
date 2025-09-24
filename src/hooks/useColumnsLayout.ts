@@ -22,8 +22,8 @@ const COL2_MIN = 260
 const COL2_MAX = 560
 
 const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
-  col1: 76, // Fixed sections rail width
-  col2: 360, // Default context list width
+  col1: 200, // Fixed folders panel width (increased from 76px for folder names)
+  col2: 360, // Default context list width  
   col2Min: COL2_MIN,
   col2Max: COL2_MAX,
   col3Min: 480 // Minimum detail view width
