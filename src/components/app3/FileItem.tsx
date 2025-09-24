@@ -1,23 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { MoreHorizontal, Edit3, Trash2, FileText } from 'lucide-react'
+import { useRef, useEffect } from 'react'
 import { UserFile } from '@/types/user-files.types'
 import { cn } from '@/lib/utils'
-// Simple time formatter - can be replaced with date-fns if needed
-function formatTimeAgo(date: Date): string {
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMs / 3600000)
-  const diffDays = Math.floor(diffMs / 86400000)
-
-  if (diffMins < 1) return 'just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  if (diffHours < 24) return `${diffHours}h ago`
-  if (diffDays < 7) return `${diffDays}d ago`
-  return date.toLocaleDateString()
-}
 
 interface FileItemProps {
   file: UserFile
@@ -50,7 +35,6 @@ export function FileItem({
   className,
   compact = false
 }: FileItemProps) {
-  const [showActions, setShowActions] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Focus input when starting to rename
@@ -82,20 +66,14 @@ export function FileItem({
     }
   }
 
-  const handleActionsClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setShowActions(!showActions)
-  }
 
   const handleRenameClick = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setShowActions(false)
     onStartRename(file)
   }
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setShowActions(false)
     onDelete(file)
   }
 
@@ -109,18 +87,16 @@ export function FileItem({
       aria-selected={isSelected}
       onClick={() => onSelect(file)}
       className={cn(
-        "group relative flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors",
+        "group relative flex items-center justify-between p-3 rounded cursor-pointer transition-colors",
         isSelected
-          ? "bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400"
-          : "hover:bg-zinc-100 dark:hover:bg-zinc-800",
+          ? "bg-gray-900 text-white"
+          : "text-gray-700 hover:bg-gray-100",
         compact && "p-2",
         className
       )}
-      onMouseEnter={() => setShowActions(true)}
-      onMouseLeave={() => setShowActions(false)}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
-        <FileText className={cn("text-muted-foreground flex-shrink-0", compact ? "w-3 h-3" : "w-4 h-4")} />
+        <span className={cn("flex-shrink-0", isSelected ? "text-gray-300" : "text-gray-500")}>📄</span>
         <div className="min-w-0 flex-1">
           {isRenaming ? (
             <input
@@ -131,7 +107,7 @@ export function FileItem({
               onKeyDown={handleKeyDown}
               onBlur={handleBlur}
               onClick={handleInputClick}
-              className="w-full px-2 py-1 text-sm bg-background border border-zinc-200 dark:border-zinc-700 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+              className="w-full px-2 py-1 text-sm bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-400"
               aria-label="Rename file"
             />
           ) : (
@@ -146,48 +122,31 @@ export function FileItem({
                   />
                 )}
               </div>
-              {!compact && (
-                <div className="text-xs text-muted-foreground truncate mt-0.5">
-                  {formatTimeAgo(new Date(file.updated_at))} • {file.word_count} words
-                </div>
-              )}
             </div>
           )}
         </div>
       </div>
 
       {!isRenaming && (
-        <div className="relative">
+        <div className="relative opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
           <button
-            onClick={handleActionsClick}
-            aria-label="File actions"
-            aria-expanded={showActions}
-            className={cn(
-              "p-1 rounded hover:bg-muted/50 transition-colors",
-              showActions || isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-            )}
+            onClick={handleRenameClick}
+            className="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-gray-700"
+            title="Rename file"
           >
-            <MoreHorizontal className="w-4 h-4" />
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
           </button>
-
-          {showActions && (
-            <div className="absolute right-0 top-6 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-md shadow-lg z-10 min-w-[120px]">
-              <button
-                onClick={handleRenameClick}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 text-left"
-              >
-                <Edit3 className="w-3 h-3" />
-                Rename
-              </button>
-              <button
-                onClick={handleDeleteClick}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 text-left"
-              >
-                <Trash2 className="w-3 h-3" />
-                Delete
-              </button>
-            </div>
-          )}
+          <button
+            onClick={handleDeleteClick}
+            className="p-1 hover:bg-red-100 rounded text-gray-500 hover:text-red-600"
+            title="Delete file"
+          >
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
         </div>
       )}
     </div>

@@ -23,7 +23,7 @@ export function DetailView({
 }: DetailViewProps) {
   return (
     <div 
-      className={`flex flex-col bg-background ${className}`}
+      className={`flex flex-col bg-white ${className}`}
       role="main"
       aria-label="Detail View"
     >
@@ -70,8 +70,8 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
   if (isLoading) {
     return (
       <div className="flex flex-col">
-        <header className="flex-shrink-0 h-12 flex items-center px-4 border-b border-border bg-card/20">
-          <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+        <header className="flex-shrink-0 h-12 flex items-center px-4 border-b border-gray-200 bg-gray-50">
+          <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
         </header>
         <div className="flex-1">
           <EditorSkeleton className="h-full" />
@@ -89,13 +89,8 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
   if (file) {
     return (
       <div className="flex flex-col h-full">
-        <header className="flex-shrink-0 h-12 flex items-center justify-between px-4 border-b border-border bg-card/20">
-          <h1 className="text-sm font-medium text-foreground truncate">{file.name}</h1>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>{file.word_count} words</span>
-            <span>·</span>
-            <span>{new Date(file.updated_at).toLocaleDateString()}</span>
-          </div>
+        <header className="flex-shrink-0 h-12 flex items-center justify-between px-4 border-b border-gray-200 bg-gray-50">
+          <h1 className="text-sm font-medium text-gray-900 truncate">{file.name}</h1>
         </header>
         
         <div className="flex-1 min-h-0">
@@ -109,28 +104,6 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
         </div>
 
         {/* Footer */}
-        <footer className="flex-shrink-0 px-4 py-2 border-t border-border bg-card/20">
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <span>{file.char_count} chars</span>
-              <span>·</span>
-              <span>{file.line_count} lines</span>
-              <span>·</span>
-              <span>Version {file.version}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1">
-                <kbd className="px-1 py-0.5 text-[10px] bg-muted rounded border">⌘S</kbd>
-                <span>save</span>
-              </div>
-              <span>·</span>
-              <div className="flex items-center gap-1">
-                <kbd className="px-1 py-0.5 text-[10px] bg-muted rounded border">⌘K</kbd>
-                <span>search</span>
-              </div>
-            </div>
-          </div>
-        </footer>
       </div>
     )
   }

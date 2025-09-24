@@ -25,7 +25,7 @@ export function ContextList({
   
   return (
     <div 
-      className={`flex flex-col bg-zinc-50/20 dark:bg-zinc-800/20 border-r border-zinc-200 dark:border-zinc-700 ${className}`}
+      className={`flex flex-col bg-white border-r border-gray-200 ${className}`}
       role="main"
       aria-label="Context List"
     >

@@ -1,7 +1,6 @@
 'use client'
 
 import { ReactNode, useRef, useEffect, KeyboardEvent } from 'react'
-import { Button } from '@/components/ui/button'
 import { useFoldersList, useCreateFolder, useRenameFolder, useDeleteFolder } from '@/hooks/useFolders'
 import type { Mode, AppSelection } from './types'
 
@@ -23,7 +22,7 @@ export function FoldersPanel({
   
   return (
     <div 
-      className={`flex flex-col bg-zinc-50/30 dark:bg-zinc-800/30 border-r border-zinc-200 dark:border-zinc-700 ${className}`}
+      className={`flex flex-col bg-gray-50 border-r border-gray-200 ${className}`}
       role="navigation"
       aria-label="Folders and Modes"
     >
@@ -83,7 +82,7 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
   return (
     <div className="flex flex-col h-full">
       {/* Header toolbar */}
-      <header className="flex-shrink-0 p-2 border-b border-border bg-card/20 sticky top-0 z-10">
+      <header className="flex-shrink-0 px-4 py-3 border-b border-gray-200 bg-white">
         <div 
           ref={toolbarRef}
           className="flex gap-1"
@@ -91,44 +90,34 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
           aria-label="Content modes"
           onKeyDown={handleToolbarKeyDown}
         >
-          <Button
+          <button
             onClick={() => handleModeChange('notes')}
-            variant={selection.mode === 'notes' ? 'default' : 'ghost'}
-            size="sm"
-            className="h-8 text-xs font-medium flex-1"
+            className={`px-3 py-1 text-sm font-medium rounded transition-colors flex-1 ${
+              selection.mode === 'notes' 
+                ? 'bg-gray-900 text-white' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
             role="tab"
             aria-selected={selection.mode === 'notes'}
             aria-controls="folders-content"
             id="tab-notes"
           >
-            All Notes
-          </Button>
-          <Button
-            onClick={() => handleModeChange('messages')}
-            variant={selection.mode === 'messages' ? 'default' : 'ghost'}
-            size="sm"
-            disabled
-            className="h-8 text-xs font-medium flex-1 opacity-50 cursor-not-allowed"
-            role="tab"
-            aria-selected={selection.mode === 'messages'}
-            aria-controls="folders-content"
-            id="tab-messages"
-            aria-disabled="true"
-          >
-            Messages
-          </Button>
-          <Button
+            Notes
+          </button>
+          <button
             onClick={() => handleModeChange('trash')}
-            variant={selection.mode === 'trash' ? 'default' : 'ghost'}
-            size="sm"
-            className="h-8 text-xs font-medium flex-1"
+            className={`px-3 py-1 text-sm font-medium rounded transition-colors flex-1 ${
+              selection.mode === 'trash' 
+                ? 'bg-gray-900 text-white' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+            }`}
             role="tab"
             aria-selected={selection.mode === 'trash'}
             aria-controls="folders-content"
             id="tab-trash"
           >
             Trash
-          </Button>
+          </button>
         </div>
       </header>
       
@@ -262,45 +251,36 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
   if (!isFeatureEnabled) {
     // Only show All Notes when feature is disabled
     return (
-      <div className="p-2">
-        <div className="space-y-1">
-          <button
-            onClick={() => onFolderSelect(null)}
-            className="w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-sm">📝</span>
-              <span className="font-medium">All Notes</span>
-            </div>
-          </button>
-        </div>
+      <div className="p-3">
+        <button
+          onClick={() => onFolderSelect(null)}
+          className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-gray-100 text-gray-900 hover:bg-gray-200"
+        >
+          <span className="text-gray-500">📄</span>
+          <span className="font-medium">All Notes</span>
+        </button>
       </div>
     )
   }
   
   if (isLoading) {
     return (
-      <div className="p-2">
+      <div className="p-3">
         <div className="space-y-1">
           {/* All Notes button */}
           <button
             onClick={() => onFolderSelect(null)}
-            className="w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"
+            className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-gray-100 text-gray-900 hover:bg-gray-200"
           >
-            <div className="flex items-center gap-3">
-              <span className="text-sm">📝</span>
-              <span className="font-medium">All Notes</span>
-            </div>
+            <span className="text-gray-500">📄</span>
+            <span className="font-medium">All Notes</span>
           </button>
           
           {/* Loading skeleton for folders */}
           {[1, 2, 3].map((i) => (
-            <div key={i} className="w-full flex items-center justify-between p-2 rounded-lg">
-              <div className="flex items-center gap-3">
-                <span className="text-sm">📁</span>
-                <div className="h-4 w-16 bg-muted rounded animate-pulse" />
-              </div>
-              <div className="h-3 w-6 bg-muted rounded animate-pulse" />
+            <div key={i} className="w-full flex items-center gap-3 p-2">
+              <span className="text-gray-400">📁</span>
+              <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
             </div>
           ))}
         </div>
@@ -311,29 +291,27 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
   // Handle error state
   if (error) {
     return (
-      <div className="p-2">
+      <div className="p-3">
         <div className="space-y-1">
           {/* All Notes button - always available */}
           <button
             onClick={() => onFolderSelect(null)}
-            className="w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"
+            className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-gray-100 text-gray-900 hover:bg-gray-200"
           >
-            <div className="flex items-center gap-3">
-              <span className="text-sm">📝</span>
-              <span className="font-medium">All Notes</span>
-            </div>
+            <span className="text-gray-500">📄</span>
+            <span className="font-medium">All Notes</span>
           </button>
         </div>
         
-        <div className="mt-4 p-3 bg-destructive/10 rounded-lg">
-          <p className="text-xs text-destructive">Failed to load folders</p>
+        <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-600">
+          Failed to load folders
         </div>
       </div>
     )
   }
 
   return (
-    <div className="p-2">
+    <div className="p-3">
       {/* All Notes option */}
       <div 
         ref={listboxRef}
@@ -351,17 +329,15 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
           onClick={() => onFolderSelect(null)}
           tabIndex={-1}
           className={`
-            w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+            w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-gray-400
             ${selection.folderId === null
-              ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
-              : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
+              ? 'bg-gray-900 text-white'
+              : 'text-gray-700 hover:bg-gray-100'
             }
           `}
         >
-          <div className="flex items-center gap-3">
-            <span className="text-sm">📝</span>
-            <span className="font-medium">All Notes</span>
-          </div>
+          <span className={selection.folderId === null ? 'text-gray-300' : 'text-gray-500'}>📄</span>
+          <span className="font-medium">All Notes</span>
         </button>
 
         {/* Individual folders */}
@@ -377,40 +353,42 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
               onClick={() => onFolderSelect(folder.id)}
               tabIndex={-1}
               className={`
-                w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+                w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 pr-16
                 ${selection.folderId === folder.id
-                  ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
-                  : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-700 hover:bg-gray-100'
                 }
               `}
             >
-              <div className="flex items-center gap-3">
-                <span className="text-sm">📁</span>
-                <span className="font-medium">{folder.name}</span>
-              </div>
+              <span className={selection.folderId === folder.id ? 'text-gray-300' : 'text-gray-500'}>📁</span>
+              <span className="font-medium">{folder.name}</span>
             </button>
             
             {/* Context menu for folder actions */}
-            <div className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   handleRenameFolder(folder.id, folder.name)
                 }}
-                className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-xs"
+                className="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-gray-700"
                 title="Rename folder"
               >
-                ✏️
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
               </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   handleDeleteFolder(folder.id, folder.name)
                 }}
-                className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-xs ml-1"
+                className="p-1 hover:bg-red-100 rounded text-gray-500 hover:text-red-600"
                 title="Delete folder"
               >
-                🗑️
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
               </button>
             </div>
           </div>
@@ -418,18 +396,19 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
       </div>
       
       {/* Footer */}
-      <footer className="mt-auto">
+      <footer className="mt-auto pt-4">
         {/* New Folder CTA */}
-        <div className="p-2 border-t border-border bg-card/20">
-          <Button
-            variant="outline"
-            size="sm"
+        <div className="px-3 pb-3 border-t border-gray-200 pt-3">
+          <button
             onClick={handleCreateFolder}
             disabled={createFolder.isPending}
-            className="w-full h-8 text-xs"
+            className="w-full flex items-center justify-center gap-2 p-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded border border-gray-300 hover:border-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {createFolder.isPending ? 'Creating...' : '+ New Folder'}
-          </Button>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            {createFolder.isPending ? 'Creating...' : 'New Folder'}
+          </button>
         </div>
       </footer>
     </div>
