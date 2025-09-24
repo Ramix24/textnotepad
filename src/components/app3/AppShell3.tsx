@@ -1,12 +1,18 @@
 'use client'
 
 import { ReactNode, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import { LogOut } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { useColumnsLayout } from '@/hooks/useColumnsLayout'
 import { useKeyboardNav } from '@/hooks/useKeyboardNav'
 import { useCreateFile } from '@/hooks/useFiles'
+import { useSupabase } from '@/components/SupabaseProvider'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { SectionsRail } from './SectionsRail'
 import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
+import { toast } from 'sonner'
 
 interface AppShell3Props {
   sectionsContent?: ReactNode
@@ -25,6 +31,9 @@ export function AppShell3({
   const createFile = useCreateFile()
   const resizerRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const { supabase } = useSupabase()
+  const { user } = useAuthSession()
+  const router = useRouter()
   
   // Refs for focusing columns
   const sectionsRef = useRef<HTMLDivElement>(null)
@@ -111,6 +120,25 @@ export function AppShell3({
     }
   }, [layout, createFile])
 
+  // Handle sign out
+  const handleSignOut = useCallback(async () => {
+    try {
+      const { error } = await supabase.auth.signOut()
+
+      if (error) {
+        toast.error('Authentication failed, please retry', {
+          description: 'Unable to sign out. Please try again.',
+        })
+      } else {
+        router.push('/')
+      }
+    } catch {
+      toast.error('Sign out failed', {
+        description: 'An unexpected error occurred during sign out.',
+      })
+    }
+  }, [supabase, router])
+
   // Global keyboard navigation
   useKeyboardNav({
     onFocusColumn1: handleFocusColumn1,
@@ -191,9 +219,9 @@ export function AppShell3({
           <div className="text-sm font-medium text-foreground">
             TextNotepad
           </div>
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-4">
             {layout.isDesktop && (
-              <div className="hidden md:flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground">
                 <kbd className="px-1.5 py-0.5 text-[10px] bg-muted rounded border">1</kbd>
                 <kbd className="px-1.5 py-0.5 text-[10px] bg-muted rounded border">2</kbd>
                 <kbd className="px-1.5 py-0.5 text-[10px] bg-muted rounded border">3</kbd>
@@ -203,9 +231,27 @@ export function AppShell3({
                 <span>new</span>
               </div>
             )}
-            <div>
-              {layout.breakpoint} · {layout.state.activePanel}
-            </div>
+            
+            {/* User Authentication UI */}
+            {user && (
+              <div className="flex items-center gap-3">
+                {user.email && (
+                  <span className="text-sm text-muted-foreground hidden sm:block">
+                    {user.email}
+                  </span>
+                )}
+                <Button
+                  onClick={handleSignOut}
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground h-8"
+                >
+                  <LogOut className="h-3 w-3 mr-1.5" />
+                  <span className="hidden sm:inline">Sign out</span>
+                  <span className="sm:hidden">Exit</span>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </header>
