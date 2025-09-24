@@ -2,17 +2,13 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
-import { LogOut } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
-import { Button } from '@/components/ui/button'
 import { useCountersWorker, type CountResult } from '@/hooks/useCountersWorker'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { updateFileContent, calculateContentStats } from '@/lib/userFiles.repo'
-import { useAuthSession } from '@/hooks/useAuthSession'
 import { useSupabase } from '@/components/SupabaseProvider'
 import { UserFile } from '@/types/user-files.types'
 import { cn } from '@/lib/utils'
-import { useRouter } from 'next/navigation'
 
 interface EditorProps {
   file: UserFile
@@ -41,8 +37,6 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
   
   // Refs for managing focus and keyboard shortcuts
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const router = useRouter()
-  const { user } = useAuthSession()
   const queryClient = useQueryClient()
   
   // Web Worker for live statistics
@@ -96,24 +90,6 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     })
   }, [isDirty, file.id, onDirtyChange, computeStats])
 
-  // Handle sign out
-  const handleSignOut = useCallback(async () => {
-    try {
-      const { error } = await supabase.auth.signOut()
-
-      if (error) {
-        toast.error('Authentication failed, please retry', {
-          description: 'Unable to sign out. Please try again.',
-        })
-      } else {
-        router.push('/')
-      }
-    } catch {
-      toast.error('Authentication failed, please retry', {
-        description: 'An unexpected error occurred during sign out.',
-      })
-    }
-  }, [router, supabase.auth])
 
   // Keyboard shortcuts
   const handleKeyDown = useCallback(async (event: React.KeyboardEvent) => {
@@ -175,23 +151,23 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
 
   // Save status color
   const getSaveStatusColor = () => {
-    if (saveMutation.isPending) return 'text-blue-600'
-    if (isDirty) return 'text-amber-600'
-    return 'text-green-600'
+    if (saveMutation.isPending) return 'text-blue-400'
+    if (isDirty) return 'text-amber-400'
+    return 'text-green-400'
   }
 
   return (
-    <div className={cn('flex flex-col h-full bg-background', className)}>
+    <div className={cn('flex flex-col h-full bg-gray-900', className)}>
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 bg-gray-800">
         <div className="flex items-center space-x-2">
           {/* File name with dirty indicator */}
-          <h1 className="text-lg font-medium text-foreground">
+          <h1 className="text-lg font-medium text-white">
             {file.name}
           </h1>
           {isDirty && (
             <span 
-              className="text-amber-600 text-xl leading-none"
+              className="text-amber-400 text-xl leading-none"
               title="Unsaved changes"
               aria-label="Unsaved changes"
             >
@@ -200,32 +176,16 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
           )}
           
           {/* File metadata */}
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-gray-400">
             v{file.version}
           </span>
         </div>
         
-        {/* Save status, user email, and sign out */}
+        {/* Save status */}
         <div className="flex items-center space-x-3">
           <span className={cn('text-sm font-medium', getSaveStatusColor())}>
             {getSaveStatus()}
           </span>
-          
-          {user?.email && (
-            <span className="text-sm text-gray-500">
-              {user.email}
-            </span>
-          )}
-          
-          <Button
-            onClick={handleSignOut}
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign out
-          </Button>
         </div>
       </div>
 
@@ -238,10 +198,10 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
           className={cn(
-            'flex-1 w-full p-4 bg-background text-foreground',
+            'flex-1 w-full p-4 bg-gray-900 text-white',
             'font-mono text-sm leading-relaxed', // Monospace for code-like editing
-            'border-0 outline-none ring-0 focus:ring-2 focus:ring-ring focus:ring-offset-2',
-            'resize-none placeholder:text-muted-foreground',
+            'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
+            'resize-none placeholder:text-gray-400',
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
           placeholder="Start typing your content here..."

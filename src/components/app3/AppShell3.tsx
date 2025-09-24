@@ -172,21 +172,21 @@ export function AppShell3({
               className={`
                 flex-1 flex flex-col items-center justify-center gap-1 text-xs font-medium transition-all duration-200 relative
                 ${isActive 
-                  ? 'text-indigo-600 dark:text-indigo-400' 
+                  ? 'text-blue-400' 
                   : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 active:scale-95'
                 }
               `}
             >
               {/* Active indicator */}
               {isActive && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-indigo-500 rounded-full" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-blue-400 rounded-full" />
               )}
               
               {/* Icon */}
               <div className={`
                 w-8 h-8 rounded-lg flex items-center justify-center transition-colors
                 ${isActive 
-                  ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' 
+                  ? 'bg-gray-700 text-blue-400' 
                   : 'bg-transparent text-zinc-500 dark:text-zinc-400 group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800'
                 }
               `}>
@@ -196,7 +196,7 @@ export function AppShell3({
               {/* Label */}
               <span className={`
                 leading-none transition-colors
-                ${isActive ? 'text-indigo-600 dark:text-indigo-400 font-semibold' : 'text-zinc-500 dark:text-zinc-400'}
+                ${isActive ? 'text-blue-400 font-semibold' : 'text-gray-400'}
               `}>
                 {tab.label}
               </span>
@@ -313,7 +313,7 @@ export function AppShell3({
             aria-orientation="vertical"
             tabIndex={0}
             className={`w-1 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 cursor-col-resize flex-shrink-0 transition-colors ${
-              layout.state.isResizing ? 'bg-indigo-500' : ''
+              layout.state.isResizing ? 'bg-blue-400' : ''
             }`}
             onMouseDown={handleMouseDown}
             onKeyDown={handleKeyDown}
@@ -325,7 +325,7 @@ export function AppShell3({
           <div 
             ref={detailRef}
             tabIndex={-1}
-            className="flex-1 min-w-0 outline-none focus:ring-2 focus:ring-indigo-500/50 focus:ring-inset"
+            className="flex-1 min-w-0 outline-none focus:ring-2 focus:ring-blue-400/50 focus:ring-inset"
             style={{ 
               minWidth: layout.breakpoint === 'desktop' ? layout.columnWidths.col3Min : undefined 
             }}
