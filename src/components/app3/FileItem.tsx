@@ -89,14 +89,14 @@ export function FileItem({
       className={cn(
         "group relative flex items-center justify-between p-3 rounded cursor-pointer transition-colors",
         isSelected
-          ? "bg-gray-900 text-white"
-          : "text-gray-700 hover:bg-gray-100",
+          ? "bg-gray-700 text-white"
+          : "text-gray-300 hover:text-gray-100 hover:bg-gray-700",
         compact && "p-2",
         className
       )}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
-        <span className={cn("flex-shrink-0", isSelected ? "text-gray-300" : "text-gray-500")}>📄</span>
+        <span className={cn("flex-shrink-0", isSelected ? "text-gray-400" : "text-gray-500")}>📄</span>
         <div className="min-w-0 flex-1">
           {isRenaming ? (
             <input
@@ -107,7 +107,7 @@ export function FileItem({
               onKeyDown={handleKeyDown}
               onBlur={handleBlur}
               onClick={handleInputClick}
-              className="w-full px-2 py-1 text-sm bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-400"
+              className="w-full px-2 py-1 text-sm bg-gray-800 text-white border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-gray-500"
               aria-label="Rename file"
             />
           ) : (
@@ -131,7 +131,7 @@ export function FileItem({
         <div className="relative opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
           <button
             onClick={handleRenameClick}
-            className="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-gray-700"
+            className="p-1 hover:bg-gray-600 rounded text-gray-400 hover:text-gray-200"
             title="Rename file"
           >
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +140,7 @@ export function FileItem({
           </button>
           <button
             onClick={handleDeleteClick}
-            className="p-1 hover:bg-red-100 rounded text-gray-500 hover:text-red-600"
+            className="p-1 hover:bg-red-900 rounded text-gray-400 hover:text-red-400"
             title="Delete file"
           >
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

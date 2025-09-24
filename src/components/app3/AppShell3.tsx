@@ -213,9 +213,9 @@ export function AppShell3({
       data-testid="app-shell-3"
     >
       {/* Header */}
-      <header className="h-14 border-b border-gray-200 bg-white flex-shrink-0">
+      <header className="h-14 border-b border-gray-700 bg-gray-800 flex-shrink-0">
         <div className="flex items-center justify-between h-full px-6">
-          <div className="text-lg font-medium text-gray-900">
+          <div className="text-lg font-medium text-white">
             textnotepad.com
           </div>
           
@@ -228,7 +228,7 @@ export function AppShell3({
               <input
                 type="text"
                 placeholder="Search notes..."
-                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-gray-50 hover:bg-white transition-colors"
+                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent bg-gray-700 text-white placeholder-gray-400 hover:bg-gray-600 transition-colors"
               />
             </div>
           </div>
@@ -239,7 +239,7 @@ export function AppShell3({
             {user && (
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

@@ -25,7 +25,7 @@ export function ContextList({
   
   return (
     <div 
-      className={`flex flex-col bg-white border-r border-gray-200 ${className}`}
+      className={`flex flex-col bg-gray-900 border-r border-gray-700 ${className}`}
       role="main"
       aria-label="Context List"
     >
@@ -201,15 +201,15 @@ function NotesView({
 
   return (
     <div className="flex flex-col">
-      <header className="flex-shrink-0 p-4 border-b border-border bg-card/30 flex items-center justify-between">
+      <header className="flex-shrink-0 p-4 border-b border-gray-700 bg-gray-800 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-medium text-foreground">{getFolderDisplayName()}</h2>
-          <p className="text-xs text-muted-foreground mt-1">{files.length} notes</p>
+          <h2 className="text-sm font-medium text-white">{getFolderDisplayName()}</h2>
+          <p className="text-xs text-gray-400 mt-1">{files.length} notes</p>
         </div>
         <button
           onClick={onNewNote}
           disabled={fileOps.createFile.isPending}
-          className="px-3 py-1.5 text-xs font-medium bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+          className="px-3 py-1.5 text-xs font-medium bg-gray-700 text-white rounded-md hover:bg-gray-600 disabled:opacity-50 transition-colors"
         >
           {fileOps.createFile.isPending ? 'Creating...' : 'New Note'}
         </button>
@@ -218,7 +218,7 @@ function NotesView({
       <div className="flex-1 overflow-auto">
         {isLoading ? (
           <div className="p-6 text-center">
-            <div className="text-sm text-muted-foreground">Loading notes...</div>
+            <div className="text-sm text-gray-400">Loading notes...</div>
           </div>
         ) : sortedFiles.length === 0 ? (
           <NotesEmptyState onNewNote={onNewNote} isCreating={fileOps.createFile.isPending} />
@@ -245,8 +245,8 @@ function NotesView({
       </div>
 
       {/* Footer */}
-      <footer className="flex-shrink-0 p-3 border-t border-border bg-card/20">
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+      <footer className="flex-shrink-0 p-3 border-t border-gray-700 bg-gray-800">
+        <div className="flex items-center justify-between text-xs text-gray-400">
           <div className="flex items-center gap-2">
             <span>{files.length} notes</span>
             {files.length > 0 && (
@@ -257,7 +257,7 @@ function NotesView({
             )}
           </div>
           <div className="flex items-center gap-1">
-            <kbd className="px-1 py-0.5 text-[10px] bg-muted rounded border">⌘N</kbd>
+            <kbd className="px-1 py-0.5 text-[10px] bg-gray-700 text-gray-300 rounded border border-gray-600">⌘N</kbd>
             <span>new</span>
           </div>
         </div>
@@ -269,17 +269,17 @@ function NotesView({
 function NotesEmptyState({ onNewNote, isCreating }: { onNewNote: () => void, isCreating: boolean }) {
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-      <div className="w-12 h-12 rounded-lg bg-muted mb-4 flex items-center justify-center">
+      <div className="w-12 h-12 rounded-lg bg-gray-800 mb-4 flex items-center justify-center">
         <span className="text-lg">📝</span>
       </div>
-      <h3 className="text-sm font-medium text-foreground mb-2">No notes in this folder</h3>
-      <p className="text-xs text-muted-foreground leading-relaxed max-w-[200px] mb-4">
+      <h3 className="text-sm font-medium text-white mb-2">No notes in this folder</h3>
+      <p className="text-xs text-gray-400 leading-relaxed max-w-[200px] mb-4">
         Start writing your first note in this folder
       </p>
       <button
         onClick={onNewNote}
         disabled={isCreating}
-        className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+        className="px-4 py-2 text-sm font-medium bg-gray-700 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 transition-colors"
       >
         {isCreating ? 'Creating...' : '+ New Note'}
       </button>
@@ -290,11 +290,11 @@ function NotesEmptyState({ onNewNote, isCreating }: { onNewNote: () => void, isC
 function TrashView() {
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-      <div className="w-12 h-12 rounded-lg bg-muted mb-4 flex items-center justify-center">
+      <div className="w-12 h-12 rounded-lg bg-gray-800 mb-4 flex items-center justify-center">
         <span className="text-lg">🗑️</span>
       </div>
-      <h3 className="text-sm font-medium text-foreground mb-2">Trash</h3>
-      <p className="text-xs text-muted-foreground leading-relaxed max-w-[200px]">
+      <h3 className="text-sm font-medium text-white mb-2">Trash</h3>
+      <p className="text-xs text-gray-400 leading-relaxed max-w-[200px]">
         Deleted items will appear here. Coming soon with RLS implementation.
       </p>
     </div>
@@ -304,16 +304,16 @@ function TrashView() {
 function MessagesView() {
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-      <div className="w-12 h-12 rounded-lg bg-muted mb-4 flex items-center justify-center">
+      <div className="w-12 h-12 rounded-lg bg-gray-800 mb-4 flex items-center justify-center">
         <span className="text-lg">💬</span>
       </div>
-      <h3 className="text-sm font-medium text-foreground mb-2">Messages</h3>
-      <p className="text-xs text-muted-foreground leading-relaxed max-w-[200px]">
+      <h3 className="text-sm font-medium text-white mb-2">Messages</h3>
+      <p className="text-xs text-gray-400 leading-relaxed max-w-[200px]">
         No conversations yet. Start a conversation to see your messages here.
       </p>
       <button 
         disabled
-        className="mt-4 px-3 py-1.5 text-xs font-medium text-muted-foreground border border-border rounded-md cursor-not-allowed"
+        className="mt-4 px-3 py-1.5 text-xs font-medium text-gray-400 border border-gray-600 rounded-md cursor-not-allowed"
       >
         Coming Soon
       </button>
