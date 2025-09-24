@@ -30,19 +30,23 @@ test.describe('3-Column Layout', () => {
       await setupApp(page)
       
       // Verify all 3 columns are visible
-      const sectionsColumn = page.locator('[data-testid="sections-column"]')
+      const foldersColumn = page.locator('[data-testid="folders-column"]')
       const listColumn = page.locator('[data-testid="list-column"]') 
       const detailColumn = page.locator('[data-testid="detail-column"]')
       
-      await expect(sectionsColumn).toBeVisible()
+      await expect(foldersColumn).toBeVisible()
       await expect(listColumn).toBeVisible()
       await expect(detailColumn).toBeVisible()
       
-      // Verify sections rail shows section buttons
-      await expect(sectionsColumn.locator('button:has-text("Folders")')).toBeVisible()
-      await expect(sectionsColumn.locator('button:has-text("Notes")')).toBeVisible()
-      await expect(sectionsColumn.locator('button:has-text("Messages")')).toBeVisible()
-      await expect(sectionsColumn.locator('button:has-text("Trash")')).toBeVisible()
+      // Verify folders panel shows mode buttons and folders
+      await expect(foldersColumn.locator('button:has-text("All Notes")')).toBeVisible()
+      await expect(foldersColumn.locator('button:has-text("Messages")')).toBeVisible()
+      await expect(foldersColumn.locator('button:has-text("Trash")')).toBeVisible()
+      
+      // Verify folder list is shown (in notes mode)
+      await expect(foldersColumn.locator('button:has-text("Personal")')).toBeVisible()
+      await expect(foldersColumn.locator('button:has-text("Work")')).toBeVisible()
+      await expect(foldersColumn.locator('button:has-text("Projects")')).toBeVisible()
     })
 
     test('should resize column 2 with drag separator and persist after refresh', async ({ page }) => {
@@ -85,43 +89,73 @@ test.describe('3-Column Layout', () => {
     test('should filter list when clicking on folder', async ({ page }) => {
       await setupApp(page)
       
-      const sectionsColumn = page.locator('[data-testid="sections-column"]')
+      const foldersColumn = page.locator('[data-testid="folders-column"]')
       
-      // Click on Folders section
-      await sectionsColumn.locator('button:has-text("Folders")').click()
+      // Initially should be in "All Notes" mode - verify header shows "All Notes"
+      await expect(page.locator('text=All Notes')).toBeVisible()
       
-      // Verify folders view is shown
-      await expect(page.locator('text=Organize your notes')).toBeVisible()
+      // Click on Personal folder
+      const personalFolder = foldersColumn.locator('button:has-text("Personal")')
+      await personalFolder.click()
       
-      // Click on a folder (mock folder)
-      const personalFolder = page.locator('button:has-text("Personal")')
-      if (await personalFolder.isVisible()) {
-        await personalFolder.click()
-        
-        // Verify folder is selected (has active styling)
-        await expect(personalFolder).toHaveClass(/bg-primary/)
-      }
+      // Verify folder is selected (has active styling) 
+      await expect(personalFolder).toHaveClass(/bg-indigo/)
+      
+      // Verify context list header shows the folder name
+      await expect(page.locator('text=Personal')).toBeVisible()
+      
+      // Click back to All Notes
+      const allNotesButton = foldersColumn.locator('button:has-text("All Notes")')
+      await allNotesButton.click()
+      await expect(allNotesButton).toHaveClass(/bg-indigo/)
+    })
+
+    test('should switch between modes (All Notes, Messages, Trash)', async ({ page }) => {
+      await setupApp(page)
+      
+      const foldersColumn = page.locator('[data-testid="folders-column"]')
+      
+      // Initially should be in All Notes mode
+      const allNotesButton = foldersColumn.locator('button:has-text("All Notes")')
+      await expect(allNotesButton).toHaveClass(/bg-indigo/)
+      
+      // Switch to Trash mode
+      const trashButton = foldersColumn.locator('button:has-text("Trash")')
+      await trashButton.click()
+      await expect(trashButton).toHaveClass(/bg-indigo/)
+      
+      // Verify context list shows trash placeholder
+      await expect(page.locator('text=Trash')).toBeVisible()
+      await expect(page.locator('text=Deleted items will appear here')).toBeVisible()
+      
+      // Switch back to All Notes
+      await allNotesButton.click()
+      await expect(allNotesButton).toHaveClass(/bg-indigo/)
+      
+      // Verify context list shows notes again
+      await expect(page.locator('text=All Notes')).toBeVisible()
+      
+      // Messages mode should be disabled
+      const messagesButton = foldersColumn.locator('button:has-text("Messages")')
+      await expect(messagesButton).toHaveAttribute('disabled')
     })
 
     test('should show file content in editor and reset on file switch', async ({ page }) => {
       await setupApp(page)
       
-      const sectionsColumn = page.locator('[data-testid="sections-column"]')
-      
-      // Go to Notes section
-      await sectionsColumn.locator('button:has-text("Notes")').click()
-      
+      // Should already be in "All Notes" mode by default
       // Wait for notes to load
       await page.waitForSelector('[role="listbox"]', { timeout: 5000 })
       
       // Get list of files
       const fileItems = page.locator('[role="option"]')
-      const fileCount = await fileItems.count()
+      let fileCount = await fileItems.count()
       
       if (fileCount === 0) {
         // Create a test file first
         await page.locator('button:has-text("New Note")').click()
         await page.waitForSelector('[role="option"]', { timeout: 5000 })
+        fileCount = await page.locator('[role="option"]').count()
       }
       
       // Click on first file
@@ -159,20 +193,19 @@ test.describe('3-Column Layout', () => {
       await page.setViewportSize({ width: 1024, height: 800 })
     })
 
-    test('should show 2 panels and switch between Sections+List and Detail', async ({ page }) => {
+    test('should show 2 panels and switch between Folders+List and Detail', async ({ page }) => {
       await setupApp(page)
       
-      // Initially should show Sections + List
-      const sectionsColumn = page.locator('[data-testid="sections-column"]')
+      // Initially should show Folders + List
+      const foldersColumn = page.locator('[data-testid="folders-column"]')
       const listColumn = page.locator('[data-testid="list-column"]')
       const detailColumn = page.locator('[data-testid="detail-column"]')
       
-      await expect(sectionsColumn).toBeVisible()
+      await expect(foldersColumn).toBeVisible()
       await expect(listColumn).toBeVisible()
       await expect(detailColumn).not.toBeVisible()
       
-      // Click on a file to switch to detail view
-      await page.locator('button:has-text("Notes")').click()
+      // Should already be in "All Notes" mode, wait for files to load
       await page.waitForSelector('[role="listbox"]', { timeout: 5000 })
       
       const fileItems = page.locator('[role="option"]')
@@ -187,20 +220,16 @@ test.describe('3-Column Layout', () => {
       // Click on file - should switch to detail view
       await fileItems.first().click()
       
-      // Now detail should be visible, sections+list hidden
+      // Now detail should be visible, folders+list hidden
       await expect(detailColumn).toBeVisible()
-      await expect(sectionsColumn).not.toBeVisible()
+      await expect(foldersColumn).not.toBeVisible()
       await expect(listColumn).not.toBeVisible()
     })
 
     test('should create new note and open editor', async ({ page }) => {
       await setupApp(page)
       
-      const sectionsColumn = page.locator('[data-testid="sections-column"]')
-      
-      // Go to Notes section
-      await sectionsColumn.locator('button:has-text("Notes")').click()
-      
+      // Should already be in "All Notes" mode
       // Click New Note button
       await page.locator('button:has-text("New Note")').click()
       
@@ -228,24 +257,24 @@ test.describe('3-Column Layout', () => {
       await expect(tabBar).toBeVisible()
       
       // Verify tabs are present
-      const sectionsTab = tabBar.locator('button:has-text("Sections")')
+      const foldersTab = tabBar.locator('button:has-text("Folders")')
       const notesTab = tabBar.locator('button:has-text("Notes")')  
       const editorTab = tabBar.locator('button:has-text("Editor")')
       
-      await expect(sectionsTab).toBeVisible()
+      await expect(foldersTab).toBeVisible()
       await expect(notesTab).toBeVisible()
       await expect(editorTab).toBeVisible()
       
-      // Initially sections should be active
-      await expect(sectionsTab).toHaveClass(/text-primary/)
+      // Initially folders should be active
+      await expect(foldersTab).toHaveClass(/text-indigo/)
       
       // Click Notes tab
       await notesTab.click()
-      await expect(notesTab).toHaveClass(/text-primary/)
+      await expect(notesTab).toHaveClass(/text-indigo/)
       
       // Click Editor tab
       await editorTab.click()
-      await expect(editorTab).toHaveClass(/text-primary/)
+      await expect(editorTab).toHaveClass(/text-indigo/)
     })
 
     test('should create new note in current folder and open editor', async ({ page }) => {
@@ -278,10 +307,10 @@ test.describe('3-Column Layout', () => {
     test('should focus columns with 1, 2, 3 keys', async ({ page }) => {
       await setupApp(page)
       
-      // Press '1' to focus sections column
+      // Press '1' to focus folders column
       await page.keyboard.press('1')
-      const sectionsColumn = page.locator('[data-testid="sections-column"]')
-      await expect(sectionsColumn).toBeFocused()
+      const foldersColumn = page.locator('[data-testid="folders-column"]')
+      await expect(foldersColumn).toBeFocused()
       
       // Press '2' to focus list column
       await page.keyboard.press('2')
@@ -297,11 +326,7 @@ test.describe('3-Column Layout', () => {
     test('should create new file with Ctrl+N in current folder', async ({ page }) => {
       await setupApp(page)
       
-      const sectionsColumn = page.locator('[data-testid="sections-column"]')
-      
-      // Go to Notes section first
-      await sectionsColumn.locator('button:has-text("Notes")').click()
-      
+      // Should already be in "All Notes" mode
       // Get initial file count
       await page.waitForSelector('[role="listbox"]', { timeout: 5000 })
       const initialFileCount = await page.locator('[role="option"]').count()
@@ -333,10 +358,10 @@ test.describe('3-Column Layout', () => {
       await page.setViewportSize({ width: 1024, height: 800 })
       await setupApp(page)
       
-      // Press '1' - should show sections
+      // Press '1' - should show folders
       await page.keyboard.press('1')
-      const sectionsColumn = page.locator('[data-testid="sections-column"]')
-      await expect(sectionsColumn).toBeVisible()
+      const foldersColumn = page.locator('[data-testid="folders-column"]')
+      await expect(foldersColumn).toBeVisible()
       
       // Press '2' - should show list  
       await page.keyboard.press('2')
@@ -358,17 +383,17 @@ test.describe('3-Column Layout', () => {
       // Press '2' - should switch to Notes tab and update tab bar
       await page.keyboard.press('2')
       const notesTab = tabBar.locator('button:has-text("Notes")')
-      await expect(notesTab).toHaveClass(/text-primary/)
+      await expect(notesTab).toHaveClass(/text-indigo/)
       
       // Press '3' - should switch to Editor tab
       await page.keyboard.press('3')
       const editorTab = tabBar.locator('button:has-text("Editor")')
-      await expect(editorTab).toHaveClass(/text-primary/)
+      await expect(editorTab).toHaveClass(/text-indigo/)
       
-      // Press '1' - should switch back to Sections tab
+      // Press '1' - should switch back to Folders tab
       await page.keyboard.press('1')
-      const sectionsTab = tabBar.locator('button:has-text("Sections")')
-      await expect(sectionsTab).toHaveClass(/text-primary/)
+      const foldersTab = tabBar.locator('button:has-text("Folders")')
+      await expect(foldersTab).toHaveClass(/text-indigo/)
     })
   })
 })
