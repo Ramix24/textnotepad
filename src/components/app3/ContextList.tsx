@@ -53,24 +53,27 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
     onFileSelect: (fileId) => {
       onSelectionChange({ 
         ...selection,
-        fileId,
-        section: 'notes'
+        fileId
       })
       onMobileAdvance?.() // Auto-advance to pane 3 on mobile
     },
     onFileCreated: (newFile) => {
       onSelectionChange({
         ...selection,
-        fileId: newFile.id,
-        section: 'notes'
+        fileId: newFile.id
       })
       onMobileAdvance?.()
     },
     onFileDeleted: (fileId) => {
       if (selection.fileId === fileId) {
+        // Smart selection: pick the next available note in the current filter
+        const filteredFiles = getFilteredFiles(files, selection)
+        const currentIndex = filteredFiles.findIndex(f => f.id === fileId)
+        const nextFile = filteredFiles[currentIndex + 1] || filteredFiles[currentIndex - 1]
+        
         onSelectionChange({
           ...selection,
-          fileId: null
+          fileId: nextFile?.id || null
         })
       }
     }
@@ -81,109 +84,62 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
   }
 
   const handleNewNote = () => {
+    // Create file (folder support will be added later)
     fileOps.handleCreateFile()
   }
 
-  if (selection.section === 'folders') {
-    return <FoldersView selection={selection} onSelectionChange={onSelectionChange} />
-  }
+  // Filter files based on current mode and folder
+  const filteredFiles = getFilteredFiles(files, selection)
 
-  if (selection.section === 'notes') {
+  if (selection.mode === 'notes') {
     return (
       <NotesView 
-        files={files}
+        files={filteredFiles}
         isLoading={isLoading}
         selectedFileId={selection.fileId}
         onFileSelect={handleFileSelect}
         onNewNote={handleNewNote}
         fileOps={fileOps}
+        selection={selection}
       />
     )
   }
 
-  if (selection.section === 'trash') {
+  if (selection.mode === 'trash') {
     return <TrashView />
   }
 
-  if (selection.section === 'messages') {
+  if (selection.mode === 'messages') {
     return <MessagesView />
   }
 
   return null
 }
 
-// TODO: Implement folders when database schema supports it
-function FoldersView({ selection, onSelectionChange }: {
-  selection: AppSelection
-  onSelectionChange: (selection: Partial<AppSelection>) => void
-}) {
-  // Mock folders data - replace with real implementation when DB supports folders
-  const mockFolders = [
-    { id: 'personal', name: 'Personal', count: 5 },
-    { id: 'work', name: 'Work', count: 12 },
-    { id: 'projects', name: 'Projects', count: 8 },
-  ]
-
-  return (
-    <div className="flex flex-col">
-      <header className="flex-shrink-0 p-4 border-b border-border bg-card/30 flex items-center justify-between">
-        <div>
-          <h2 className="text-sm font-medium text-foreground">Folders</h2>
-          <p className="text-xs text-muted-foreground mt-1">Organize your notes</p>
-        </div>
-      </header>
-      
-      <div className="flex-1 overflow-auto p-2">
-        <div role="listbox" className="space-y-1">
-          {mockFolders.map((folder) => (
-            <button
-              key={folder.id}
-              role="option"
-              aria-selected={selection.folderId === folder.id}
-              onClick={() => onSelectionChange({ 
-                ...selection, 
-                folderId: folder.id,
-                fileId: null, // Clear fileId when changing folders
-                section: 'folders' 
-              })}
-              className={`
-                w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors
-                ${selection.folderId === folder.id
-                  ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
-                  : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
-                }
-              `}
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-sm">📁</span>
-                <span className="text-sm font-medium">{folder.name}</span>
-              </div>
-              <span className="text-xs text-muted-foreground">{folder.count}</span>
-            </button>
-          ))}
-        </div>
-        
-        <div className="mt-4 text-center">
-          <div className="p-6 text-center">
-            <div className="w-12 h-12 rounded-lg bg-muted mb-4 flex items-center justify-center mx-auto">
-              <span className="text-lg">📁</span>
-            </div>
-            <h3 className="text-sm font-medium text-foreground mb-2">No folders yet</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed max-w-[200px] mb-4 mx-auto">
-              Create folders to organize your notes by topic or project
-            </p>
-            <button 
-              disabled
-              className="px-3 py-1.5 text-xs font-medium text-muted-foreground border border-border rounded-md cursor-not-allowed"
-            >
-              + New Folder (Coming Soon)
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+// Helper function to filter files based on selection
+function getFilteredFiles(files: UserFile[], selection: AppSelection): UserFile[] {
+  if (selection.mode === 'trash') {
+    // Show soft-deleted files only
+    return files.filter(f => f.deleted_at)
+  }
+  
+  if (selection.mode === 'notes') {
+    // Show non-deleted files, filtered by folder
+    const activeFiles = files.filter(f => !f.deleted_at)
+    
+    if (selection.folderId === null) {
+      // All Notes: show all files (no folder support yet)
+      return activeFiles
+    }
+    
+    // Specific folder: temporary empty array until folder support is implemented
+    // TODO: Replace with actual folder filtering when database supports folders
+    return []
+  }
+  
+  return []
 }
+
 
 function NotesView({ 
   files, 
@@ -191,7 +147,8 @@ function NotesView({
   selectedFileId, 
   onFileSelect, 
   onNewNote,
-  fileOps
+  fileOps,
+  selection
 }: {
   files: UserFile[]
   isLoading: boolean
@@ -199,17 +156,24 @@ function NotesView({
   onFileSelect: (file: UserFile) => void
   onNewNote: () => void
   fileOps: ReturnType<typeof useFileOperations>
+  selection: AppSelection
 }) {
-  // Sort files by last modified (updated_at desc)
-  const sortedFiles = files
-    .filter(f => !f.deleted_at) // Exclude soft-deleted files
-    .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+  // Sort files by last modified (updated_at desc) - files are already filtered
+  const sortedFiles = files.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+
+  // Get folder name for header
+  const getFolderDisplayName = () => {
+    if (selection.folderId === null) return 'All Notes'
+    // TODO: Replace with actual folder name lookup when folders are implemented
+    const mockFolders = { 'personal': 'Personal', 'work': 'Work', 'projects': 'Projects' }
+    return mockFolders[selection.folderId as keyof typeof mockFolders] || 'Unknown Folder'
+  }
 
   return (
     <div className="flex flex-col">
       <header className="flex-shrink-0 p-4 border-b border-border bg-card/30 flex items-center justify-between">
         <div>
-          <h2 className="text-sm font-medium text-foreground">Notes</h2>
+          <h2 className="text-sm font-medium text-foreground">{getFolderDisplayName()}</h2>
           <p className="text-xs text-muted-foreground mt-1">{files.length} notes</p>
         </div>
         <button

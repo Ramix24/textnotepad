@@ -45,11 +45,25 @@ interface DefaultDetailContentProps {
 }
 
 function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: DefaultDetailContentProps) {
-  const { data: file, isLoading, error } = useFileById(selection.fileId)
+  // Always call hooks at the top level
+  const { data: file, isLoading, error } = useFileById(
+    selection.mode === 'notes' ? selection.fileId : null
+  )
 
-  // No file selected
+  // Handle different modes
+  if (selection.mode !== 'notes') {
+    if (selection.mode === 'messages') {
+      return <MessagesPlaceholder />
+    }
+    if (selection.mode === 'trash') {
+      return <TrashPlaceholder />
+    }
+    return <DetailViewEmpty mode={selection.mode} />
+  }
+
+  // No file selected in notes mode
   if (!selection.fileId) {
-    return <DetailViewEmpty />
+    return <DetailViewEmpty mode="notes" />
   }
 
   // Loading state
@@ -98,31 +112,95 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
   }
 
   // Fallback
-  return <DetailViewEmpty />
+  return <DetailViewEmpty mode="notes" />
 }
 
-function DetailViewEmpty() {
+function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' }) {
+  const getEmptyContent = () => {
+    switch (mode) {
+      case 'notes':
+        return {
+          icon: '✏️',
+          title: 'Select or create a note',
+          description: 'Choose a note from the list to start editing, or create a new one to begin writing.',
+          showActions: true
+        }
+      case 'messages':
+        return {
+          icon: '💬',
+          title: 'No conversation selected',
+          description: 'Select a conversation from the list to view messages and continue the discussion.',
+          showActions: false
+        }
+      case 'trash':
+        return {
+          icon: '🗑️',
+          title: 'No deleted item selected',
+          description: 'Select a deleted item from the list to preview or restore it.',
+          showActions: false
+        }
+    }
+  }
+
+  const content = getEmptyContent()
+
   return (
     <div className="flex flex-col items-center justify-center h-full p-8 text-center">
       <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-zinc-100 to-zinc-50 dark:from-zinc-800 dark:to-zinc-900 mb-6 flex items-center justify-center border border-zinc-200 dark:border-zinc-700">
         <div className="w-8 h-8 rounded-lg bg-background flex items-center justify-center">
-          <span className="text-lg">✏️</span>
+          <span className="text-lg">{content.icon}</span>
         </div>
       </div>
       
-      <h3 className="text-lg font-medium text-foreground mb-2">Select or create a note</h3>
+      <h3 className="text-lg font-medium text-foreground mb-2">{content.title}</h3>
       <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-[300px] mb-6">
-        Choose a note from the list to start editing, or create a new one to begin writing.
+        {content.description}
       </p>
       
-      <div className="flex gap-3">
-        <button className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors">
-          Create New Note
-        </button>
-        <button className="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-          Browse Notes
-        </button>
+      {content.showActions && (
+        <div className="flex gap-3">
+          <button className="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors">
+            Create New Note
+          </button>
+          <button className="px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
+            Browse Notes
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function MessagesPlaceholder() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-zinc-100 to-zinc-50 dark:from-zinc-800 dark:to-zinc-900 mb-6 flex items-center justify-center border border-zinc-200 dark:border-zinc-700">
+        <div className="w-8 h-8 rounded-lg bg-background flex items-center justify-center">
+          <span className="text-lg">💬</span>
+        </div>
       </div>
+      
+      <h3 className="text-lg font-medium text-foreground mb-2">Messages</h3>
+      <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-[300px] mb-6">
+        Messages and conversations will be available here soon. This feature is currently under development.
+      </p>
+    </div>
+  )
+}
+
+function TrashPlaceholder() {
+  return (
+    <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-zinc-100 to-zinc-50 dark:from-zinc-800 dark:to-zinc-900 mb-6 flex items-center justify-center border border-zinc-200 dark:border-zinc-700">
+        <div className="w-8 h-8 rounded-lg bg-background flex items-center justify-center">
+          <span className="text-lg">🗑️</span>
+        </div>
+      </div>
+      
+      <h3 className="text-lg font-medium text-foreground mb-2">Trash</h3>
+      <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-[300px] mb-6">
+        Deleted items and their previews will appear here. Select an item from the trash list to view or restore it.
+      </p>
     </div>
   )
 }

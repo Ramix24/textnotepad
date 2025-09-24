@@ -9,7 +9,7 @@ import { useKeyboardNav } from '@/hooks/useKeyboardNav'
 import { useCreateFile } from '@/hooks/useFiles'
 import { useSupabase } from '@/components/SupabaseProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
-import { SectionsRail } from './SectionsRail'
+import { FoldersPanel } from './FoldersPanel'
 import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
 import { toast } from 'sonner'
@@ -102,12 +102,13 @@ export function AppShell3({
     try {
       const newFile = await createFile.mutateAsync({
         name: `Note ${new Date().toLocaleDateString()}`
+        // TODO: Add folderId support when database schema supports folders
       })
       
       layout.setSelection({
         ...layout.selection,
-        fileId: newFile.id,
-        section: 'notes'
+        mode: 'notes',
+        fileId: newFile.id
       })
       
       // Focus detail view after creating file
@@ -154,9 +155,9 @@ export function AppShell3({
   // Mobile tab bar with better active states
   const MobileTabBar = () => {
     const tabs = [
-      { key: 'sections', label: 'Sections', icon: '📁', pane: 1 as const },
-      { key: 'list', label: 'Notes', icon: '📝', pane: 2 as const },
-      { key: 'detail', label: 'Editor', icon: '✏️', pane: 3 as const }
+      { key: 'folders', label: 'Folders', icon: '📁', pane: 1 as const },
+      { key: 'notes', label: 'Notes', icon: '📝', pane: 2 as const },
+      { key: 'editor', label: 'Editor', icon: '✏️', pane: 3 as const }
     ]
 
     return (
@@ -266,7 +267,7 @@ export function AppShell3({
             : undefined
         }}
       >
-        {/* Column 1: Sections Rail */}
+        {/* Column 1: Folders Panel */}
         {layout.showSections && (
           <div 
             ref={sectionsRef}
@@ -275,22 +276,16 @@ export function AppShell3({
             style={{ 
               width: layout.breakpoint === 'desktop' ? layout.columnWidths.col1 : '100%' 
             }}
-            data-testid="sections-column"
+            data-testid="folders-column"
           >
-            <SectionsRail 
+            <FoldersPanel 
               className="h-full"
-              activeSection={layout.selection.section}
-              onSectionSelect={(section) => {
-                layout.setSelection({ 
-                  section, 
-                  fileId: null, // Clear fileId when changing sections
-                  folderId: section === 'folders' ? layout.selection.folderId : null 
-                })
-              }}
+              selection={layout.selection}
+              onSelectionChange={layout.setSelection}
               onMobileAdvance={() => layout.isMobile && layout.setActivePane(2)}
             >
               {sectionsContent}
-            </SectionsRail>
+            </FoldersPanel>
           </div>
         )}
 

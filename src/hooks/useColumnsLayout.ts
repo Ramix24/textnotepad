@@ -30,17 +30,44 @@ const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
 }
 
 const DEFAULT_SELECTION: AppSelection = {
-  section: 'folders',
+  mode: 'notes',
   folderId: null,
-  fileId: null,
-  conversationId: null,
-  trashId: null
+  fileId: null
 }
 
 const STORAGE_KEYS = {
   COL2_WIDTH: 'layout:c2w',
   ACTIVE_PANEL: 'layout:active-panel', 
-  SELECTION: 'selection'
+  SELECTION: 'tnp:selection' // New key for folder-based selection
+}
+
+// Migration function to handle old selection format
+function migrateSelection(stored: any): AppSelection {
+  if (!stored) return DEFAULT_SELECTION
+  
+  // If it's already the new format, return as-is
+  if ('mode' in stored) {
+    return {
+      mode: stored.mode || 'notes',
+      folderId: stored.folderId || null,
+      fileId: stored.fileId || null
+    }
+  }
+  
+  // Migrate from old format
+  if ('section' in stored) {
+    const mode = stored.section === 'notes' ? 'notes' :
+                 stored.section === 'messages' ? 'messages' :
+                 stored.section === 'trash' ? 'trash' : 'notes'
+    
+    return {
+      mode,
+      folderId: stored.folderId || null,
+      fileId: stored.fileId || null
+    }
+  }
+  
+  return DEFAULT_SELECTION
 }
 
 function useBreakpoint(breakpoints: BreakpointConfig = DEFAULT_BREAKPOINTS) {
@@ -83,10 +110,11 @@ export function useColumnsLayout(
   
   const [isResizing, setIsResizing] = useState(false)
 
-  // Selection state
-  const [selection, setSelectionState] = useState<AppSelection>(() =>
-    getPreference(STORAGE_KEYS.SELECTION, DEFAULT_SELECTION)
-  )
+  // Selection state with migration
+  const [selection, setSelectionState] = useState<AppSelection>(() => {
+    const stored = getPreference(STORAGE_KEYS.SELECTION, null)
+    return migrateSelection(stored)
+  })
 
   // Debounced persistence
   const debouncedSetCol2Width = useMemo(
