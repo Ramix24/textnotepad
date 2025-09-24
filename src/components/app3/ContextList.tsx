@@ -243,6 +243,25 @@ function NotesView({
           </div>
         )}
       </div>
+
+      {/* Footer */}
+      <footer className="flex-shrink-0 p-3 border-t border-border bg-card/20">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <span>{files.length} notes</span>
+            {files.length > 0 && (
+              <>
+                <span>·</span>
+                <span>Updated {new Date().toLocaleDateString()}</span>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-1">
+            <kbd className="px-1 py-0.5 text-[10px] bg-muted rounded border">⌘N</kbd>
+            <span>new</span>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

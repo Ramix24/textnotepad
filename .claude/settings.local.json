@@ -39,7 +39,8 @@
       "Bash(npx playwright test:*)",
       "Bash(start http://localhost:3004)",
       "Bash(start http://localhost:3006)",
-      "Bash(start http://localhost:3006/app)"
+      "Bash(start http://localhost:3006/app)",
+      "Bash(npx supabase:*)"
     ],
     "deny": [],
     "ask": [],

@@ -107,6 +107,30 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
             className="h-full"
           />
         </div>
+
+        {/* Footer */}
+        <footer className="flex-shrink-0 px-4 py-2 border-t border-border bg-card/20">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <span>{file.char_count} chars</span>
+              <span>·</span>
+              <span>{file.line_count} lines</span>
+              <span>·</span>
+              <span>Version {file.version}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <kbd className="px-1 py-0.5 text-[10px] bg-muted rounded border">⌘S</kbd>
+                <span>save</span>
+              </div>
+              <span>·</span>
+              <div className="flex items-center gap-1">
+                <kbd className="px-1 py-0.5 text-[10px] bg-muted rounded border">⌘K</kbd>
+                <span>search</span>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
     )
   }

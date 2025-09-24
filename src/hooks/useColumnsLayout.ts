@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { getPreference, createDebouncedSetter } from '@/lib/prefs'
 import type { 
   BreakpointConfig, 
@@ -120,6 +121,8 @@ export function useColumnsLayout(
   breakpoints: BreakpointConfig = DEFAULT_BREAKPOINTS
 ): UseColumnsLayoutReturn {
   const breakpoint = useBreakpoint(breakpoints)
+  const router = useRouter()
+  const searchParams = useSearchParams()
   
   // Initialize state from localStorage
   const [col2Width, setCol2Width] = useState(() => 
@@ -132,10 +135,22 @@ export function useColumnsLayout(
   
   const [isResizing, setIsResizing] = useState(false)
 
-  // Selection state with migration
+  // Selection state with migration and URL sync
   const [selection, setSelectionState] = useState<AppSelection>(() => {
     const stored = getPreference(STORAGE_KEYS.SELECTION, null)
-    return migrateSelection(stored)
+    const migrated = migrateSelection(stored)
+    
+    // Override with URL params if present
+    const folderParam = searchParams?.get('folder')
+    if (folderParam) {
+      return {
+        ...migrated,
+        mode: 'notes',
+        folderId: folderParam
+      }
+    }
+    
+    return migrated
   })
 
   // Debounced persistence
@@ -171,12 +186,27 @@ export function useColumnsLayout(
     }, [])
   }
 
+  // URL synchronization for folder selection
+  const updateUrl = useCallback((newSelection: AppSelection) => {
+    const params = new URLSearchParams(searchParams?.toString() || '')
+    
+    if (newSelection.mode === 'notes' && newSelection.folderId) {
+      params.set('folder', newSelection.folderId)
+    } else {
+      params.delete('folder')
+    }
+    
+    const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname
+    router.replace(newUrl, { scroll: false })
+  }, [router, searchParams])
+
   // Selection actions
   const setSelection = useCallback((next: Partial<AppSelection>) => {
     const newSelection = { ...selection, ...next }
     setSelectionState(newSelection)
     debouncedSetSelection(newSelection)
-  }, [selection, debouncedSetSelection])
+    updateUrl(newSelection)
+  }, [selection, debouncedSetSelection, updateUrl])
 
   // Active pane management (for mobile/tablet)
   const activePane = useMemo<1 | 2 | 3>(() => {

@@ -2,7 +2,7 @@
 
 import { ReactNode, useRef, useEffect, KeyboardEvent } from 'react'
 import { Button } from '@/components/ui/button'
-import { useFoldersWithCount } from '@/hooks/useFolders'
+import { useFoldersList, useCreateFolder, useRenameFolder, useDeleteFolder } from '@/hooks/useFolders'
 import type { Mode, AppSelection } from './types'
 
 interface FoldersPanelProps {
@@ -160,11 +160,40 @@ interface FoldersListProps {
 }
 
 function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
-  const { data: folders = [], isLoading, error } = useFoldersWithCount()
+  const { data: folders = [], isLoading, error } = useFoldersList()
+  const createFolder = useCreateFolder()
+  const renameFolder = useRenameFolder()
+  const deleteFolder = useDeleteFolder()
   
+  const listboxRef = useRef<HTMLDivElement>(null)
+  
+  // Check feature flag
+  const isFeatureEnabled = process.env.NEXT_PUBLIC_FEATURE_FOLDERS === 'true'
+
+  const handleCreateFolder = () => {
+    const name = prompt('Enter folder name:')
+    if (name && name.trim()) {
+      createFolder.mutate({ name: name.trim() })
+    }
+  }
+
+  const handleRenameFolder = (folderId: string, currentName: string) => {
+    const name = prompt('Enter new folder name:', currentName)
+    if (name && name.trim() && name.trim() !== currentName) {
+      renameFolder.mutate({ id: folderId, name: name.trim() })
+    }
+  }
+
+  const handleDeleteFolder = (folderId: string, folderName: string) => {
+    const confirmed = confirm(`Are you sure you want to delete "${folderName}"? Files will be moved to All Notes.`)
+    if (confirmed) {
+      deleteFolder.mutate(folderId)
+    }
+  }
+
   // Edge case: Validate current selection against available folders
   useEffect(() => {
-    if (selection.folderId && selection.folderId !== 'all' && !isLoading) {
+    if (isFeatureEnabled && selection.folderId && selection.folderId !== 'all' && !isLoading) {
       const folderExists = folders.some(f => f.id === selection.folderId)
       if (!folderExists) {
         console.warn(`Invalid folder selection "${selection.folderId}", falling back to All Notes`)
@@ -172,12 +201,11 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
         return
       }
     }
-  }, [selection.folderId, folders, isLoading, onFolderSelect])
+  }, [isFeatureEnabled, selection.folderId, folders, isLoading, onFolderSelect])
 
-  const listboxRef = useRef<HTMLDivElement>(null)
   const allFolders = [
     { id: null, name: 'All Notes', file_count: 0 }, 
-    ...folders.map(f => ({ id: f.id, name: f.name, file_count: f.file_count }))
+    ...folders.map(f => ({ id: f.id, name: f.name, file_count: 0 })) // file_count not available in useFoldersList
   ]
   
   // Find current selected index
@@ -222,15 +250,34 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
 
   // Focus management
   useEffect(() => {
-    if (listboxRef.current && selectedIndex >= 0) {
+    if (isFeatureEnabled && listboxRef.current && selectedIndex >= 0) {
       const items = listboxRef.current.querySelectorAll('[role="option"]')
       if (items[selectedIndex]) {
         ;(items[selectedIndex] as HTMLElement).focus()
       }
     }
-  }, [selectedIndex])
+  }, [isFeatureEnabled, selectedIndex])
 
   // Handle loading state
+  if (!isFeatureEnabled) {
+    // Only show All Notes when feature is disabled
+    return (
+      <div className="p-2">
+        <div className="space-y-1">
+          <button
+            onClick={() => onFolderSelect(null)}
+            className="w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-sm">📝</span>
+              <span className="font-medium">All Notes</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    )
+  }
+  
   if (isLoading) {
     return (
       <div className="p-2">
@@ -319,44 +366,72 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
 
         {/* Individual folders */}
         {folders.map((folder) => (
-          <button
+          <div
             key={folder.id}
-            id={`folder-${folder.id}`}
-            role="option"
-            aria-selected={selection.folderId === folder.id}
-            onClick={() => onFolderSelect(folder.id)}
-            tabIndex={-1}
-            className={`
-              w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
-              ${selection.folderId === folder.id
-                ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
-                : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
-              }
-            `}
+            className="group relative"
           >
-            <div className="flex items-center gap-3">
-              <span className="text-sm">📁</span>
-              <span className="font-medium">{folder.name}</span>
+            <button
+              id={`folder-${folder.id}`}
+              role="option"
+              aria-selected={selection.folderId === folder.id}
+              onClick={() => onFolderSelect(folder.id)}
+              tabIndex={-1}
+              className={`
+                w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+                ${selection.folderId === folder.id
+                  ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800'
+                  : 'hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
+                }
+              `}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-sm">📁</span>
+                <span className="font-medium">{folder.name}</span>
+              </div>
+            </button>
+            
+            {/* Context menu for folder actions */}
+            <div className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleRenameFolder(folder.id, folder.name)
+                }}
+                className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-xs"
+                title="Rename folder"
+              >
+                ✏️
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleDeleteFolder(folder.id, folder.name)
+                }}
+                className="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-xs ml-1"
+                title="Delete folder"
+              >
+                🗑️
+              </button>
             </div>
-            <span className="text-xs text-muted-foreground">{folder.file_count}</span>
-          </button>
+          </div>
         ))}
       </div>
       
-      {/* New Folder CTA */}
-      <div className="mt-4 pt-2 border-t border-border">
-        <Button
-          variant="outline"
-          size="sm"
-          disabled
-          className="w-full h-8 text-xs cursor-not-allowed opacity-50"
-        >
-          + New Folder
-        </Button>
-        <p className="text-xs text-muted-foreground mt-1 text-center">
-          Coming soon
-        </p>
-      </div>
+      {/* Footer */}
+      <footer className="mt-auto">
+        {/* New Folder CTA */}
+        <div className="p-2 border-t border-border bg-card/20">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCreateFolder}
+            disabled={createFolder.isPending}
+            className="w-full h-8 text-xs"
+          >
+            {createFolder.isPending ? 'Creating...' : '+ New Folder'}
+          </Button>
+        </div>
+      </footer>
     </div>
   )
 }

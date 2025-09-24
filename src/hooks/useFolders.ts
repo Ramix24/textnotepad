@@ -1,16 +1,20 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useSupabase } from '@/components/SupabaseProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { toast } from 'sonner'
-import type { UserFolder, CreateFolderRequest, UpdateFolderRequest, FolderWithFileCount } from '@/types/folders.types'
+import type { UserFolder, CreateFolderRequest } from '@/types/folders.types'
 
 const FOLDERS_QUERY_KEY = 'folders'
 
-// Fetch user's folders
+interface ApiResponse<T = unknown> {
+  ok: boolean
+  data?: T
+  error?: string
+}
+
+// Fetch user's folders using API route
 export function useFoldersList() {
-  const { supabase } = useSupabase()
   const { user } = useAuthSession()
 
   return useQuery({
@@ -18,43 +22,14 @@ export function useFoldersList() {
     queryFn: async (): Promise<UserFolder[]> => {
       if (!user) throw new Error('User not authenticated')
 
-      const { data, error } = await (supabase as any)
-        .from('folders')
-        .select('*')
-        .order('name')
-
-      if (error) throw error
-      return data || []
-    },
-    enabled: !!user,
-  })
-}
-
-// Fetch folders with file count
-export function useFoldersWithCount() {
-  const { supabase } = useSupabase()
-  const { user } = useAuthSession()
-
-  return useQuery({
-    queryKey: [FOLDERS_QUERY_KEY, 'with-count', user?.id],
-    queryFn: async (): Promise<FolderWithFileCount[]> => {
-      if (!user) throw new Error('User not authenticated')
-
-      const { data, error } = await (supabase as any)
-        .from('folders')
-        .select(`
-          *,
-          file_count:user_files(count)
-        `)
-        .order('name')
-
-      if (error) throw error
-
-      // Transform the data to flatten file_count
-      return (data || []).map((folder: any) => ({
-        ...folder,
-        file_count: Array.isArray(folder.file_count) ? folder.file_count.length : 0
-      }))
+      const response = await fetch('/api/folders')
+      const result: ApiResponse<UserFolder[]> = await response.json()
+      
+      if (!result.ok || !result.data) {
+        throw new Error(result.error || 'Failed to fetch folders')
+      }
+      
+      return result.data
     },
     enabled: !!user,
   })
@@ -62,33 +37,38 @@ export function useFoldersWithCount() {
 
 // Get folder by ID
 export function useFolderById(folderId?: string | null) {
-  const { supabase } = useSupabase()
   const { user } = useAuthSession()
+  const queryClient = useQueryClient()
 
   return useQuery({
     queryKey: [FOLDERS_QUERY_KEY, folderId, user?.id],
     queryFn: async (): Promise<UserFolder | null> => {
       if (!user || !folderId) return null
 
-      const { data, error } = await (supabase as any)
-        .from('folders')
-        .select('*')
-        .eq('id', folderId)
-        .single()
+      // Try to get from cache first
+      const folders = queryClient.getQueryData<UserFolder[]>([FOLDERS_QUERY_KEY, user.id])
+      const cachedFolder = folders?.find(f => f.id === folderId)
+      if (cachedFolder) return cachedFolder
 
-      if (error) {
-        if (error.code === 'PGRST116') return null // Not found
-        throw error
+      // Fallback to API if not in cache
+      const response = await fetch(`/api/folders/${folderId}`)
+      if (response.status === 404) return null
+      
+      const result: ApiResponse<UserFolder> = await response.json()
+      
+      if (!result.ok || !result.data) {
+        if (result.error === 'Folder not found') return null
+        throw new Error(result.error || 'Failed to fetch folder')
       }
-      return data
+      
+      return result.data
     },
     enabled: !!user && !!folderId,
   })
 }
 
-// Create folder
+// Create folder with optimistic updates
 export function useCreateFolder() {
-  const { supabase } = useSupabase()
   const { user } = useAuthSession()
   const queryClient = useQueryClient()
 
@@ -96,103 +76,202 @@ export function useCreateFolder() {
     mutationFn: async (request: CreateFolderRequest): Promise<UserFolder> => {
       if (!user) throw new Error('User not authenticated')
 
-      const { data, error } = await (supabase as any)
-        .from('folders')
-        .insert({
+      const response = await fetch('/api/folders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      })
+      
+      const result: ApiResponse<UserFolder> = await response.json()
+      
+      if (!result.ok || !result.data) {
+        throw new Error(result.error || 'Failed to create folder')
+      }
+      
+      return result.data
+    },
+    onMutate: async (request) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: [FOLDERS_QUERY_KEY, user?.id] })
+
+      // Snapshot the previous value
+      const previousFolders = queryClient.getQueryData<UserFolder[]>([FOLDERS_QUERY_KEY, user?.id])
+
+      // Optimistically update to the new value
+      if (previousFolders && user) {
+        const optimisticFolder: UserFolder = {
+          id: `temp-${Date.now()}`,
           user_id: user.id,
           name: request.name,
-        })
-        .select()
-        .single()
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }
+        
+        queryClient.setQueryData<UserFolder[]>(
+          [FOLDERS_QUERY_KEY, user.id],
+          [...previousFolders, optimisticFolder]
+        )
+      }
 
-      if (error) throw error
-      return data
+      // Return a context object with the snapshotted value
+      return { previousFolders }
     },
     onSuccess: (newFolder) => {
-      // Invalidate folders queries to refetch
-      queryClient.invalidateQueries({ queryKey: [FOLDERS_QUERY_KEY] })
-      
       toast.success('Folder created', {
         description: `"${newFolder.name}" was created successfully.`,
       })
     },
-    onError: (error: any) => {
+    onError: (error: any, request, context) => {
+      // If the mutation fails, use the context to roll back
+      if (context?.previousFolders && user) {
+        queryClient.setQueryData([FOLDERS_QUERY_KEY, user.id], context.previousFolders)
+      }
+      
       console.error('Failed to create folder:', error)
       toast.error('Failed to create folder', {
         description: error.message || 'An unexpected error occurred.',
       })
     },
+    onSettled: () => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: [FOLDERS_QUERY_KEY] })
+    },
   })
 }
 
-// Update folder
-export function useUpdateFolder() {
-  const { supabase } = useSupabase()
+// Rename folder with optimistic updates
+export function useRenameFolder() {
   const { user } = useAuthSession()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: UpdateFolderRequest }): Promise<UserFolder> => {
+    mutationFn: async ({ id, name }: { id: string; name: string }): Promise<UserFolder> => {
       if (!user) throw new Error('User not authenticated')
 
-      const { data, error } = await (supabase as any)
-        .from('folders')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single()
+      const response = await fetch(`/api/folders/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name }),
+      })
+      
+      const result: ApiResponse<UserFolder> = await response.json()
+      
+      if (!result.ok || !result.data) {
+        throw new Error(result.error || 'Failed to rename folder')
+      }
+      
+      return result.data
+    },
+    onMutate: async ({ id, name }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: [FOLDERS_QUERY_KEY, user?.id] })
 
-      if (error) throw error
-      return data
+      // Snapshot the previous value
+      const previousFolders = queryClient.getQueryData<UserFolder[]>([FOLDERS_QUERY_KEY, user?.id])
+
+      // Optimistically update to the new value
+      if (previousFolders && user) {
+        queryClient.setQueryData<UserFolder[]>(
+          [FOLDERS_QUERY_KEY, user.id],
+          previousFolders.map(folder => 
+            folder.id === id 
+              ? { ...folder, name, updated_at: new Date().toISOString() }
+              : folder
+          )
+        )
+      }
+
+      // Return a context object with the snapshotted value
+      return { previousFolders }
     },
     onSuccess: (updatedFolder) => {
-      // Invalidate folders queries to refetch
-      queryClient.invalidateQueries({ queryKey: [FOLDERS_QUERY_KEY] })
-      
-      toast.success('Folder updated', {
-        description: `"${updatedFolder.name}" was updated successfully.`,
+      toast.success('Folder renamed', {
+        description: `Folder renamed to "${updatedFolder.name}".`,
       })
     },
-    onError: (error: any) => {
-      console.error('Failed to update folder:', error)
-      toast.error('Failed to update folder', {
+    onError: (error: any, variables, context) => {
+      // If the mutation fails, use the context to roll back
+      if (context?.previousFolders && user) {
+        queryClient.setQueryData([FOLDERS_QUERY_KEY, user.id], context.previousFolders)
+      }
+      
+      console.error('Failed to rename folder:', error)
+      toast.error('Failed to rename folder', {
         description: error.message || 'An unexpected error occurred.',
       })
     },
+    onSettled: () => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: [FOLDERS_QUERY_KEY] })
+    },
   })
 }
 
-// Delete folder
+// Delete folder with optimistic updates
 export function useDeleteFolder() {
-  const { supabase } = useSupabase()
   const { user } = useAuthSession()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (folderId: string): Promise<void> => {
+    mutationFn: async (folderId: string): Promise<{ id: string }> => {
       if (!user) throw new Error('User not authenticated')
 
-      const { error } = await (supabase as any)
-        .from('folders')
-        .delete()
-        .eq('id', folderId)
+      const response = await fetch(`/api/folders/${folderId}`, {
+        method: 'DELETE',
+      })
+      
+      const result: ApiResponse<{ id: string }> = await response.json()
+      
+      if (!result.ok || !result.data) {
+        throw new Error(result.error || 'Failed to delete folder')
+      }
+      
+      return result.data
+    },
+    onMutate: async (folderId) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: [FOLDERS_QUERY_KEY, user?.id] })
 
-      if (error) throw error
+      // Snapshot the previous value
+      const previousFolders = queryClient.getQueryData<UserFolder[]>([FOLDERS_QUERY_KEY, user?.id])
+
+      // Optimistically update to the new value
+      if (previousFolders && user) {
+        queryClient.setQueryData<UserFolder[]>(
+          [FOLDERS_QUERY_KEY, user.id],
+          previousFolders.filter(folder => folder.id !== folderId)
+        )
+      }
+
+      // Return a context object with the snapshotted value
+      return { previousFolders }
     },
     onSuccess: () => {
-      // Invalidate all related queries
-      queryClient.invalidateQueries({ queryKey: [FOLDERS_QUERY_KEY] })
-      queryClient.invalidateQueries({ queryKey: ['files'] }) // Files might be affected
+      // Invalidate files queries as they might be affected
+      queryClient.invalidateQueries({ queryKey: ['files'] })
       
       toast.success('Folder deleted', {
         description: 'The folder was deleted. Files have been moved to All Notes.',
       })
     },
-    onError: (error: any) => {
+    onError: (error: any, folderId, context) => {
+      // If the mutation fails, use the context to roll back
+      if (context?.previousFolders && user) {
+        queryClient.setQueryData([FOLDERS_QUERY_KEY, user.id], context.previousFolders)
+      }
+      
       console.error('Failed to delete folder:', error)
       toast.error('Failed to delete folder', {
         description: error.message || 'An unexpected error occurred.',
       })
+    },
+    onSettled: () => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: [FOLDERS_QUERY_KEY] })
     },
   })
 }
