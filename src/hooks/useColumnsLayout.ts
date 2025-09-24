@@ -45,13 +45,32 @@ const STORAGE_KEYS = {
 function migrateSelection(stored: any): AppSelection {
   if (!stored) return DEFAULT_SELECTION
   
-  // If it's already the new format, return as-is
+  // If it's already the new format, validate and sanitize
   if ('mode' in stored) {
-    return {
-      mode: stored.mode || 'notes',
-      folderId: stored.folderId || null,
-      fileId: stored.fileId || null
+    const validModes = ['notes', 'messages', 'trash']
+    const mode = validModes.includes(stored.mode) ? stored.mode : 'notes'
+    
+    // Validate folderId - should be null or valid folder ID
+    let folderId = stored.folderId || null
+    if (folderId && typeof folderId === 'string') {
+      const validFolderIds = ['personal', 'work', 'projects']
+      if (!validFolderIds.includes(folderId)) {
+        console.warn(`Invalid persisted folderId "${folderId}", resetting to null`)
+        folderId = null
+      }
+    } else if (folderId && typeof folderId !== 'string') {
+      console.warn('Invalid folderId type in persisted state, resetting to null')
+      folderId = null
     }
+    
+    // Validate fileId - should be null or string
+    let fileId = stored.fileId || null
+    if (fileId && typeof fileId !== 'string') {
+      console.warn('Invalid fileId type in persisted state, resetting to null')
+      fileId = null
+    }
+    
+    return { mode, folderId, fileId }
   }
   
   // Migrate from old format
@@ -60,13 +79,25 @@ function migrateSelection(stored: any): AppSelection {
                  stored.section === 'messages' ? 'messages' :
                  stored.section === 'trash' ? 'trash' : 'notes'
     
-    return {
-      mode,
-      folderId: stored.folderId || null,
-      fileId: stored.fileId || null
+    console.info(`Migrating old selection format from section "${stored.section}" to mode "${mode}"`)
+    
+    // In the old format, there might be different field names
+    let folderId = stored.folderId || null
+    const fileId = stored.fileId || stored.selectedFileId || null
+    
+    // Validate migrated data
+    if (folderId && typeof folderId === 'string') {
+      const validFolderIds = ['personal', 'work', 'projects']
+      if (!validFolderIds.includes(folderId)) {
+        console.warn(`Invalid migrated folderId "${folderId}", resetting to null`)
+        folderId = null
+      }
     }
+    
+    return { mode, folderId, fileId }
   }
   
+  console.warn('Unknown selection format in persisted state, using defaults')
   return DEFAULT_SELECTION
 }
 

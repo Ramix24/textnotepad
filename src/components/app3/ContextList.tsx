@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { useFilesList } from '@/hooks/useFiles'
 import { useFileOperations } from './useFileOperations'
 import { FileItem } from './FileItem'
@@ -49,6 +49,36 @@ interface DefaultContextContentProps {
 function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }: DefaultContextContentProps) {
   const { data: files = [], isLoading } = useFilesList()
   
+  // Edge case: Invalid folder detection and recovery
+  useEffect(() => {
+    if (selection.mode === 'notes' && selection.folderId) {
+      const validFolderIds = ['personal', 'work', 'projects']
+      if (!validFolderIds.includes(selection.folderId)) {
+        console.warn(`Invalid folderId "${selection.folderId}" detected, resetting to All Notes`)
+        onSelectionChange({
+          mode: 'notes',
+          folderId: null,
+          fileId: null // Also clear invalid file selection
+        })
+        return
+      }
+    }
+  }, [selection.mode, selection.folderId, onSelectionChange])
+
+  // Edge case: File no longer exists
+  useEffect(() => {
+    if (selection.fileId && files.length > 0 && !isLoading) {
+      const fileExists = files.some(f => f.id === selection.fileId)
+      if (!fileExists) {
+        console.warn(`Selected file "${selection.fileId}" no longer exists, clearing selection`)
+        onSelectionChange({
+          ...selection,
+          fileId: null
+        })
+      }
+    }
+  }, [selection, files, isLoading, onSelectionChange])
+  
   const fileOps = useFileOperations({
     onFileSelect: (fileId) => {
       onSelectionChange({ 
@@ -69,12 +99,26 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
         // Smart selection: pick the next available note in the current filter
         const filteredFiles = getFilteredFiles(files, selection)
         const currentIndex = filteredFiles.findIndex(f => f.id === fileId)
-        const nextFile = filteredFiles[currentIndex + 1] || filteredFiles[currentIndex - 1]
+        
+        // Try to select the next file, then previous, then null
+        let nextFile = filteredFiles[currentIndex + 1]
+        if (!nextFile && currentIndex > 0) {
+          nextFile = filteredFiles[currentIndex - 1]
+        }
         
         onSelectionChange({
           ...selection,
           fileId: nextFile?.id || null
         })
+        
+        // If we're in an empty folder and no files remain, consider switching to All Notes
+        if (!nextFile && selection.folderId !== null) {
+          const allFiles = files.filter(f => !f.deleted_at)
+          if (allFiles.length > 0) {
+            console.info('No files remaining in current folder, but files exist in All Notes')
+            // User can manually switch to All Notes if desired
+          }
+        }
       }
     }
   })
@@ -134,6 +178,17 @@ function getFilteredFiles(files: UserFile[], selection: AppSelection): UserFile[
     
     // Specific folder: temporary empty array until folder support is implemented
     // TODO: Replace with actual folder filtering when database supports folders
+    // For now, validate that the folderId exists in our mock data
+    const validFolderIds = ['personal', 'work', 'projects']
+    if (!selection.folderId || !validFolderIds.includes(selection.folderId)) {
+      // Invalid folder ID - this is an edge case where persisted state is stale
+      // Return all files as fallback behavior
+      if (selection.folderId) {
+        console.warn(`Invalid folderId "${selection.folderId}" found, falling back to All Notes`)
+      }
+      return activeFiles
+    }
+    
     return []
   }
   

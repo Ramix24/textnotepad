@@ -1,0 +1,49 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: TextNotepad
+        - generic [ref=e7]: mobile · list
+    - main "Context List" [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e13]:
+          - heading "Folders" [level=2] [ref=e14]
+          - paragraph [ref=e15]: Organize your notes
+        - generic [ref=e16]:
+          - listbox [ref=e17]:
+            - option "📁 Personal 5" [ref=e18] [cursor=pointer]:
+              - generic [ref=e19] [cursor=pointer]:
+                - generic [ref=e20] [cursor=pointer]: 📁
+                - generic [ref=e21] [cursor=pointer]: Personal
+              - generic [ref=e22] [cursor=pointer]: "5"
+            - option "📁 Work 12" [ref=e23] [cursor=pointer]:
+              - generic [ref=e24] [cursor=pointer]:
+                - generic [ref=e25] [cursor=pointer]: 📁
+                - generic [ref=e26] [cursor=pointer]: Work
+              - generic [ref=e27] [cursor=pointer]: "12"
+            - option "📁 Projects 8" [ref=e28] [cursor=pointer]:
+              - generic [ref=e29] [cursor=pointer]:
+                - generic [ref=e30] [cursor=pointer]: 📁
+                - generic [ref=e31] [cursor=pointer]: Projects
+              - generic [ref=e32] [cursor=pointer]: "8"
+          - generic [ref=e33]:
+            - paragraph [ref=e34]: "TODO: Folder support coming soon"
+            - paragraph [ref=e35]: Database schema needs folder_id column
+    - generic [ref=e36]:
+      - button "📁 Sections" [ref=e37] [cursor=pointer]:
+        - generic [ref=e39] [cursor=pointer]: 📁
+        - generic [ref=e40] [cursor=pointer]: Sections
+      - button "📝 Notes" [ref=e41] [cursor=pointer]:
+        - generic [ref=e44] [cursor=pointer]: 📝
+        - generic [ref=e45] [cursor=pointer]: Notes
+      - button "✏️ Editor" [ref=e46] [cursor=pointer]:
+        - generic [ref=e48] [cursor=pointer]: ✏️
+        - generic [ref=e49] [cursor=pointer]: Editor
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e55] [cursor=pointer]:
+    - img [ref=e56] [cursor=pointer]
+  - alert [ref=e59]
+```

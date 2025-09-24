@@ -32,7 +32,14 @@
       "Bash(pnpm test:run:*)",
       "Bash(pkill:*)",
       "Bash(taskkill:*)",
-      "Bash(cmd /c:*)"
+      "Bash(cmd /c:*)",
+      "Bash(powershell:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run build:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(start http://localhost:3004)",
+      "Bash(start http://localhost:3006)",
+      "Bash(start http://localhost:3006/app)"
     ],
     "deny": [],
     "ask": [],

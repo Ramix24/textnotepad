@@ -165,6 +165,18 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
     { id: 'work', name: 'Work', count: 12 },
     { id: 'projects', name: 'Projects', count: 8 },
   ]
+  
+  // Edge case: Validate current selection against available folders
+  useEffect(() => {
+    if (selection.folderId && selection.folderId !== 'all') {
+      const folderExists = mockFolders.some(f => f.id === selection.folderId)
+      if (!folderExists) {
+        console.warn(`Invalid folder selection "${selection.folderId}", falling back to All Notes`)
+        onFolderSelect(null)
+        return
+      }
+    }
+  }, [selection.folderId, onFolderSelect])
 
   const listboxRef = useRef<HTMLDivElement>(null)
   const allFolders = [{ id: null, name: 'All Notes', count: 0 }, ...mockFolders]

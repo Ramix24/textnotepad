@@ -1,0 +1,56 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: TextNotepad
+        - generic [ref=e6]:
+          - generic [ref=e7]:
+            - generic [ref=e8]: "1"
+            - generic [ref=e9]: "2"
+            - generic [ref=e10]: "3"
+            - generic [ref=e11]: to focus
+            - generic [ref=e12]: ·
+            - generic [ref=e13]: ⌘N
+            - generic [ref=e14]: new
+          - generic [ref=e15]: desktop · sections
+    - generic [ref=e16]:
+      - navigation "Sections" [ref=e18]:
+        - generic [ref=e19]:
+          - button "📁 Folders" [ref=e20] [cursor=pointer]:
+            - generic [ref=e21] [cursor=pointer]: 📁
+            - generic [ref=e22] [cursor=pointer]: Folders
+          - button "📝 Notes" [active] [ref=e23] [cursor=pointer]:
+            - generic [ref=e24] [cursor=pointer]: 📝
+            - generic [ref=e25] [cursor=pointer]: Notes
+          - button "💬 Messages Soon" [disabled] [ref=e26]:
+            - generic [ref=e27]: 💬
+            - generic [ref=e28]: Messages
+            - generic [ref=e29]: Soon
+          - button "🗑️ Trash" [ref=e30] [cursor=pointer]:
+            - generic [ref=e31] [cursor=pointer]: 🗑️
+            - generic [ref=e32] [cursor=pointer]: Trash
+      - main "Context List" [ref=e34]:
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - generic [ref=e37]:
+              - heading "Notes" [level=2] [ref=e38]
+              - paragraph [ref=e39]: 0 notes
+            - button "New Note" [ref=e40] [cursor=pointer]
+          - generic [ref=e43]: Loading notes...
+      - separator [ref=e44]
+      - main "Detail View" [ref=e46]:
+        - generic [ref=e47]:
+          - generic [ref=e50]: 📝
+          - heading "Select or create a note" [level=3] [ref=e51]
+          - paragraph [ref=e52]: Choose a note from the list to start editing, or create a new one to begin writing.
+          - generic [ref=e53]:
+            - button "Create New Note" [ref=e54] [cursor=pointer]
+            - button "Browse Notes" [ref=e55] [cursor=pointer]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e61] [cursor=pointer]:
+    - img [ref=e62] [cursor=pointer]
+  - alert [ref=e65]
+```
