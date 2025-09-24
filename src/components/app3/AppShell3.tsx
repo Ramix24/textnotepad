@@ -101,8 +101,8 @@ export function AppShell3({
   const handleNewFile = useCallback(async () => {
     try {
       const newFile = await createFile.mutateAsync({
-        name: `Note ${new Date().toLocaleDateString()}`
-        // TODO: Add folderId support when database schema supports folders
+        name: `Note ${new Date().toLocaleDateString()}`,
+        folder_id: layout.selection.mode === 'notes' ? layout.selection.folderId : null
       })
       
       layout.setSelection({

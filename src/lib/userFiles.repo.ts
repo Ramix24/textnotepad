@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { Database } from '@/types/database.types'
-import { UserFile, InsertUserFile } from '@/types/user-files.types'
+import { UserFile } from '@/types/user-files.types'
 import { calculateTextStats } from '@/lib/counters'
 
 // Error classes for better error handling
@@ -99,7 +99,7 @@ export async function getLatestFileForUser(
  */
 export async function createFile(
   supabase: TypedSupabaseClient,
-  params: { name?: string } = {}
+  params: { name?: string; folder_id?: string | null } = {}
 ): Promise<UserFile> {
   const { data: session } = await supabase.auth.getSession()
   
@@ -118,10 +118,11 @@ export async function createFile(
   }
 
   const defaultContent = ''
-  const fileData: InsertUserFile = {
+  const fileData: any = {
     user_id: session.session.user.id,
     name: fileName,
     content: defaultContent,
+    folder_id: params.folder_id || null,
     word_count: 0,
     char_count: 0,
     line_count: 0,

@@ -50,15 +50,9 @@ function migrateSelection(stored: any): AppSelection {
     const validModes = ['notes', 'messages', 'trash']
     const mode = validModes.includes(stored.mode) ? stored.mode : 'notes'
     
-    // Validate folderId - should be null or valid folder ID
+    // Validate folderId - should be null or string (actual validation happens in FoldersPanel)
     let folderId = stored.folderId || null
-    if (folderId && typeof folderId === 'string') {
-      const validFolderIds = ['personal', 'work', 'projects']
-      if (!validFolderIds.includes(folderId)) {
-        console.warn(`Invalid persisted folderId "${folderId}", resetting to null`)
-        folderId = null
-      }
-    } else if (folderId && typeof folderId !== 'string') {
+    if (folderId && typeof folderId !== 'string') {
       console.warn('Invalid folderId type in persisted state, resetting to null')
       folderId = null
     }
@@ -85,13 +79,10 @@ function migrateSelection(stored: any): AppSelection {
     let folderId = stored.folderId || null
     const fileId = stored.fileId || stored.selectedFileId || null
     
-    // Validate migrated data
-    if (folderId && typeof folderId === 'string') {
-      const validFolderIds = ['personal', 'work', 'projects']
-      if (!validFolderIds.includes(folderId)) {
-        console.warn(`Invalid migrated folderId "${folderId}", resetting to null`)
-        folderId = null
-      }
+    // Validate migrated data - just check type, actual validation in FoldersPanel
+    if (folderId && typeof folderId !== 'string') {
+      console.warn(`Invalid migrated folderId type, resetting to null`)
+      folderId = null
     }
     
     return { mode, folderId, fileId }

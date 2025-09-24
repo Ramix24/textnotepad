@@ -6,10 +6,11 @@ interface UseFileOperationsOptions {
   onFileSelect?: (fileId: string) => void
   onFileCreated?: (file: UserFile) => void
   onFileDeleted?: (fileId: string) => void
+  currentFolderId?: string | null
 }
 
 export function useFileOperations(options: UseFileOperationsOptions = {}) {
-  const { onFileSelect, onFileCreated, onFileDeleted } = options
+  const { onFileSelect, onFileCreated, onFileDeleted, currentFolderId } = options
   
   const createFile = useCreateFile()
   const renameFile = useRenameFile()
@@ -21,7 +22,8 @@ export function useFileOperations(options: UseFileOperationsOptions = {}) {
   const handleCreateFile = async (name?: string) => {
     try {
       const newFile = await createFile.mutateAsync({
-        name: name || `Note ${new Date().toLocaleDateString()}`
+        name: name || `Note ${new Date().toLocaleDateString()}`,
+        folder_id: currentFolderId
       })
       onFileCreated?.(newFile)
       onFileSelect?.(newFile.id)

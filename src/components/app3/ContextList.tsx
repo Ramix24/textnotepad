@@ -49,21 +49,7 @@ interface DefaultContextContentProps {
 function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }: DefaultContextContentProps) {
   const { data: files = [], isLoading } = useFilesList()
   
-  // Edge case: Invalid folder detection and recovery
-  useEffect(() => {
-    if (selection.mode === 'notes' && selection.folderId) {
-      const validFolderIds = ['personal', 'work', 'projects']
-      if (!validFolderIds.includes(selection.folderId)) {
-        console.warn(`Invalid folderId "${selection.folderId}" detected, resetting to All Notes`)
-        onSelectionChange({
-          mode: 'notes',
-          folderId: null,
-          fileId: null // Also clear invalid file selection
-        })
-        return
-      }
-    }
-  }, [selection.mode, selection.folderId, onSelectionChange])
+  // Edge case: Invalid folder detection and recovery is now handled by FoldersPanel with real data
 
   // Edge case: File no longer exists
   useEffect(() => {
@@ -80,6 +66,7 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
   }, [selection, files, isLoading, onSelectionChange])
   
   const fileOps = useFileOperations({
+    currentFolderId: selection.mode === 'notes' ? selection.folderId : null,
     onFileSelect: (fileId) => {
       onSelectionChange({ 
         ...selection,
@@ -128,7 +115,7 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
   }
 
   const handleNewNote = () => {
-    // Create file (folder support will be added later)
+    // Create file in current folder context
     fileOps.handleCreateFile()
   }
 
@@ -172,24 +159,12 @@ function getFilteredFiles(files: UserFile[], selection: AppSelection): UserFile[
     const activeFiles = files.filter(f => !f.deleted_at)
     
     if (selection.folderId === null) {
-      // All Notes: show all files (no folder support yet)
+      // All Notes: show all files regardless of folder
       return activeFiles
     }
     
-    // Specific folder: temporary empty array until folder support is implemented
-    // TODO: Replace with actual folder filtering when database supports folders
-    // For now, validate that the folderId exists in our mock data
-    const validFolderIds = ['personal', 'work', 'projects']
-    if (!selection.folderId || !validFolderIds.includes(selection.folderId)) {
-      // Invalid folder ID - this is an edge case where persisted state is stale
-      // Return all files as fallback behavior
-      if (selection.folderId) {
-        console.warn(`Invalid folderId "${selection.folderId}" found, falling back to All Notes`)
-      }
-      return activeFiles
-    }
-    
-    return []
+    // Specific folder: filter by folder_id
+    return activeFiles.filter(f => (f as any).folder_id === selection.folderId)
   }
   
   return []

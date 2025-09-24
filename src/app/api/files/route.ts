@@ -10,6 +10,7 @@ interface ApiResponse<T = unknown> {
 
 interface CreateFileRequest {
   name?: string
+  folder_id?: string | null
 }
 
 /**
@@ -68,7 +69,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       )
     }
 
-    const file = await createFile(supabase, { name: body.name })
+    const file = await createFile(supabase, { 
+      name: body.name,
+      folder_id: body.folder_id 
+    })
     
     return NextResponse.json(
       { data: file },

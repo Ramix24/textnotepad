@@ -11,6 +11,7 @@ interface ApiResponse<T = unknown> {
 
 interface CreateFileRequest {
   name?: string
+  folder_id?: string | null
 }
 
 

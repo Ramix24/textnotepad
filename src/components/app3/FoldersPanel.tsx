@@ -2,6 +2,7 @@
 
 import { ReactNode, useRef, useEffect, KeyboardEvent } from 'react'
 import { Button } from '@/components/ui/button'
+import { useFoldersWithCount } from '@/hooks/useFolders'
 import type { Mode, AppSelection } from './types'
 
 interface FoldersPanelProps {
@@ -159,27 +160,25 @@ interface FoldersListProps {
 }
 
 function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
-  // TODO: Replace with useFoldersList() hook when database schema supports folders
-  const mockFolders = [
-    { id: 'personal', name: 'Personal', count: 5 },
-    { id: 'work', name: 'Work', count: 12 },
-    { id: 'projects', name: 'Projects', count: 8 },
-  ]
+  const { data: folders = [], isLoading, error } = useFoldersWithCount()
   
   // Edge case: Validate current selection against available folders
   useEffect(() => {
-    if (selection.folderId && selection.folderId !== 'all') {
-      const folderExists = mockFolders.some(f => f.id === selection.folderId)
+    if (selection.folderId && selection.folderId !== 'all' && !isLoading) {
+      const folderExists = folders.some(f => f.id === selection.folderId)
       if (!folderExists) {
         console.warn(`Invalid folder selection "${selection.folderId}", falling back to All Notes`)
         onFolderSelect(null)
         return
       }
     }
-  }, [selection.folderId, onFolderSelect])
+  }, [selection.folderId, folders, isLoading, onFolderSelect])
 
   const listboxRef = useRef<HTMLDivElement>(null)
-  const allFolders = [{ id: null, name: 'All Notes', count: 0 }, ...mockFolders]
+  const allFolders = [
+    { id: null, name: 'All Notes', file_count: 0 }, 
+    ...folders.map(f => ({ id: f.id, name: f.name, file_count: f.file_count }))
+  ]
   
   // Find current selected index
   const selectedIndex = allFolders.findIndex(folder => folder.id === selection.folderId)
@@ -231,6 +230,61 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
     }
   }, [selectedIndex])
 
+  // Handle loading state
+  if (isLoading) {
+    return (
+      <div className="p-2">
+        <div className="space-y-1">
+          {/* All Notes button */}
+          <button
+            onClick={() => onFolderSelect(null)}
+            className="w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-sm">📝</span>
+              <span className="font-medium">All Notes</span>
+            </div>
+          </button>
+          
+          {/* Loading skeleton for folders */}
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="w-full flex items-center justify-between p-2 rounded-lg">
+              <div className="flex items-center gap-3">
+                <span className="text-sm">📁</span>
+                <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+              </div>
+              <div className="h-3 w-6 bg-muted rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // Handle error state
+  if (error) {
+    return (
+      <div className="p-2">
+        <div className="space-y-1">
+          {/* All Notes button - always available */}
+          <button
+            onClick={() => onFolderSelect(null)}
+            className="w-full flex items-center justify-between p-2 rounded-lg text-left transition-colors text-sm bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-sm">📝</span>
+              <span className="font-medium">All Notes</span>
+            </div>
+          </button>
+        </div>
+        
+        <div className="mt-4 p-3 bg-destructive/10 rounded-lg">
+          <p className="text-xs text-destructive">Failed to load folders</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="p-2">
       {/* All Notes option */}
@@ -264,7 +318,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
         </button>
 
         {/* Individual folders */}
-        {mockFolders.map((folder) => (
+        {folders.map((folder) => (
           <button
             key={folder.id}
             id={`folder-${folder.id}`}
@@ -284,7 +338,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
               <span className="text-sm">📁</span>
               <span className="font-medium">{folder.name}</span>
             </div>
-            <span className="text-xs text-muted-foreground">{folder.count}</span>
+            <span className="text-xs text-muted-foreground">{folder.file_count}</span>
           </button>
         ))}
       </div>
