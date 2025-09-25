@@ -58,9 +58,9 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
       onDirtyChange?.(file.id, false)
       onFileUpdate?.(updatedFile)
       
-      // Invalidate related queries
-      queryClient.invalidateQueries({ queryKey: ['userFile', file.id] })
-      queryClient.invalidateQueries({ queryKey: ['userFiles', file.user_id] })
+      // Invalidate related queries using correct keys from useFiles hook
+      queryClient.invalidateQueries({ queryKey: ['files', 'detail', file.id] })
+      queryClient.invalidateQueries({ queryKey: ['files', 'list'] })
       
       toast.success('Saved', { duration: 1000 })
     },
