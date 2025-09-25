@@ -2,7 +2,6 @@
 
 import * as React from 'react'
 import { ReactNode, useCallback, useRef } from 'react'
-import { useRouter } from 'next/navigation'
 import { useColumnsLayout } from '@/hooks/useColumnsLayout'
 import { useKeyboardNav } from '@/hooks/useKeyboardNav'
 import { useCreateFile } from '@/hooks/useFiles'
@@ -35,7 +34,6 @@ export function AppShell3({
   const containerRef = useRef<HTMLDivElement>(null)
   const { supabase } = useSupabase()
   const { user } = useAuthSession()
-  const router = useRouter()
   const [isSearchOpen, setIsSearchOpen] = React.useState(false)
   
   // Refs for focusing columns
@@ -134,14 +132,15 @@ export function AppShell3({
           description: 'Unable to sign out. Please try again.',
         })
       } else {
-        router.push('/')
+        // Force redirect to landing page and reload to clear app state
+        window.location.href = '/'
       }
     } catch {
       toast.error('Sign out failed', {
         description: 'An unexpected error occurred during sign out.',
       })
     }
-  }, [supabase, router])
+  }, [supabase])
 
   // Handle file selection from search
   const handleFileSelect = useCallback((fileId: string) => {

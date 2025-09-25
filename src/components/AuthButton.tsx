@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useAuthSession } from '@/hooks/useAuthSession'
@@ -9,7 +8,6 @@ import { useSupabase } from '@/components/SupabaseProvider'
 export function AuthButton() {
   const { supabase } = useSupabase()
   const { user, loading } = useAuthSession()
-  const router = useRouter()
 
   const handleSignIn = async () => {
     try {
@@ -41,7 +39,8 @@ export function AuthButton() {
           description: error.message,
         })
       } else {
-        router.push('/')
+        // Force redirect to landing page and reload to clear app state
+        window.location.href = '/'
       }
     } catch {
       toast.error('Sign out failed', {
