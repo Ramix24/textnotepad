@@ -1,9 +1,11 @@
 'use client'
 
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { useFilesList } from '@/hooks/useFiles'
 import { useFileOperations } from './useFileOperations'
 import { FileItem } from './FileItem'
+import { SortDropdown, SortOption } from '@/components/sort-dropdown'
+import { sortFiles, getDefaultSort } from '@/lib/sort'
 import type { AppSelection } from './types'
 import type { UserFile } from '@/types/user-files.types'
 
@@ -25,7 +27,7 @@ export function ContextList({
   
   return (
     <div 
-      className={`flex flex-col bg-gray-900 border-r border-gray-700 ${className}`}
+      className={`flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 ${className}`}
       role="main"
       aria-label="Context List"
     >
@@ -188,8 +190,10 @@ function NotesView({
   fileOps: ReturnType<typeof useFileOperations>
   selection: AppSelection
 }) {
-  // Sort files by last modified (updated_at desc) - files are already filtered
-  const sortedFiles = files.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+  const [sortBy, setSortBy] = useState<SortOption>(getDefaultSort())
+  
+  // Sort files based on current sort option
+  const sortedFiles = sortFiles(files, sortBy)
 
   // Get folder name for header
   const getFolderDisplayName = () => {
@@ -201,24 +205,36 @@ function NotesView({
 
   return (
     <div className="flex flex-col">
-      <header className="flex-shrink-0 p-4 border-b border-gray-700 bg-gray-800 flex items-center justify-between">
-        <div>
-          <h2 className="text-sm font-medium text-white">{getFolderDisplayName()}</h2>
-          <p className="text-xs text-gray-400 mt-1">{files.length} notes</p>
+      <header className="flex-shrink-0 p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex-1">
+            <h2 className="text-sm font-medium text-gray-900 dark:text-white">{getFolderDisplayName()}</h2>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{files.length} notes</p>
+          </div>
+          <button
+            onClick={onNewNote}
+            disabled={fileOps.createFile.isPending}
+            className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          >
+            {fileOps.createFile.isPending ? 'Creating...' : 'New Note'}
+          </button>
         </div>
-        <button
-          onClick={onNewNote}
-          disabled={fileOps.createFile.isPending}
-          className="px-3 py-1.5 text-xs font-medium bg-gray-700 text-white rounded-md hover:bg-gray-600 disabled:opacity-50 transition-colors"
-        >
-          {fileOps.createFile.isPending ? 'Creating...' : 'New Note'}
-        </button>
+        
+        {files.length > 0 && (
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-600 dark:text-gray-400">Sort by:</span>
+            <SortDropdown 
+              value={sortBy} 
+              onChange={setSortBy}
+            />
+          </div>
+        )}
       </header>
       
       <div className="flex-1 overflow-auto">
         {isLoading ? (
           <div className="p-6 text-center">
-            <div className="text-sm text-gray-400">Loading notes...</div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">Loading notes...</div>
           </div>
         ) : sortedFiles.length === 0 ? (
           <NotesEmptyState onNewNote={onNewNote} isCreating={fileOps.createFile.isPending} />
@@ -245,8 +261,8 @@ function NotesView({
       </div>
 
       {/* Footer */}
-      <footer className="flex-shrink-0 p-3 border-t border-gray-700 bg-gray-800">
-        <div className="flex items-center justify-between text-xs text-gray-400">
+      <footer className="flex-shrink-0 p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+        <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
           <div className="flex items-center gap-2">
             <span>{files.length} notes</span>
             {files.length > 0 && (
@@ -257,7 +273,7 @@ function NotesView({
             )}
           </div>
           <div className="flex items-center gap-1">
-            <kbd className="px-1 py-0.5 text-[10px] bg-gray-700 text-gray-300 rounded border border-gray-600">⌘N</kbd>
+            <kbd className="px-1 py-0.5 text-[10px] bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded border border-gray-300 dark:border-gray-600">⌘N</kbd>
             <span>new</span>
           </div>
         </div>
@@ -269,17 +285,17 @@ function NotesView({
 function NotesEmptyState({ onNewNote, isCreating }: { onNewNote: () => void, isCreating: boolean }) {
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-      <div className="w-12 h-12 rounded-lg bg-gray-800 mb-4 flex items-center justify-center">
+      <div className="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-800 mb-4 flex items-center justify-center">
         <span className="text-lg">📝</span>
       </div>
-      <h3 className="text-sm font-medium text-white mb-2">No notes in this folder</h3>
-      <p className="text-xs text-gray-400 leading-relaxed max-w-[200px] mb-4">
+      <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">No notes in this folder</h3>
+      <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed max-w-[200px] mb-4">
         Start writing your first note in this folder
       </p>
       <button
         onClick={onNewNote}
         disabled={isCreating}
-        className="px-4 py-2 text-sm font-medium bg-gray-700 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 transition-colors"
+        className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
       >
         {isCreating ? 'Creating...' : '+ New Note'}
       </button>
@@ -290,11 +306,11 @@ function NotesEmptyState({ onNewNote, isCreating }: { onNewNote: () => void, isC
 function TrashView() {
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-      <div className="w-12 h-12 rounded-lg bg-gray-800 mb-4 flex items-center justify-center">
+      <div className="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-800 mb-4 flex items-center justify-center">
         <span className="text-lg">🗑️</span>
       </div>
-      <h3 className="text-sm font-medium text-white mb-2">Trash</h3>
-      <p className="text-xs text-gray-400 leading-relaxed max-w-[200px]">
+      <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Trash</h3>
+      <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed max-w-[200px]">
         Deleted items will appear here. Coming soon with RLS implementation.
       </p>
     </div>
@@ -304,16 +320,16 @@ function TrashView() {
 function MessagesView() {
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-      <div className="w-12 h-12 rounded-lg bg-gray-800 mb-4 flex items-center justify-center">
+      <div className="w-12 h-12 rounded-lg bg-gray-200 dark:bg-gray-800 mb-4 flex items-center justify-center">
         <span className="text-lg">💬</span>
       </div>
-      <h3 className="text-sm font-medium text-white mb-2">Messages</h3>
-      <p className="text-xs text-gray-400 leading-relaxed max-w-[200px]">
+      <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Messages</h3>
+      <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed max-w-[200px]">
         No conversations yet. Start a conversation to see your messages here.
       </p>
       <button 
         disabled
-        className="mt-4 px-3 py-1.5 text-xs font-medium text-gray-400 border border-gray-600 rounded-md cursor-not-allowed"
+        className="mt-4 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-md cursor-not-allowed"
       >
         Coming Soon
       </button>

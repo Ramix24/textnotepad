@@ -26,6 +26,15 @@
   --input: 0 0% 96.1%;
   --ring: 0 0% 9%;
   --radius: 1rem;
+
+  /* Light theme variables (default) */
+  --bg-primary: #F7F7F8;
+  --bg-secondary: #ECECEE;
+  --accent-blue: #3F51B5;
+  --bg-active: #E3E8F7;
+  --text-primary: #1A1A1A;
+  --text-secondary: #5F5F5F;
+  --border-dark: #D6D6D6;
 }
 
 .dark {
@@ -48,6 +57,15 @@
   --border: 0 0% 14.9%;
   --input: 0 0% 14.9%;
   --ring: 238 94% 26%;
+
+  /* Dark theme overrides */
+  --bg-primary: #1A1A1A;
+  --bg-secondary: #262626;
+  --accent-blue: #3F51B5;
+  --bg-active: #2A3A52;
+  --text-primary: #E0E0E0;
+  --text-secondary: #A0A0A0;
+  --border-dark: #404040;
 }
 
 * {
@@ -55,8 +73,8 @@
 }
 
 body {
-  background-color: #ffffff;
-  color: #1f2937;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 

@@ -22,7 +22,7 @@ export function FoldersPanel({
   
   return (
     <div 
-      className={`flex flex-col bg-gray-900 border-r border-gray-700 ${className}`}
+      className={`flex flex-col bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 ${className}`}
       role="navigation"
       aria-label="Folders and Modes"
     >
@@ -82,7 +82,7 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
   return (
     <div className="flex flex-col h-full">
       {/* Header toolbar */}
-      <header className="flex-shrink-0 px-4 py-3 border-b border-gray-700 bg-gray-800">
+      <header className="flex-shrink-0 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div 
           ref={toolbarRef}
           className="flex gap-1"
@@ -94,8 +94,8 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
             onClick={() => handleModeChange('notes')}
             className={`px-3 py-1 text-sm font-medium rounded transition-colors flex-1 ${
               selection.mode === 'notes' 
-                ? 'bg-gray-700 text-white' 
-                : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+                ? 'bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-white' 
+                : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700'
             }`}
             role="tab"
             aria-selected={selection.mode === 'notes'}
@@ -108,8 +108,8 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
             onClick={() => handleModeChange('trash')}
             className={`px-3 py-1 text-sm font-medium rounded transition-colors flex-1 ${
               selection.mode === 'trash' 
-                ? 'bg-gray-700 text-white' 
-                : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+                ? 'bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-white' 
+                : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700'
             }`}
             role="tab"
             aria-selected={selection.mode === 'trash'}
@@ -120,6 +120,7 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
           </button>
         </div>
       </header>
+      
       
       {/* Folders list or mode-specific content */}
       <div 
@@ -254,7 +255,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
       <div className="p-3">
         <button
           onClick={() => onFolderSelect(null)}
-          className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-gray-800 text-white hover:bg-gray-700"
+          className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
         >
           <span className="text-gray-400">📄</span>
           <span className="font-medium">All Notes</span>
@@ -270,7 +271,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
           {/* All Notes button */}
           <button
             onClick={() => onFolderSelect(null)}
-            className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-gray-800 text-white hover:bg-gray-700"
+            className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
           >
             <span className="text-gray-400">📄</span>
             <span className="font-medium">All Notes</span>
@@ -280,7 +281,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
           {[1, 2, 3].map((i) => (
             <div key={i} className="w-full flex items-center gap-3 p-2">
               <span className="text-gray-500">📁</span>
-              <div className="h-4 w-20 bg-gray-700 rounded animate-pulse" />
+              <div className="h-4 w-20 bg-gray-300 dark:bg-gray-700 rounded animate-pulse" />
             </div>
           ))}
         </div>
@@ -296,14 +297,14 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
           {/* All Notes button - always available */}
           <button
             onClick={() => onFolderSelect(null)}
-            className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-gray-800 text-white hover:bg-gray-700"
+            className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
           >
             <span className="text-gray-400">📄</span>
             <span className="font-medium">All Notes</span>
           </button>
         </div>
         
-        <div className="mt-3 p-2 bg-red-900 border border-red-700 rounded text-xs text-red-400">
+        <div className="mt-3 p-2 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded text-xs text-red-600 dark:text-red-400">
           Failed to load folders
         </div>
       </div>
@@ -311,9 +312,11 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
   }
 
   return (
-    <div className="p-3">
-      {/* All Notes option */}
-      <div 
+    <div className="flex flex-col h-full">
+      
+      <div className="p-3 flex-1">
+        {/* All Notes option */}
+        <div 
         ref={listboxRef}
         role="listbox"
         className="space-y-1"
@@ -329,14 +332,14 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
           onClick={() => onFolderSelect(null)}
           tabIndex={-1}
           className={`
-            w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-gray-400
+            w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
             ${selection.folderId === null
-              ? 'bg-gray-700 text-white'
-              : 'text-gray-300 hover:text-gray-100 hover:bg-gray-700'
+              ? 'bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-white'
+              : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
             }
           `}
         >
-          <svg className={`w-4 h-4 ${selection.folderId === null ? 'text-gray-400' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`w-4 h-4 ${selection.folderId === null ? 'text-blue-500 dark:text-gray-400' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <span className="font-medium">All Notes</span>
@@ -355,14 +358,14 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
               onClick={() => onFolderSelect(folder.id)}
               tabIndex={-1}
               className={`
-                w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-gray-400 pr-16
+                w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 pr-16
                 ${selection.folderId === folder.id
-                  ? 'bg-gray-700 text-white'
-                  : 'text-gray-300 hover:text-gray-100 hover:bg-gray-700'
+                  ? 'bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-white'
+                  : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
                 }
               `}
             >
-              <svg className={`w-4 h-4 ${selection.folderId === folder.id ? 'text-gray-400' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-4 h-4 ${selection.folderId === folder.id ? 'text-blue-500 dark:text-gray-400' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
               </svg>
               <span className="font-medium">{folder.name}</span>
@@ -375,7 +378,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
                   e.stopPropagation()
                   handleRenameFolder(folder.id, folder.name)
                 }}
-                className="p-1 hover:bg-gray-600 rounded text-gray-400 hover:text-gray-200"
+                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                 title="Rename folder"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -387,7 +390,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
                   e.stopPropagation()
                   handleDeleteFolder(folder.id, folder.name)
                 }}
-                className="p-1 hover:bg-red-900 rounded text-gray-400 hover:text-red-400"
+                className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
                 title="Delete folder"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -397,24 +400,25 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
             </div>
           </div>
         ))}
-      </div>
+        </div>
       
-      {/* Footer */}
-      <footer className="mt-auto pt-4">
-        {/* New Folder CTA */}
-        <div className="px-3 pb-3 border-t border-gray-700 pt-3">
+        {/* Footer */}
+        <footer className="mt-auto pt-4">
+          {/* New Folder CTA */}
+          <div className="px-3 pb-3 border-t border-gray-200 dark:border-gray-700 pt-3">
           <button
             onClick={handleCreateFolder}
             disabled={createFolder.isPending}
-            className="w-full flex items-center justify-center gap-2 p-2 text-sm text-gray-300 hover:text-gray-100 hover:bg-gray-700 rounded border border-gray-600 hover:border-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-2 p-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
             {createFolder.isPending ? 'Creating...' : 'New Folder'}
           </button>
-        </div>
-      </footer>
+          </div>
+        </footer>
+      </div>
     </div>
   )
 }

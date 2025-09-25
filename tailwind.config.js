@@ -48,6 +48,13 @@ module.exports = {
           surface: '#f8fafc',
           accent: '#1a1a1a',
         },
+        'bg-primary': 'var(--bg-primary)',
+        'bg-secondary': 'var(--bg-secondary)',
+        'accent-blue': 'var(--accent-blue)',
+        'bg-active': 'var(--bg-active)',
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'border-dark': 'var(--border-dark)',
       },
       borderRadius: {
         lg: 'var(--radius)',

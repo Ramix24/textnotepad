@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import { ReactNode, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useColumnsLayout } from '@/hooks/useColumnsLayout'
@@ -10,6 +11,8 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { FoldersPanel } from './FoldersPanel'
 import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { GlobalSearchModal } from '@/components/global-search-modal'
 import { toast } from 'sonner'
 
 interface AppShell3Props {
@@ -32,6 +35,7 @@ export function AppShell3({
   const { supabase } = useSupabase()
   const { user } = useAuthSession()
   const router = useRouter()
+  const [isSearchOpen, setIsSearchOpen] = React.useState(false)
   
   // Refs for focusing columns
   const sectionsRef = useRef<HTMLDivElement>(null)
@@ -138,6 +142,21 @@ export function AppShell3({
     }
   }, [supabase, router])
 
+  // Handle file selection from search
+  const handleFileSelect = useCallback((fileId: string) => {
+    layout.setSelection({
+      ...layout.selection,
+      mode: 'notes',
+      fileId
+    })
+    
+    // Focus detail view after selecting file
+    if (layout.isMobile || layout.isTablet) {
+      layout.setActivePane(3)
+    }
+    setTimeout(() => detailRef.current?.focus(), 100)
+  }, [layout])
+
   // Global keyboard navigation
   useKeyboardNav({
     onFocusColumn1: handleFocusColumn1,
@@ -150,6 +169,19 @@ export function AppShell3({
     }
   })
 
+  // Global keyboard shortcuts
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setIsSearchOpen(true)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   // Mobile tab bar with better active states
   const MobileTabBar = () => {
     const tabs = [
@@ -160,7 +192,7 @@ export function AppShell3({
 
     return (
       <div 
-        className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm border-t border-zinc-200 dark:border-zinc-700 flex safe-area-pb"
+        className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 flex safe-area-pb"
         data-testid="mobile-tab-bar"
       >
         {tabs.map((tab) => {
@@ -172,8 +204,8 @@ export function AppShell3({
               className={`
                 flex-1 flex flex-col items-center justify-center gap-1 text-xs font-medium transition-all duration-200 relative
                 ${isActive 
-                  ? 'text-blue-400' 
-                  : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 active:scale-95'
+                  ? 'text-blue-500 dark:text-blue-400' 
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 active:scale-95'
                 }
               `}
             >
@@ -186,8 +218,8 @@ export function AppShell3({
               <div className={`
                 w-8 h-8 rounded-lg flex items-center justify-center transition-colors
                 ${isActive 
-                  ? 'bg-gray-700 text-blue-400' 
-                  : 'bg-transparent text-zinc-500 dark:text-zinc-400 group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800'
+                  ? 'bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-blue-400' 
+                  : 'bg-transparent text-gray-500 dark:text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-800'
                 }
               `}>
                 <span className="text-base">{tab.icon}</span>
@@ -196,7 +228,7 @@ export function AppShell3({
               {/* Label */}
               <span className={`
                 leading-none transition-colors
-                ${isActive ? 'text-blue-400 font-semibold' : 'text-gray-400'}
+                ${isActive ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-500 dark:text-gray-400'}
               `}>
                 {tab.label}
               </span>
@@ -213,33 +245,39 @@ export function AppShell3({
       data-testid="app-shell-3"
     >
       {/* Header */}
-      <header className="h-14 border-b border-gray-700 bg-gray-800 flex-shrink-0">
+      <header className="h-14 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
         <div className="flex items-center justify-between h-full px-6">
-          <div className="text-lg font-medium text-white">
+          <div className="text-lg font-medium text-gray-900 dark:text-white">
             textnotepad.com
           </div>
           
           {/* Global Search */}
           <div className="flex-1 max-w-md mx-8">
-            <div className="relative">
-              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div 
+              className="relative cursor-pointer"
+              onClick={() => setIsSearchOpen(true)}
+            >
+              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <input
-                type="text"
-                placeholder="Search notes..."
-                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent bg-gray-700 text-white placeholder-gray-400 hover:bg-gray-600 transition-colors"
-              />
+              <div className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-500 dark:placeholder-gray-400 hover:bg-white dark:hover:bg-gray-600 transition-colors">
+                Search notes...
+              </div>
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <kbd className="px-1.5 py-0.5 text-[10px] bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400 rounded font-mono">⌘K</kbd>
+              </div>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Theme Toggle */}
+            <ThemeToggle />
             
             {/* User Authentication UI */}
             {user && (
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700 rounded transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -349,6 +387,13 @@ export function AppShell3({
 
       {/* Mobile tab bar */}
       {layout.breakpoint === 'mobile' && <MobileTabBar />}
+
+      {/* Global Search Modal */}
+      <GlobalSearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onFileSelect={handleFileSelect}
+      />
     </div>
   )
 }
