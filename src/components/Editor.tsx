@@ -157,12 +157,12 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
   }
 
   return (
-    <div className={cn('flex flex-col h-full bg-white dark:bg-gray-900', className)}>
+    <div className={cn('flex flex-col h-full bg-bg-primary', className)}>
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border-dark bg-bg-secondary">
         <div className="flex items-center space-x-2">
           {/* File name with dirty indicator */}
-          <h1 className="text-lg font-medium text-gray-900 dark:text-white">
+          <h1 className="text-lg font-medium text-text-primary">
             {file.name}
           </h1>
           {isDirty && (
@@ -176,7 +176,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
           )}
           
           {/* File metadata */}
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="text-sm text-text-secondary">
             v{file.version}
           </span>
         </div>
@@ -198,10 +198,10 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
           className={cn(
-            'flex-1 w-full p-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-white',
+            'flex-1 w-full p-4 bg-bg-primary text-text-primary',
             'font-mono text-sm leading-relaxed', // Monospace for code-like editing
             'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
-            'resize-none placeholder:text-gray-500 dark:placeholder:text-gray-400',
+            'resize-none placeholder:text-text-secondary',
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
           placeholder="Start typing your content here..."
