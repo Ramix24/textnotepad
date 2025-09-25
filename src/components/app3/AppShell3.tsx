@@ -192,7 +192,7 @@ export function AppShell3({
 
     return (
       <div 
-        className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 flex safe-area-pb"
+        className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-bg-secondary/95 backdrop-blur-sm border-t border-border-dark flex safe-area-pb"
         data-testid="mobile-tab-bar"
       >
         {tabs.map((tab) => {
@@ -205,21 +205,21 @@ export function AppShell3({
                 flex-1 flex flex-col items-center justify-center gap-1 text-xs font-medium transition-all duration-200 relative
                 ${isActive 
                   ? 'text-blue-500 dark:text-blue-400' 
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 active:scale-95'
+                  : 'text-text-secondary hover:text-text-primary active:scale-95'
                 }
               `}
             >
               {/* Active indicator */}
               {isActive && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-blue-400 rounded-full" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-accent-blue rounded-full" />
               )}
               
               {/* Icon */}
               <div className={`
                 w-8 h-8 rounded-lg flex items-center justify-center transition-colors
                 ${isActive 
-                  ? 'bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-blue-400' 
-                  : 'bg-transparent text-gray-500 dark:text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-800'
+                  ? 'bg-bg-active text-accent-blue' 
+                  : 'bg-transparent text-text-secondary group-hover:bg-[color:var(--bg-active)]/40'
                 }
               `}>
                 <span className="text-base">{tab.icon}</span>
@@ -228,7 +228,7 @@ export function AppShell3({
               {/* Label */}
               <span className={`
                 leading-none transition-colors
-                ${isActive ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-500 dark:text-gray-400'}
+                ${isActive ? 'text-accent-blue font-semibold' : 'text-text-secondary'}
               `}>
                 {tab.label}
               </span>
@@ -241,13 +241,13 @@ export function AppShell3({
 
   return (
     <div 
-      className={`fixed inset-0 flex flex-col overflow-hidden bg-background ${className}`}
+      className={`fixed inset-0 flex flex-col overflow-hidden bg-bg-primary ${className}`}
       data-testid="app-shell-3"
     >
       {/* Header */}
-      <header className="h-14 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex-shrink-0">
+      <header className="h-14 border-b border-border-dark bg-bg-secondary flex-shrink-0">
         <div className="flex items-center justify-between h-full px-6">
-          <div className="text-lg font-medium text-gray-900 dark:text-white">
+          <div className="text-lg font-medium text-text-primary">
             textnotepad.com
           </div>
           
@@ -257,14 +257,14 @@ export function AppShell3({
               className="relative cursor-pointer"
               onClick={() => setIsSearchOpen(true)}
             >
-              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <div className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-500 dark:placeholder-gray-400 hover:bg-white dark:hover:bg-gray-600 transition-colors">
+              <div className="w-full pl-10 pr-4 py-2 text-sm border border-border-dark rounded-lg bg-bg-primary text-text-secondary placeholder:text-text-secondary hover:bg-bg-secondary transition-colors">
                 Search notes...
               </div>
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <kbd className="px-1.5 py-0.5 text-[10px] bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400 rounded font-mono">⌘K</kbd>
+                <kbd className="px-1.5 py-0.5 text-[10px] bg-bg-active text-text-secondary rounded font-mono">⌘K</kbd>
               </div>
             </div>
           </div>
@@ -277,7 +277,7 @@ export function AppShell3({
             {user && (
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-[color:var(--bg-active)]/40 rounded transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -350,8 +350,8 @@ export function AppShell3({
             role="separator"
             aria-orientation="vertical"
             tabIndex={0}
-            className={`w-1 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 cursor-col-resize flex-shrink-0 transition-colors ${
-              layout.state.isResizing ? 'bg-blue-400' : ''
+            className={`w-1 bg-border-dark hover:bg-text-secondary cursor-col-resize flex-shrink-0 transition-colors ${
+              layout.state.isResizing ? 'bg-accent-blue' : ''
             }`}
             onMouseDown={handleMouseDown}
             onKeyDown={handleKeyDown}
