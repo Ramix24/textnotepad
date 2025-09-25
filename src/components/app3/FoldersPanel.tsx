@@ -22,7 +22,7 @@ export function FoldersPanel({
   
   return (
     <div 
-      className={`flex flex-col bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 ${className}`}
+      className={`flex flex-col bg-bg-secondary border-r border-border-dark ${className}`}
       role="navigation"
       aria-label="Folders and Modes"
     >
@@ -82,7 +82,7 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
   return (
     <div className="flex flex-col h-full">
       {/* Header toolbar */}
-      <header className="flex-shrink-0 px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+      <header className="flex-shrink-0 px-4 py-3 border-b border-border-dark bg-bg-secondary">
         <div 
           ref={toolbarRef}
           className="flex gap-1"
@@ -94,8 +94,8 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
             onClick={() => handleModeChange('notes')}
             className={`px-3 py-1 text-sm font-medium rounded transition-colors flex-1 ${
               selection.mode === 'notes' 
-                ? 'bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-white' 
-                : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700'
+                ? 'bg-bg-active text-accent-blue' 
+                : 'text-text-secondary hover:text-accent-blue hover:bg-[color:var(--bg-active)]/40'
             }`}
             role="tab"
             aria-selected={selection.mode === 'notes'}
@@ -108,8 +108,8 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
             onClick={() => handleModeChange('trash')}
             className={`px-3 py-1 text-sm font-medium rounded transition-colors flex-1 ${
               selection.mode === 'trash' 
-                ? 'bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-white' 
-                : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-700'
+                ? 'bg-bg-active text-accent-blue' 
+                : 'text-text-secondary hover:text-accent-blue hover:bg-[color:var(--bg-active)]/40'
             }`}
             role="tab"
             aria-selected={selection.mode === 'trash'}
@@ -255,9 +255,9 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
       <div className="p-3">
         <button
           onClick={() => onFolderSelect(null)}
-          className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+          className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
         >
-          <span className="text-gray-400">📄</span>
+          <span className="text-text-secondary">📄</span>
           <span className="font-medium">All Notes</span>
         </button>
       </div>
@@ -271,9 +271,9 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
           {/* All Notes button */}
           <button
             onClick={() => onFolderSelect(null)}
-            className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+            className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
           >
-            <span className="text-gray-400">📄</span>
+            <span className="text-text-secondary">📄</span>
             <span className="font-medium">All Notes</span>
           </button>
           
@@ -297,9 +297,9 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
           {/* All Notes button - always available */}
           <button
             onClick={() => onFolderSelect(null)}
-            className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700"
+            className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
           >
-            <span className="text-gray-400">📄</span>
+            <span className="text-text-secondary">📄</span>
             <span className="font-medium">All Notes</span>
           </button>
         </div>
@@ -334,12 +334,12 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
           className={`
             w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
             ${selection.folderId === null
-              ? 'bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-white'
+              ? 'bg-bg-active text-accent-blue'
               : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
             }
           `}
         >
-          <svg className={`w-4 h-4 ${selection.folderId === null ? 'text-blue-500 dark:text-gray-400' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`w-4 h-4 ${selection.folderId === null ? 'text-blue-500 dark:text-text-secondary' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <span className="font-medium">All Notes</span>
@@ -360,12 +360,12 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
               className={`
                 w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 pr-16
                 ${selection.folderId === folder.id
-                  ? 'bg-blue-100 dark:bg-gray-700 text-blue-600 dark:text-white'
+                  ? 'bg-bg-active text-accent-blue'
                   : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
                 }
               `}
             >
-              <svg className={`w-4 h-4 ${selection.folderId === folder.id ? 'text-blue-500 dark:text-gray-400' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-4 h-4 ${selection.folderId === folder.id ? 'text-blue-500 dark:text-text-secondary' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
               </svg>
               <span className="font-medium">{folder.name}</span>
@@ -378,7 +378,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
                   e.stopPropagation()
                   handleRenameFolder(folder.id, folder.name)
                 }}
-                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-500 dark:text-text-secondary hover:text-gray-700 dark:hover:text-gray-200"
                 title="Rename folder"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -390,7 +390,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
                   e.stopPropagation()
                   handleDeleteFolder(folder.id, folder.name)
                 }}
-                className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
+                className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded text-gray-500 dark:text-text-secondary hover:text-red-600 dark:hover:text-red-400"
                 title="Delete folder"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -23,7 +23,7 @@ export function DetailView({
 }: DetailViewProps) {
   return (
     <div 
-      className={`flex flex-col bg-white dark:bg-gray-900 ${className}`}
+      className={`flex flex-col bg-bg-primary ${className}`}
       role="main"
       aria-label="Detail View"
     >
@@ -70,8 +70,8 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
   if (isLoading) {
     return (
       <div className="flex flex-col">
-        <header className="flex-shrink-0 h-12 flex items-center px-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-          <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+        <header className="flex-shrink-0 h-12 flex items-center px-4 border-b border-border-dark bg-bg-secondary">
+          <div className="h-4 w-32 bg-border-dark rounded animate-pulse" />
         </header>
         <div className="flex-1">
           <EditorSkeleton className="h-full" />
@@ -89,8 +89,8 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
   if (file) {
     return (
       <div className="flex flex-col h-full">
-        <header className="flex-shrink-0 h-12 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-          <h1 className="text-sm font-medium text-gray-900 dark:text-white truncate">{file.name}</h1>
+        <header className="flex-shrink-0 h-12 flex items-center justify-between px-4 border-b border-border-dark bg-bg-secondary">
+          <h1 className="text-sm font-medium text-text-primary truncate">{file.name}</h1>
         </header>
         
         <div className="flex-1 min-h-0">
@@ -143,14 +143,14 @@ function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' }) {
 
   return (
     <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-900 mb-6 flex items-center justify-center border border-gray-300 dark:border-gray-700">
-        <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-border-dark to-bg-secondary mb-6 flex items-center justify-center border border-border-dark">
+        <div className="w-8 h-8 rounded-lg bg-bg-secondary flex items-center justify-center">
           <span className="text-lg">{content.icon}</span>
         </div>
       </div>
       
-      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">{content.title}</h3>
-      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-[300px] mb-6">
+      <h3 className="text-lg font-medium text-text-primary mb-2">{content.title}</h3>
+      <p className="text-sm text-text-secondary leading-relaxed max-w-[300px] mb-6">
         {content.description}
       </p>
       
@@ -161,14 +161,14 @@ function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' }) {
 function MessagesPlaceholder() {
   return (
     <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-900 mb-6 flex items-center justify-center border border-gray-300 dark:border-gray-700">
-        <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-border-dark to-bg-secondary mb-6 flex items-center justify-center border border-border-dark">
+        <div className="w-8 h-8 rounded-lg bg-bg-secondary flex items-center justify-center">
           <span className="text-lg">💬</span>
         </div>
       </div>
       
-      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Messages</h3>
-      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-[300px] mb-6">
+      <h3 className="text-lg font-medium text-text-primary mb-2">Messages</h3>
+      <p className="text-sm text-text-secondary leading-relaxed max-w-[300px] mb-6">
         Messages and conversations will be available here soon. This feature is currently under development.
       </p>
     </div>
@@ -178,14 +178,14 @@ function MessagesPlaceholder() {
 function TrashPlaceholder() {
   return (
     <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-900 mb-6 flex items-center justify-center border border-gray-300 dark:border-gray-700">
-        <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-border-dark to-bg-secondary mb-6 flex items-center justify-center border border-border-dark">
+        <div className="w-8 h-8 rounded-lg bg-bg-secondary flex items-center justify-center">
           <span className="text-lg">🗑️</span>
         </div>
       </div>
       
-      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Trash</h3>
-      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-[300px] mb-6">
+      <h3 className="text-lg font-medium text-text-primary mb-2">Trash</h3>
+      <p className="text-sm text-text-secondary leading-relaxed max-w-[300px] mb-6">
         Deleted items and their previews will appear here. Select an item from the trash list to view or restore it.
       </p>
     </div>
@@ -201,8 +201,8 @@ function DetailViewError({ error }: { error: string }) {
         </div>
       </div>
       
-      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Failed to load file</h3>
-      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-[300px] mb-6">
+      <h3 className="text-lg font-medium text-text-primary mb-2">Failed to load file</h3>
+      <p className="text-sm text-text-secondary leading-relaxed max-w-[300px] mb-6">
         {error}
       </p>
       
