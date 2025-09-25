@@ -26,7 +26,7 @@ const features = [
 
 export function Features() {
   return (
-    <Section id="features" className="bg-gray-50">
+    <Section id="features" className="bg-bg-secondary">
       <Container>
         <MotionDiv
           initial={animations.fadeInUp.initial}
@@ -34,10 +34,10 @@ export function Features() {
           transition={animations.fadeInUp.transition}
           className="text-center space-y-4 mb-16"
         >
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
+          <h2 className="text-3xl lg:text-4xl font-bold text-text-primary">
             Privacy-first features for modern writers
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-text-secondary max-w-3xl mx-auto">
             Everything you need to write securely, privately, and productively.
           </p>
         </MotionDiv>
@@ -53,14 +53,14 @@ export function Features() {
                 delay: 0.1 * index
               }}
             >
-              <Card className="h-full bg-white border-gray-200">
+              <Card className="h-full bg-bg-primary border-border-dark">
                 <CardContent className="p-6 space-y-4">
                   <div className="h-12 w-12 rounded-xl bg-tn-accent/10 flex items-center justify-center">
                     <feature.icon className="h-6 w-6 text-tn-accent" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-lg font-semibold text-gray-900">{feature.title}</h3>
-                    <p className="text-gray-600">{feature.description}</p>
+                    <h3 className="text-lg font-semibold text-text-primary">{feature.title}</h3>
+                    <p className="text-text-secondary">{feature.description}</p>
                   </div>
                 </CardContent>
               </Card>

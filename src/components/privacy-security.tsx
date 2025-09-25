@@ -28,13 +28,13 @@ export function PrivacySecurity() {
             className="space-y-8"
           >
             <div className="space-y-4">
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
+              <h2 className="text-3xl lg:text-4xl font-bold text-text-primary">
                 Bank-level security meets privacy by design
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-text-secondary">
                 Not even we can read your notes.
               </p>
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-text-secondary">
                 TextNotepad.com uses end-to-end encryption with a zero-knowledge architecture. 
                 Your notes are encrypted on your device before they ever leave it, and we 
                 never have access to your encryption keys.
@@ -45,7 +45,7 @@ export function PrivacySecurity() {
               {securityFeatures.map((feature, index) => (
                 <li key={index} className="flex items-start space-x-3">
                   <Check className="h-5 w-5 text-tn-accent mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-600">{feature}</span>
+                  <span className="text-text-secondary">{feature}</span>
                 </li>
               ))}
             </ul>
@@ -97,8 +97,8 @@ function SecurityDiagram() {
     <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 border border-gray-200">
       <div className="space-y-6">
         <div className="text-center space-y-2">
-          <h3 className="text-lg font-semibold text-gray-900">Zero-Knowledge Architecture</h3>
-          <p className="text-sm text-gray-600">Your data journey</p>
+          <h3 className="text-lg font-semibold text-text-primary">Zero-Knowledge Architecture</h3>
+          <p className="text-sm text-text-secondary">Your data journey</p>
         </div>
         
         <div className="flex flex-col space-y-4">
@@ -108,8 +108,8 @@ function SecurityDiagram() {
                 <Lock className="h-5 w-5 text-tn-accent" />
               </div>
               <div>
-                <div className="font-medium text-sm text-gray-900">Your Device</div>
-                <div className="text-xs text-gray-600">Encryption happens here</div>
+                <div className="font-medium text-sm text-text-primary">Your Device</div>
+                <div className="text-xs text-text-secondary">Encryption happens here</div>
               </div>
             </div>
             <div className="text-green-600 text-xs font-medium">Encrypted</div>
@@ -123,8 +123,8 @@ function SecurityDiagram() {
                 <Globe className="h-5 w-5 text-tn-accent" />
               </div>
               <div>
-                <div className="font-medium text-sm text-gray-900">EU Servers</div>
-                <div className="text-xs text-gray-600">Still encrypted</div>
+                <div className="font-medium text-sm text-text-primary">EU Servers</div>
+                <div className="text-xs text-text-secondary">Still encrypted</div>
               </div>
             </div>
             <div className="text-green-600 text-xs font-medium">Encrypted</div>
@@ -138,8 +138,8 @@ function SecurityDiagram() {
                 <Shield className="h-5 w-5 text-red-600" />
               </div>
               <div>
-                <div className="font-medium text-sm text-gray-900">TextNotepad.com Team</div>
-                <div className="text-xs text-gray-600">Cannot decrypt</div>
+                <div className="font-medium text-sm text-text-primary">TextNotepad.com Team</div>
+                <div className="text-xs text-text-secondary">Cannot decrypt</div>
               </div>
             </div>
             <div className="text-red-600 text-xs font-medium">No Access</div>

@@ -15,38 +15,38 @@ export function Header() {
       animate={animations.fadeIn.animate}
       transition={animations.fadeIn.transition}
     >
-      <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <header className="sticky top-0 z-50 w-full border-b border-border-dark bg-bg-primary/95 backdrop-blur supports-[backdrop-filter]:bg-bg-primary/60">
         <Container>
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center space-x-2">
               <div className="h-8 w-8 rounded-lg bg-tn-accent flex items-center justify-center">
                 <span className="text-white font-bold text-sm">T</span>
               </div>
-              <span className="text-xl font-semibold text-gray-900">TextNotepad.com</span>
+              <span className="text-xl font-semibold text-text-primary">TextNotepad.com</span>
             </Link>
 
             <nav className="hidden md:flex items-center space-x-8">
               <Link
                 href="#features"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
               >
                 Features
               </Link>
               <Link
                 href="#pricing"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
               >
                 Pricing
               </Link>
               <Link
                 href="#security"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
               >
                 Security
               </Link>
               <Link
                 href="#faq"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
               >
                 FAQ
               </Link>
@@ -59,7 +59,7 @@ export function Header() {
                 </Button>
               ) : (
                 <>
-                  <Button variant="ghost" size="sm" asChild className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                  <Button variant="ghost" size="sm" asChild className="text-text-secondary hover:text-text-primary hover:bg-[color:var(--bg-active)]/40">
                     <Link href="/auth">Sign In</Link>
                   </Button>
                   <Button size="sm" asChild className="bg-tn-accent text-white hover:bg-gray-800">
