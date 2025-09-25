@@ -42,7 +42,9 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     file,
     onSaved: (updatedFile) => {
       onFileUpdate?.(updatedFile)
-      toast.success('Saved', { duration: 1000 })
+      // Show brief "just saved" indicator
+      setJustSaved(true)
+      setTimeout(() => setJustSaved(false), 1500)
     },
     onConflict: (conflictingFile) => {
       // Handle version conflict - refresh content with server version
@@ -128,6 +130,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
 
   // Track dirty state for UI indicators
   const [isDirty, setIsDirty] = useState(false)
+  const [justSaved, setJustSaved] = useState(false)
   
   // Update dirty state when content changes (with debounce to avoid flicker)
   useEffect(() => {
@@ -150,14 +153,16 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
   // Save status text
   const getSaveStatus = () => {
     if (isSaving) return 'Saving…'
-    if (isDirty) return 'Autosave enabled'
+    if (justSaved) return '✓ Saved'
+    if (isDirty) return 'Typing...'
     return 'Saved'
   }
 
   // Save status color
   const getSaveStatusColor = () => {
     if (isSaving) return 'text-blue-600 dark:text-blue-400'
-    if (isDirty) return 'text-amber-600 dark:text-amber-400'
+    if (justSaved) return 'text-green-600 dark:text-green-400'
+    if (isDirty) return 'text-gray-500 dark:text-gray-400'
     return 'text-green-600 dark:text-green-400'
   }
 
