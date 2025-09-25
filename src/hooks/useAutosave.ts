@@ -106,12 +106,12 @@ export function useAutosave({
       // Update our version reference with the server version
       currentVersionRef.current = updatedFile.version
       
-      // Invalidate related queries to refresh cache
+      // Invalidate related queries to refresh cache using correct keys from useFiles hook
       queryClient.invalidateQueries({
-        queryKey: ['userFile', file.id]
+        queryKey: ['files', 'detail', file.id]
       })
       queryClient.invalidateQueries({
-        queryKey: ['userFiles', file.user_id]
+        queryKey: ['files', 'list']
       })
       
       // Notify success
