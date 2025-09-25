@@ -23,10 +23,10 @@ export function Hero() {
           >
             <div className="space-y-4">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-text-primary">
-                Encrypted notes. No tracking, ever.
+                Privacy is freedom.
               </h1>
               <p className="text-xl text-text-secondary max-w-lg leading-7">
-                Privacy is freedom.
+                No tracking, ever.
               </p>
             </div>
 

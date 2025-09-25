@@ -5,19 +5,17 @@ import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function PromoBanner() {
-  const [isVisible, setIsVisible] = useState<boolean | null>(null) // null = loading state
+  const [isVisible, setIsVisible] = useState(() => {
+    // Check localStorage during initial render (client-side only)
+    if (typeof window !== 'undefined') {
+      const isDismissed = localStorage.getItem('promo-banner-dismissed')
+      return !isDismissed
+    }
+    return true // Show by default on server-side render
+  })
   const [timeLeft, setTimeLeft] = useState("")
 
   useEffect(() => {
-    // Check if banner was previously dismissed
-    const isDismissed = localStorage.getItem('promo-banner-dismissed')
-    if (isDismissed) {
-      setIsVisible(false)
-      return
-    }
-    
-    // Not dismissed, show the banner
-    setIsVisible(true)
 
     const updateCountdown = () => {
       const now = new Date().getTime()
@@ -52,8 +50,6 @@ export function PromoBanner() {
     localStorage.setItem('promo-banner-dismissed', 'true')
   }
 
-  // Don't render anything until we know the visibility state
-  if (isVisible === null) return null
   if (!isVisible) return null
 
   return (
