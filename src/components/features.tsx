@@ -4,29 +4,39 @@ import { Container } from "@/components/ui/container"
 import { Section } from "@/components/ui/section"
 import { Card, CardContent } from "@/components/ui/card"
 import { MotionDiv, animations } from "@/components/ui/motion"
-import { Shield, Lock, Focus } from "lucide-react"
+import { Shield, Lock, Zap, Globe, Code } from "lucide-react"
 
 const features = [
   {
-    icon: Shield,
-    title: "Full End-to-End Encryption",
-    description: "Military-grade encryption ensures your notes are secure from creation to storage."
-  },
-  {
     icon: Lock,
-    title: "Zero-Knowledge Storage",
-    description: "Not even we can read your notes. Complete privacy by design."
+    title: "True privacy",
+    description: "End-to-end encryption protects every note."
   },
   {
-    icon: Focus,
-    title: "Distraction-Free Writing",
-    description: "Clean, minimalist interface designed to help you focus on what matters most."
+    icon: Shield,
+    title: "No surveillance",
+    description: "No cookies, no trackers, no profiling."
+  },
+  {
+    icon: Zap,
+    title: "Lightweight & fast",
+    description: "Distraction-free writing in your browser."
+  },
+  {
+    icon: Globe,
+    title: "Access anywhere",
+    description: "Your notes stay secure across devices."
+  },
+  {
+    icon: Code,
+    title: "Open and transparent",
+    description: "Built with privacy in mind, not as an afterthought."
   }
 ]
 
 export function Features() {
   return (
-    <Section id="features" className="bg-bg-secondary">
+    <Section id="why-textnotepad" className="bg-bg-secondary">
       <Container>
         <MotionDiv
           initial={animations.fadeInUp.initial}
@@ -35,14 +45,17 @@ export function Features() {
           className="text-center space-y-4 mb-16"
         >
           <h2 className="text-3xl lg:text-4xl font-bold text-text-primary">
-            Privacy-first features for modern writers
+            Why TextNotepad?
           </h2>
           <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-            Everything you need to write securely, privately, and productively.
+            Because your notes deserve freedom.
+          </p>
+          <p className="text-lg text-text-secondary max-w-4xl mx-auto mt-4">
+            TextNotepad is a private space for your thoughts, ideas, and plans. Unlike other note apps, we don&apos;t track you, sell your data, or show ads. Your notes belong to you — encrypted, secure, and always under your control.
           </p>
         </MotionDiv>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {features.map((feature, index) => (
             <MotionDiv
               key={feature.title}

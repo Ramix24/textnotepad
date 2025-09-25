@@ -17,9 +17,9 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'TextNotepad - Privacy-First Note Taking with End-to-End Encryption',
-  description: 'Founders Promo 2025: Get TextNotepad\'s 1-year plan completely free if you sign up by Dec 31, 2025. Free until Dec 31, 2026. E2EE, zero-knowledge, GDPR, distraction-free writing.',
-  keywords: ['text editor', 'note taking', 'privacy', 'encryption', 'GDPR', 'zero knowledge', 'secure notes', 'distraction-free writing'],
+  title: 'TextNotepad - Privacy is freedom. Encrypted notes with no tracking.',
+  description: 'Privacy is freedom. Secure, encrypted notes with no tracking.',
+  keywords: ['privacy', 'encrypted notes', 'no tracking', 'secure notes', 'end-to-end encryption', 'zero surveillance', 'private notes'],
   authors: [{ name: 'TextNotepad Team' }],
   creator: 'TextNotepad',
   publisher: 'TextNotepad',
@@ -31,8 +31,8 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://textnotepad.com',
-    title: 'TextNotepad - Privacy-First Note Taking',
-    description: 'Founders Promo 2025: Get the 1-year plan completely free if you sign up by Dec 31, 2025. Write in peace with ultra-secure notes.',
+    title: 'TextNotepad - Privacy is freedom',
+    description: 'Privacy is freedom. Encrypted notes with no tracking, ever.',
     siteName: 'TextNotepad',
     images: [
       {
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TextNotepad - Privacy-First Note Taking',
-    description: 'Founders Promo 2025: Get the 1-year plan completely free if you sign up by Dec 31, 2025. Write in peace with ultra-secure notes.',
+    title: 'TextNotepad - Privacy is freedom',
+    description: 'Privacy is freedom. Encrypted notes with no tracking, ever.',
     images: ['/og-image.png'],
     creator: '@textnotepad',
   },

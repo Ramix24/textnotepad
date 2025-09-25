@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Container } from "@/components/ui/container"
 import { Section } from "@/components/ui/section"
 import { MotionDiv, animations } from "@/components/ui/motion"
-import { Shield, Globe, Lock } from "lucide-react"
+import { Shield, Lock } from "lucide-react"
 import { useAuthSession } from "@/hooks/useAuthSession"
 
 export function Hero() {
@@ -23,11 +23,10 @@ export function Hero() {
           >
             <div className="space-y-4">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-text-primary">
-                Write in peace. Keep your notes{" "}
-                <span className="text-accent-blue">ultra-secure</span>.
+                Privacy is freedom.
               </h1>
               <p className="text-xl text-text-secondary max-w-lg leading-7">
-                Promo 2025: Get the 1-year plan completely free if you sign up by Dec 31, 2025.
+                Encrypted notes. No tracking, ever.
               </p>
             </div>
 
@@ -38,7 +37,7 @@ export function Hero() {
                 </Button>
               ) : (
                 <Button size="lg" asChild className="bg-accent-blue text-white hover:opacity-90 focus:ring-accent-blue/60">
-                  <Link href="/auth">Activate Free Year</Link>
+                  <Link href="/auth">Start writing securely</Link>
                 </Button>
               )}
               <Button size="lg" variant="outline" asChild className="bg-transparent border-accent-blue text-accent-blue hover:bg-[color:var(--bg-active)]/40">
@@ -46,22 +45,20 @@ export function Hero() {
               </Button>
             </div>
             
-            <div className="text-sm text-text-secondary">
-              Free until Dec 31, 2026. Renews Jan 1, 2027 → $29/year.
-            </div>
-
-            <div className="flex items-center space-x-6 text-sm text-text-secondary">
-              <div className="flex items-center space-x-2">
-                <Shield className="h-4 w-4" />
-                <span>Open Source</span>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <Lock className="h-5 w-5 text-accent-blue mt-0.5 flex-shrink-0" />
+                <span className="text-text-secondary">End-to-end encryption – only you can read your notes.</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <Globe className="h-4 w-4" />
-                <span>EU Hosted</span>
+              <div className="flex items-start space-x-3">
+                <Shield className="h-5 w-5 text-accent-blue mt-0.5 flex-shrink-0" />
+                <span className="text-text-secondary">Zero tracking – no ads, no analytics, no hidden data collection.</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <Lock className="h-4 w-4" />
-                <span>Zero-Knowledge</span>
+              <div className="flex items-start space-x-3">
+                <svg className="h-5 w-5 text-accent-blue mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+                <span className="text-text-secondary">Simple & distraction-free – just you and your writing.</span>
               </div>
             </div>
           </MotionDiv>
