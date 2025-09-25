@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
+import { Folder, FileText, MessageCircle, Trash2 } from 'lucide-react'
 import type { Section } from './types'
 
 interface SectionsRailProps {
@@ -46,11 +47,11 @@ interface DefaultSectionsContentProps {
 }
 
 function DefaultSectionsContent({ activeSection, onSectionSelect }: DefaultSectionsContentProps) {
-  const sections: Array<{ id: Section; label: string; icon: string; disabled?: boolean }> = [
-    { id: 'folders', label: 'Folders', icon: '📁' },
-    { id: 'notes', label: 'Notes', icon: '📝' },
-    { id: 'messages', label: 'Messages', icon: '💬', disabled: true },
-    { id: 'trash', label: 'Trash', icon: '🗑️' }
+  const sections: Array<{ id: Section; label: string; icon: any; disabled?: boolean }> = [
+    { id: 'folders', label: 'Folders', icon: Folder },
+    { id: 'notes', label: 'Notes', icon: FileText },
+    { id: 'messages', label: 'Messages', icon: MessageCircle, disabled: true },
+    { id: 'trash', label: 'Trash', icon: Trash2 }
   ]
 
   return (
@@ -71,7 +72,7 @@ function DefaultSectionsContent({ activeSection, onSectionSelect }: DefaultSecti
           `}
           title={section.disabled ? 'Coming soon' : section.label}
         >
-          <span className="text-lg mb-1">{section.icon}</span>
+          <section.icon className="h-5 w-5 mb-1" />
           <span className="leading-none">{section.label}</span>
           {section.disabled && (
             <span className="text-[9px] text-muted-foreground/60 mt-1">Soon</span>

@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode, useRef, useEffect, KeyboardEvent } from 'react'
+import { FileText, Folder } from 'lucide-react'
 import { useFoldersList, useCreateFolder, useRenameFolder, useDeleteFolder } from '@/hooks/useFolders'
 import type { Mode, AppSelection } from './types'
 
@@ -257,7 +258,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
           onClick={() => onFolderSelect(null)}
           className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
         >
-          <span className="text-text-secondary">📄</span>
+          <FileText className="h-4 w-4 text-text-secondary" />
           <span className="font-medium">All Notes</span>
         </button>
       </div>
@@ -273,14 +274,14 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
             onClick={() => onFolderSelect(null)}
             className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
           >
-            <span className="text-text-secondary">📄</span>
+            <FileText className="h-4 w-4 text-text-secondary" />
             <span className="font-medium">All Notes</span>
           </button>
           
           {/* Loading skeleton for folders */}
           {[1, 2, 3].map((i) => (
             <div key={i} className="w-full flex items-center gap-3 p-2">
-              <span className="text-gray-500">📁</span>
+              <Folder className="h-4 w-4 text-text-secondary" />
               <div className="h-4 w-20 bg-gray-300 dark:bg-gray-700 rounded animate-pulse" />
             </div>
           ))}
@@ -299,7 +300,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
             onClick={() => onFolderSelect(null)}
             className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
           >
-            <span className="text-text-secondary">📄</span>
+            <FileText className="h-4 w-4 text-text-secondary" />
             <span className="font-medium">All Notes</span>
           </button>
         </div>

@@ -13,6 +13,7 @@ import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { GlobalSearchModal } from '@/components/global-search-modal'
+import { Folder, FileText, Edit3 } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface AppShell3Props {
@@ -185,9 +186,9 @@ export function AppShell3({
   // Mobile tab bar with better active states
   const MobileTabBar = () => {
     const tabs = [
-      { key: 'folders', label: 'Folders', icon: '📁', pane: 1 as const },
-      { key: 'notes', label: 'Notes', icon: '📝', pane: 2 as const },
-      { key: 'editor', label: 'Editor', icon: '✏️', pane: 3 as const }
+      { key: 'folders', label: 'Folders', icon: Folder, pane: 1 as const },
+      { key: 'notes', label: 'Notes', icon: FileText, pane: 2 as const },
+      { key: 'editor', label: 'Editor', icon: Edit3, pane: 3 as const }
     ]
 
     return (
@@ -222,7 +223,7 @@ export function AppShell3({
                   : 'bg-transparent text-text-secondary group-hover:bg-[color:var(--bg-active)]/40'
                 }
               `}>
-                <span className="text-base">{tab.icon}</span>
+                <tab.icon className="h-4 w-4" />
               </div>
               
               {/* Label */}
