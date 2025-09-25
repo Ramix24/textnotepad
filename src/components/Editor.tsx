@@ -4,9 +4,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { Separator } from '@/components/ui/separator'
 import { useCountersWorker, type CountResult } from '@/hooks/useCountersWorker'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { updateFileContent, calculateContentStats } from '@/lib/userFiles.repo'
-import { useSupabase } from '@/components/SupabaseProvider'
+import { useAutosave } from '@/hooks/useAutosave'
 import { UserFile } from '@/types/user-files.types'
 import { cn } from '@/lib/utils'
 
@@ -30,44 +28,31 @@ interface EditorProps {
  */
 export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorProps) {
   // Local state management
-  const { supabase } = useSupabase()
   const [content, setContent] = useState(file.content)
-  const [isDirty, setIsDirty] = useState(false)
   const [stats, setStats] = useState<CountResult | null>(null)
   
   // Refs for managing focus and keyboard shortcuts
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const queryClient = useQueryClient()
   
   // Web Worker for live statistics
   const { compute: computeStats } = useCountersWorker({ debounceMs: 150 })
   
-  // Simple save mutation without complex autosave logic
-  const saveMutation = useMutation({
-    mutationFn: async (content: string) => {
-      const stats = calculateContentStats(content)
-      return updateFileContent(supabase, {
-        id: file.id,
-        content,
-        version: file.version,
-        ...stats,
-      })
-    },
-    onSuccess: (updatedFile) => {
-      setIsDirty(false)
-      onDirtyChange?.(file.id, false)
+  // Autosave hook
+  const { isSaving, markDirty, forceSave } = useAutosave({
+    file,
+    onSaved: (updatedFile) => {
       onFileUpdate?.(updatedFile)
-      
-      // Invalidate related queries using correct keys from useFiles hook
-      queryClient.invalidateQueries({ queryKey: ['files', 'detail', file.id] })
-      queryClient.invalidateQueries({ queryKey: ['files', 'list'] })
-      
       toast.success('Saved', { duration: 1000 })
     },
-    onError: (error) => {
-      toast.error('Failed to save', {
-        description: error instanceof Error ? error.message : 'Unknown error'
+    onConflict: (conflictingFile) => {
+      // Handle version conflict - refresh content with server version
+      setContent(conflictingFile.content)
+      toast.warning('File was updated elsewhere', {
+        description: 'Your content has been refreshed with the latest version.'
       })
+    },
+    config: {
+      debounceMs: 1000 // Save 1 second after typing stops
     }
   })
 
@@ -76,11 +61,11 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     // Update content immediately for responsive typing
     setContent(newContent)
     
-    // Set dirty state
-    if (!isDirty) {
-      setIsDirty(true)
-      onDirtyChange?.(file.id, true)
-    }
+    // Trigger autosave
+    markDirty(newContent)
+    
+    // Set dirty state for UI indicators
+    onDirtyChange?.(file.id, true)
     
     // Calculate statistics asynchronously (don't await)
     computeStats(newContent).then(newStats => {
@@ -88,7 +73,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     }).catch(() => {
       // Ignore stats calculation errors
     })
-  }, [isDirty, file.id, onDirtyChange, computeStats])
+  }, [markDirty, file.id, onDirtyChange, computeStats])
 
 
   // Keyboard shortcuts
@@ -97,18 +82,18 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     if ((event.ctrlKey || event.metaKey) && event.key === 's') {
       event.preventDefault()
       
-      if (isDirty && !saveMutation.isPending) {
-        saveMutation.mutate(content)
+      if (!isSaving) {
+        await forceSave()
       }
     }
-  }, [isDirty, content, saveMutation])
+  }, [isSaving, forceSave])
 
-  // Save on blur (when user clicks away or tabs out)
-  const handleBlur = useCallback(() => {
-    if (isDirty && !saveMutation.isPending) {
-      saveMutation.mutate(content)
+  // Force save on blur (when user clicks away or tabs out)
+  const handleBlur = useCallback(async () => {
+    if (!isSaving) {
+      await forceSave()
     }
-  }, [isDirty, content, saveMutation])
+  }, [isSaving, forceSave])
 
   // Initialize content when file prop changes (only run when file is actually different)
   const prevFileRef = useRef<UserFile | null>(null)
@@ -120,7 +105,6 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
         prevFileRef.current.version !== file.version) {
       
       setContent(file.content)
-      setIsDirty(false)
       onDirtyChange?.(file.id, false)
       
       // Update the ref to track the current file
@@ -142,16 +126,37 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     initializeStats()
   }, [content, computeStats])
 
+  // Track dirty state for UI indicators
+  const [isDirty, setIsDirty] = useState(false)
+  
+  // Update dirty state when content changes (with debounce to avoid flicker)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsDirty(content !== file.content)
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [content, file.content])
+  
+  // Clear dirty state when save completes
+  useEffect(() => {
+    if (!isSaving && content === file.content) {
+      setIsDirty(false)
+      onDirtyChange?.(file.id, false)
+    } else if (isDirty) {
+      onDirtyChange?.(file.id, true)
+    }
+  }, [isSaving, isDirty, content, file.content, file.id, onDirtyChange])
+
   // Save status text
   const getSaveStatus = () => {
-    if (saveMutation.isPending) return 'Saving…'
-    if (isDirty) return 'Press Ctrl+S to save'
+    if (isSaving) return 'Saving…'
+    if (isDirty) return 'Autosave enabled'
     return 'Saved'
   }
 
   // Save status color
   const getSaveStatusColor = () => {
-    if (saveMutation.isPending) return 'text-blue-600 dark:text-blue-400'
+    if (isSaving) return 'text-blue-600 dark:text-blue-400'
     if (isDirty) return 'text-amber-600 dark:text-amber-400'
     return 'text-green-600 dark:text-green-400'
   }
@@ -205,7 +210,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
           placeholder="Start typing your content here..."
-          disabled={saveMutation.isPending}
+          disabled={isSaving}
           aria-label="Text editor"
           aria-describedby="editor-stats"
           spellCheck={true}
