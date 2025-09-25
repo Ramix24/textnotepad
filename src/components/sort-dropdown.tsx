@@ -19,18 +19,14 @@ export interface SortDropdownProps {
 
 const sortOptions: Array<{ value: SortOption; label: string; icon: string }> = [
   { value: 'name-asc', label: 'Name A-Z', icon: '↑' },
-  { value: 'name-desc', label: 'Name Z-A', icon: '↓' },
   { value: 'modified-desc', label: 'Recently modified', icon: '📅' },
-  { value: 'modified-asc', label: 'Least recently modified', icon: '📅' },
-  { value: 'created-desc', label: 'Recently created', icon: '✨' },
-  { value: 'created-asc', label: 'Oldest first', icon: '⏰' },
 ]
 
 export function SortDropdown({ value, onChange, className }: SortDropdownProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const dropdownRef = React.useRef<HTMLDivElement>(null)
 
-  const currentOption = sortOptions.find(option => option.value === value) || sortOptions[2]
+  const currentOption = sortOptions.find(option => option.value === value) || sortOptions[0]
 
   // Close dropdown when clicking outside
   React.useEffect(() => {
@@ -67,7 +63,7 @@ export function SortDropdown({ value, onChange, className }: SortDropdownProps) 
     <div ref={dropdownRef} className={cn("relative", className)}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-2 py-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+        className="flex items-center gap-2 px-2 py-1 text-xs text-text-secondary hover:text-text-primary hover:bg-[color:var(--bg-active)]/40 rounded transition-colors"
         aria-label="Sort options"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
@@ -85,7 +81,7 @@ export function SortDropdown({ value, onChange, className }: SortDropdownProps) 
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1">
+        <div className="absolute top-full left-0 mt-1 w-48 bg-bg-primary border border-border-dark rounded-lg shadow-lg z-50 py-1">
           {sortOptions.map((option) => (
             <button
               key={option.value}
@@ -93,8 +89,8 @@ export function SortDropdown({ value, onChange, className }: SortDropdownProps) 
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2 text-left text-sm transition-colors",
                 value === option.value
-                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  ? "bg-bg-active text-accent-blue"
+                  : "text-text-primary hover:bg-[color:var(--bg-active)]/40"
               )}
               role="option"
               aria-selected={value === option.value}
@@ -102,7 +98,7 @@ export function SortDropdown({ value, onChange, className }: SortDropdownProps) 
               <span className="text-base">{option.icon}</span>
               <span>{option.label}</span>
               {value === option.value && (
-                <svg className="w-4 h-4 ml-auto text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 ml-auto text-accent-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               )}

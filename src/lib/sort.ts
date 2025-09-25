@@ -73,5 +73,5 @@ export function sortFolders(folders: Folder[], sortBy: SortOption): Folder[] {
 
 // Get the default sort option for different contexts
 export function getDefaultSort(): SortOption {
-  return 'modified-desc' // Most recently modified first by default
+  return 'name-asc' // Name A-Z by default
 }

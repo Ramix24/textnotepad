@@ -249,7 +249,7 @@ export function AppShell3({
       <header className="h-14 border-b border-border-dark bg-bg-secondary flex-shrink-0">
         <div className="flex items-center justify-between h-full px-6">
           <div className="text-lg font-medium text-text-primary">
-            textnotepad.com
+            TextNotepad.com
           </div>
           
           {/* Global Search */}
