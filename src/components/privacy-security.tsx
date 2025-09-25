@@ -51,7 +51,7 @@ export function PrivacySecurity() {
             </ul>
 
             <div className="flex flex-col sm:flex-row gap-4 items-start">
-              <Button variant="outline" asChild className="border-accent-blue text-accent-blue hover:bg-[color:var(--bg-active)]/40">
+              <Button asChild className="bg-text-primary text-bg-primary hover:bg-text-primary/90">
                 <Link href="/security">
                   Read Security Whitepaper
                 </Link>

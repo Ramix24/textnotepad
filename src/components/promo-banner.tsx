@@ -5,18 +5,19 @@ import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function PromoBanner() {
-  const [isVisible, setIsVisible] = useState(true) // Always show initially
-  const [isMounted, setIsMounted] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
   const [timeLeft, setTimeLeft] = useState("")
 
   useEffect(() => {
-    setIsMounted(true)
-    
-    // Check if banner was previously dismissed
-    const isDismissed = localStorage.getItem('promo-banner-dismissed')
-    if (isDismissed) {
-      setIsVisible(false)
-      return
+    // Simple check - if dismissed, hide it
+    try {
+      const isDismissed = localStorage.getItem('promo-banner-dismissed')
+      if (isDismissed === 'true') {
+        setIsVisible(false)
+        return
+      }
+    } catch {
+      // If localStorage fails, show banner anyway
     }
 
     const updateCountdown = () => {
@@ -52,9 +53,6 @@ export function PromoBanner() {
     localStorage.setItem('promo-banner-dismissed', 'true')
   }
 
-  // Don't render until mounted to avoid hydration mismatch
-  if (!isMounted) return <div className="h-12" /> // Placeholder to prevent layout shift
-  
   if (!isVisible) return null
 
   return (
