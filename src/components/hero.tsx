@@ -24,7 +24,7 @@ export function Hero() {
             <div className="space-y-4">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-text-primary">
                 Write in peace. Keep your notes{" "}
-                <span className="text-tn-accent">ultra-secure</span>.
+                <span className="text-accent-blue">ultra-secure</span>.
               </h1>
               <p className="text-xl text-text-secondary max-w-lg leading-7">
                 Promo 2025: Get the 1-year plan completely free if you sign up by Dec 31, 2025.
@@ -33,15 +33,15 @@ export function Hero() {
 
             <div className="flex flex-col sm:flex-row gap-4">
               {user ? (
-                <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-gray-800 focus:ring-tn-accent/60">
+                <Button size="lg" asChild className="bg-accent-blue text-white hover:opacity-90 focus:ring-accent-blue/60">
                   <Link href="/app">Open Editor</Link>
                 </Button>
               ) : (
-                <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-gray-800 focus:ring-tn-accent/60">
+                <Button size="lg" asChild className="bg-accent-blue text-white hover:opacity-90 focus:ring-accent-blue/60">
                   <Link href="/auth">Activate Free Year</Link>
                 </Button>
               )}
-              <Button size="lg" variant="outline" asChild className="bg-transparent border-tn-accent text-tn-accent hover:bg-tn-accent/10">
+              <Button size="lg" variant="outline" asChild className="bg-transparent border-accent-blue text-accent-blue hover:bg-[color:var(--bg-active)]/40">
                 <Link href="/demo">Free Trial</Link>
               </Button>
             </div>
