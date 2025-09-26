@@ -22,7 +22,7 @@ export function useNotebooksList() {
     queryFn: async (): Promise<UserNotebook[]> => {
       if (!user) throw new Error('User not authenticated')
 
-      const response = await fetch('/api/notebooks')
+      const response = await fetch('/api/folders')
       const result: ApiResponse<UserNotebook[]> = await response.json()
       
       if (!result.ok || !result.data) {
@@ -51,7 +51,7 @@ export function useNotebookById(notebookId?: string | null) {
       if (cachedNotebook) return cachedNotebook
 
       // Fallback to API if not in cache
-      const response = await fetch(`/api/notebooks/${notebookId}`)
+      const response = await fetch(`/api/folders/${notebookId}`)
       if (response.status === 404) return null
       
       const result: ApiResponse<UserNotebook> = await response.json()
@@ -76,7 +76,7 @@ export function useCreateNotebook() {
     mutationFn: async (request: CreateNotebookRequest): Promise<UserNotebook> => {
       if (!user) throw new Error('User not authenticated')
 
-      const response = await fetch('/api/notebooks', {
+      const response = await fetch('/api/folders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ export function useRenameNotebook() {
     mutationFn: async ({ id, name }: { id: string; name: string }): Promise<UserNotebook> => {
       if (!user) throw new Error('User not authenticated')
 
-      const response = await fetch(`/api/notebooks/${id}`, {
+      const response = await fetch(`/api/folders/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ export function useDeleteNotebook() {
     mutationFn: async (notebookId: string): Promise<{ id: string }> => {
       if (!user) throw new Error('User not authenticated')
 
-      const response = await fetch(`/api/notebooks/${notebookId}`, {
+      const response = await fetch(`/api/folders/${notebookId}`, {
         method: 'DELETE',
       })
       
