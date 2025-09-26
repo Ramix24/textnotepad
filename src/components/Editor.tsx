@@ -14,6 +14,7 @@ interface EditorProps {
   className?: string
   onFileUpdate?: (updatedFile: UserFile) => void
   onDirtyChange?: (fileId: string, isDirty: boolean) => void
+  readOnly?: boolean
 }
 
 /**
@@ -27,7 +28,7 @@ interface EditorProps {
  * - Accessible design with proper ARIA labels
  * - Monospace font for code editing or clean sans-serif for prose
  */
-export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorProps) {
+export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly = false }: EditorProps) {
   // Local state management
   const [content, setContent] = useState(file.content)
   const [stats, setStats] = useState<CountResult | null>(null)
@@ -70,6 +71,9 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
 
   // Handle content changes
   const handleContentChange = useCallback((newContent: string) => {
+    // Skip changes if in read-only mode
+    if (readOnly) return
+    
     // Update content immediately for responsive typing
     setContent(newContent)
     
@@ -85,7 +89,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
     }).catch(() => {
       // Ignore stats calculation errors
     })
-  }, [markDirty, file.id, onDirtyChange, computeStats])
+  }, [readOnly, markDirty, file.id, onDirtyChange, computeStats])
 
 
   // Keyboard shortcuts
@@ -246,11 +250,13 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
             'font-mono text-sm leading-relaxed', // Monospace for code-like editing
             'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
             'resize-none placeholder:text-text-secondary',
-            !user && 'opacity-50 cursor-not-allowed'
+            !user && 'opacity-50 cursor-not-allowed',
+            readOnly && 'opacity-75 cursor-default bg-bg-secondary'
           )}
-          placeholder={!user ? "Please sign in to edit your notes..." : "Start typing your content here..."}
+          placeholder={!user ? "Please sign in to edit your notes..." : readOnly ? "This file is read-only..." : "Start typing your content here..."}
           disabled={!user}
-          aria-label="Text editor"
+          readOnly={readOnly}
+          aria-label={readOnly ? "Text editor (read-only)" : "Text editor"}
           aria-describedby="editor-stats"
           spellCheck={true}
           autoComplete="off"
