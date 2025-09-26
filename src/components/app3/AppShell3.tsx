@@ -7,12 +7,12 @@ import { useKeyboardNav } from '@/hooks/useKeyboardNav'
 import { useCreateFile } from '@/hooks/useFiles'
 import { useSupabase } from '@/components/SupabaseProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
-import { FoldersPanel } from './FoldersPanel'
+import { NotebooksPanel } from './NotebooksPanel'
 import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { GlobalSearchModal } from '@/components/global-search-modal'
-import { Folder, FileText, Edit3 } from 'lucide-react'
+import { BookOpen, FileText, Edit3 } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface AppShell3Props {
@@ -185,7 +185,7 @@ export function AppShell3({
   // Mobile tab bar with better active states
   const MobileTabBar = () => {
     const tabs = [
-      { key: 'folders', label: 'Folders', icon: Folder, pane: 1 as const },
+      { key: 'notebooks', label: 'Notebooks', icon: BookOpen, pane: 1 as const },
       { key: 'notes', label: 'Notes', icon: FileText, pane: 2 as const },
       { key: 'editor', label: 'Editor', icon: Edit3, pane: 3 as const }
     ]
@@ -299,7 +299,7 @@ export function AppShell3({
             : undefined
         }}
       >
-        {/* Column 1: Folders Panel */}
+        {/* Column 1: Notebooks Panel */}
         {layout.showSections && (
           <div 
             ref={sectionsRef}
@@ -310,14 +310,14 @@ export function AppShell3({
             }}
             data-testid="folders-column"
           >
-            <FoldersPanel 
+            <NotebooksPanel 
               className="h-full"
               selection={layout.selection}
               onSelectionChange={layout.setSelection}
               onMobileAdvance={() => layout.isMobile && layout.setActivePane(2)}
             >
               {sectionsContent}
-            </FoldersPanel>
+            </NotebooksPanel>
           </div>
         )}
 

@@ -195,22 +195,11 @@ function NotesView({
   // Sort files based on current sort option
   const sortedFiles = sortFiles(files, sortBy)
 
-  // Get folder name for header
-  const getFolderDisplayName = () => {
-    if (selection.folderId === null) return 'All Notes'
-    // TODO: Replace with actual folder name lookup when folders are implemented
-    const mockFolders = { 'personal': 'Personal', 'work': 'Work', 'projects': 'Projects' }
-    return mockFolders[selection.folderId as keyof typeof mockFolders] || 'Unknown Folder'
-  }
 
   return (
     <div className="flex flex-col">
       <header className="flex-shrink-0 p-4 border-b border-border-dark bg-bg-secondary">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex-1">
-            <h2 className="text-sm font-medium text-text-primary">{getFolderDisplayName()}</h2>
-            <p className="text-xs text-text-secondary mt-1">{files.length} notes</p>
-          </div>
+        <div className="flex items-center justify-between">
           <button
             onClick={onNewNote}
             disabled={fileOps.createFile.isPending}
@@ -218,17 +207,14 @@ function NotesView({
           >
             {fileOps.createFile.isPending ? 'Creating...' : 'New Note'}
           </button>
-        </div>
-        
-        {files.length > 0 && (
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-text-secondary">Sort by:</span>
+          
+          {files.length > 0 && (
             <SortDropdown 
               value={sortBy} 
               onChange={setSortBy}
             />
-          </div>
-        )}
+          )}
+        </div>
       </header>
       
       <div className="flex-1 overflow-auto">

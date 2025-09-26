@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabaseServer'
 import { z } from 'zod'
-import { UserFolder, UpdateFolderRequest } from '@/types/folders.types'
+import { UserNotebook, UpdateNotebookRequest } from '@/types/notebooks.types'
 
 interface ApiResponse<T = unknown> {
   ok: boolean
@@ -19,7 +19,7 @@ const updateFolderSchema = z.object({
 export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
-): Promise<NextResponse<ApiResponse<UserFolder>>> {
+): Promise<NextResponse<ApiResponse<UserNotebook>>> {
   const params = await context.params
   try {
     const supabase = await createServerClient()
@@ -34,7 +34,7 @@ export async function PUT(
     }
 
     // Parse request body
-    let body: UpdateFolderRequest
+    let body: UpdateNotebookRequest
     try {
       body = await request.json()
     } catch {

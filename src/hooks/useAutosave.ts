@@ -128,6 +128,17 @@ export function useAutosave({
         toast.warning('Content updated on server, reloaded', {
           description: 'Your document was modified elsewhere and has been refreshed with the latest version.',
         })
+      } else if (error.message.includes('User not authenticated') || error.message.includes('JWT')) {
+        // Authentication error - user session expired
+        toast.error('Session expired', {
+          description: 'Your session has expired. Please sign in again to continue.',
+          action: {
+            label: 'Sign In',
+            onClick: () => {
+              window.location.href = '/auth'
+            }
+          }
+        })
       } else {
         // Generic save error
         toast.error('Failed to save changes', {

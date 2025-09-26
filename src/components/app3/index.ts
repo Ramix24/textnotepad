@@ -1,5 +1,5 @@
 export { AppShell3 } from './AppShell3';
-export { FoldersPanel } from './FoldersPanel';
+export { NotebooksPanel } from './NotebooksPanel';
 export { SectionsRail } from './SectionsRail'; // Legacy - will be removed
 export { ContextList } from './ContextList';
 export { DetailView } from './DetailView';

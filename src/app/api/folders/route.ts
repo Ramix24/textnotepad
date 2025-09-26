@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabaseServer'
 import { z } from 'zod'
-import { UserFolder, CreateFolderRequest } from '@/types/folders.types'
+import { UserNotebook, CreateNotebookRequest } from '@/types/notebooks.types'
 
 interface ApiResponse<T = unknown> {
   ok: boolean
@@ -9,14 +9,14 @@ interface ApiResponse<T = unknown> {
   error?: string
 }
 
-const createFolderSchema = z.object({
+const createNotebookSchema = z.object({
   name: z.string().min(1).max(255)
 })
 
 /**
- * GET /api/folders - List all folders for authenticated user
+ * GET /api/folders - List all notebooks for authenticated user
  */
-export async function GET(): Promise<NextResponse<ApiResponse<UserFolder[]>>> {
+export async function GET(): Promise<NextResponse<ApiResponse<UserNotebook[]>>> {
   try {
     const supabase = await createServerClient()
     
@@ -57,7 +57,7 @@ export async function GET(): Promise<NextResponse<ApiResponse<UserFolder[]>>> {
 /**
  * POST /api/folders - Create a new folder
  */
-export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<UserFolder>>> {
+export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<UserNotebook>>> {
   try {
     const supabase = await createServerClient()
     
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     }
 
     // Parse request body
-    let body: CreateFolderRequest
+    let body: CreateNotebookRequest
     try {
       body = await request.json()
     } catch {
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     }
 
     // Validate request body
-    const validation = createFolderSchema.safeParse(body)
+    const validation = createNotebookSchema.safeParse(body)
     if (!validation.success) {
       return NextResponse.json(
         { ok: false, error: validation.error.issues[0].message },

@@ -117,9 +117,9 @@ function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' }) {
     switch (mode) {
       case 'notes':
         return {
-          icon: '✏️',
-          title: 'Select or create a note',
-          description: 'Choose a note from the list to start editing, or create a new one to begin writing.',
+          icon: '🔒',
+          title: 'Privacy is Freedom',
+          description: 'No tracking, ever.',
           showActions: true
         }
       case 'messages':

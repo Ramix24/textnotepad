@@ -1,11 +1,11 @@
 'use client'
 
 import { ReactNode, useRef, useEffect, KeyboardEvent } from 'react'
-import { FileText, Folder } from 'lucide-react'
-import { useFoldersList, useCreateFolder, useRenameFolder, useDeleteFolder } from '@/hooks/useFolders'
+import { FileText, BookOpen } from 'lucide-react'
+import { useNotebooksList, useCreateNotebook, useRenameNotebook, useDeleteNotebook } from '@/hooks/useNotebooks'
 import type { Mode, AppSelection } from './types'
 
-interface FoldersPanelProps {
+interface NotebooksPanelProps {
   children?: ReactNode
   className?: string
   selection: AppSelection
@@ -13,22 +13,22 @@ interface FoldersPanelProps {
   onMobileAdvance?: () => void // For mobile navigation to pane 2
 }
 
-export function FoldersPanel({ 
+export function NotebooksPanel({ 
   children, 
   className = '',
   selection,
   onSelectionChange,
   onMobileAdvance
-}: FoldersPanelProps) {
+}: NotebooksPanelProps) {
   
   return (
     <div 
       className={`flex flex-col bg-bg-secondary border-r border-border-dark ${className}`}
       role="navigation"
-      aria-label="Folders and Modes"
+      aria-label="Notebooks and Modes"
     >
       {children || (
-        <DefaultFoldersContent 
+        <DefaultNotebooksContent 
           selection={selection}
           onSelectionChange={onSelectionChange}
           onMobileAdvance={onMobileAdvance}
@@ -38,13 +38,13 @@ export function FoldersPanel({
   )
 }
 
-interface DefaultFoldersContentProps {
+interface DefaultNotebooksContentProps {
   selection: AppSelection
   onSelectionChange: (selection: Partial<AppSelection>) => void
   onMobileAdvance?: () => void
 }
 
-function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }: DefaultFoldersContentProps) {
+function DefaultNotebooksContent({ selection, onSelectionChange, onMobileAdvance }: DefaultNotebooksContentProps) {
   const toolbarRef = useRef<HTMLDivElement>(null)
   const modes: Mode[] = ['notes', 'messages', 'trash']
   
@@ -53,7 +53,7 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
     onMobileAdvance?.() // Auto-advance to pane 2 on mobile
   }
 
-  const handleFolderSelect = (folderId: string | null) => {
+  const handleBookOpenSelect = (folderId: string | null) => {
     onSelectionChange({ mode: 'notes', folderId, fileId: null })
     onMobileAdvance?.() // Auto-advance to pane 2 on mobile
   }
@@ -123,7 +123,7 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
       </header>
       
       
-      {/* Folders list or mode-specific content */}
+      {/* Notebooks list or mode-specific content */}
       <div 
         id="folders-content"
         className="flex-1 overflow-auto"
@@ -131,9 +131,9 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
         aria-labelledby={`tab-${selection.mode}`}
       >
         {selection.mode === 'notes' ? (
-          <FoldersList 
+          <NotebooksList 
             selection={selection}
-            onFolderSelect={handleFolderSelect}
+            onNotebookSelect={handleBookOpenSelect}
           />
         ) : selection.mode === 'messages' ? (
           <MessagesPlaceholder />
@@ -145,40 +145,40 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
   )
 }
 
-interface FoldersListProps {
+interface NotebooksListProps {
   selection: AppSelection
-  onFolderSelect: (folderId: string | null) => void
+  onNotebookSelect: (folderId: string | null) => void
 }
 
-function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
-  const { data: folders = [], isLoading, error } = useFoldersList()
-  const createFolder = useCreateFolder()
-  const renameFolder = useRenameFolder()
-  const deleteFolder = useDeleteFolder()
+function NotebooksList({ selection, onNotebookSelect }: NotebooksListProps) {
+  const { data: folders = [], isLoading, error } = useNotebooksList()
+  const createNotebook = useCreateNotebook()
+  const renameNotebook = useRenameNotebook()
+  const deleteNotebook = useDeleteNotebook()
   
   const listboxRef = useRef<HTMLDivElement>(null)
   
   // Check feature flag - default to true if not set
   const isFeatureEnabled = process.env.NEXT_PUBLIC_FEATURE_FOLDERS !== 'false'
 
-  const handleCreateFolder = () => {
+  const handleCreateNotebook = () => {
     const name = prompt('Enter folder name:')
     if (name && name.trim()) {
-      createFolder.mutate({ name: name.trim() })
+      createNotebook.mutate({ name: name.trim() })
     }
   }
 
-  const handleRenameFolder = (folderId: string, currentName: string) => {
+  const handleRenameNotebook = (folderId: string, currentName: string) => {
     const name = prompt('Enter new folder name:', currentName)
     if (name && name.trim() && name.trim() !== currentName) {
-      renameFolder.mutate({ id: folderId, name: name.trim() })
+      renameNotebook.mutate({ id: folderId, name: name.trim() })
     }
   }
 
-  const handleDeleteFolder = (folderId: string, folderName: string) => {
+  const handleDeleteNotebook = (folderId: string, folderName: string) => {
     const confirmed = confirm(`Are you sure you want to delete "${folderName}"? Files will be moved to All Notes.`)
     if (confirmed) {
-      deleteFolder.mutate(folderId)
+      deleteNotebook.mutate(folderId)
     }
   }
 
@@ -188,19 +188,19 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
       const folderExists = folders.some(f => f.id === selection.folderId)
       if (!folderExists) {
         // Invalid folder selection, falling back to All Notes
-        onFolderSelect(null)
+        onNotebookSelect(null)
         return
       }
     }
-  }, [isFeatureEnabled, selection.folderId, folders, isLoading, onFolderSelect])
+  }, [isFeatureEnabled, selection.folderId, folders, isLoading, onNotebookSelect])
 
-  const allFolders = [
+  const allNotebooks = [
     { id: null, name: 'All Notes', file_count: 0 }, 
-    ...folders.map(f => ({ id: f.id, name: f.name, file_count: 0 })) // file_count not available in useFoldersList
+    ...folders.map(f => ({ id: f.id, name: f.name, file_count: 0 })) // file_count not available in useNotebooksList
   ]
   
   // Find current selected index
-  const selectedIndex = allFolders.findIndex(folder => folder.id === selection.folderId)
+  const selectedIndex = allNotebooks.findIndex(folder => folder.id === selection.folderId)
   const currentIndex = selectedIndex >= 0 ? selectedIndex : 0
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -209,9 +209,9 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
     if (key === 'ArrowDown' || key === 'ArrowUp') {
       e.preventDefault()
       const direction = key === 'ArrowDown' ? 1 : -1
-      const newIndex = Math.max(0, Math.min(allFolders.length - 1, currentIndex + direction))
-      const newFolder = allFolders[newIndex]
-      onFolderSelect(newFolder.id)
+      const newIndex = Math.max(0, Math.min(allNotebooks.length - 1, currentIndex + direction))
+      const newBookOpen = allNotebooks[newIndex]
+      onNotebookSelect(newBookOpen.id)
       
       // Focus the newly selected item
       const items = listboxRef.current?.querySelectorAll('[role="option"]')
@@ -223,18 +223,18 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
       // Enter/Space is already handled by the button click
     } else if (key === 'Home') {
       e.preventDefault()
-      onFolderSelect(allFolders[0].id)
+      onNotebookSelect(allNotebooks[0].id)
       const items = listboxRef.current?.querySelectorAll('[role="option"]')
       if (items && items[0]) {
         ;(items[0] as HTMLElement).focus()
       }
     } else if (key === 'End') {
       e.preventDefault()
-      const lastFolder = allFolders[allFolders.length - 1]
-      onFolderSelect(lastFolder.id)
+      const lastBookOpen = allNotebooks[allNotebooks.length - 1]
+      onNotebookSelect(lastBookOpen.id)
       const items = listboxRef.current?.querySelectorAll('[role="option"]')
-      if (items && items[allFolders.length - 1]) {
-        ;(items[allFolders.length - 1] as HTMLElement).focus()
+      if (items && items[allNotebooks.length - 1]) {
+        ;(items[allNotebooks.length - 1] as HTMLElement).focus()
       }
     }
   }
@@ -255,7 +255,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
     return (
       <div className="p-3">
         <button
-          onClick={() => onFolderSelect(null)}
+          onClick={() => onNotebookSelect(null)}
           className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
         >
           <FileText className="h-4 w-4 text-text-secondary" />
@@ -271,7 +271,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
         <div className="space-y-1">
           {/* All Notes button */}
           <button
-            onClick={() => onFolderSelect(null)}
+            onClick={() => onNotebookSelect(null)}
             className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
           >
             <FileText className="h-4 w-4 text-text-secondary" />
@@ -281,7 +281,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
           {/* Loading skeleton for folders */}
           {[1, 2, 3].map((i) => (
             <div key={i} className="w-full flex items-center gap-3 p-2">
-              <Folder className="h-4 w-4 text-text-secondary" />
+              <BookOpen className="h-4 w-4 text-text-secondary" />
               <div className="h-4 w-20 bg-gray-300 dark:bg-gray-700 rounded animate-pulse" />
             </div>
           ))}
@@ -297,7 +297,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
         <div className="space-y-1">
           {/* All Notes button - always available */}
           <button
-            onClick={() => onFolderSelect(null)}
+            onClick={() => onNotebookSelect(null)}
             className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
           >
             <FileText className="h-4 w-4 text-text-secondary" />
@@ -322,7 +322,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
         role="listbox"
         className="space-y-1"
         onKeyDown={handleKeyDown}
-        aria-label="Folders"
+        aria-label="Notebooks"
         aria-activedescendant={`folder-${selection.folderId || 'all'}`}
         tabIndex={0}
       >
@@ -330,7 +330,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
           id="folder-all"
           role="option"
           aria-selected={selection.folderId === null}
-          onClick={() => onFolderSelect(null)}
+          onClick={() => onNotebookSelect(null)}
           tabIndex={-1}
           className={`
             w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
@@ -356,7 +356,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
               id={`folder-${folder.id}`}
               role="option"
               aria-selected={selection.folderId === folder.id}
-              onClick={() => onFolderSelect(folder.id)}
+              onClick={() => onNotebookSelect(folder.id)}
               tabIndex={-1}
               className={`
                 w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 pr-16
@@ -377,7 +377,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
               <button
                 onClick={(e) => {
                   e.stopPropagation()
-                  handleRenameFolder(folder.id, folder.name)
+                  handleRenameNotebook(folder.id, folder.name)
                 }}
                 className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-500 dark:text-text-secondary hover:text-gray-700 dark:hover:text-gray-200"
                 title="Rename folder"
@@ -389,7 +389,7 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
               <button
                 onClick={(e) => {
                   e.stopPropagation()
-                  handleDeleteFolder(folder.id, folder.name)
+                  handleDeleteNotebook(folder.id, folder.name)
                 }}
                 className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded text-gray-500 dark:text-text-secondary hover:text-red-600 dark:hover:text-red-400"
                 title="Delete folder"
@@ -405,17 +405,17 @@ function FoldersList({ selection, onFolderSelect }: FoldersListProps) {
       
         {/* Footer */}
         <footer className="mt-auto pt-4">
-          {/* New Folder CTA */}
+          {/* New Notebook CTA */}
           <div className="px-3 pb-3 border-t border-gray-200 dark:border-gray-700 pt-3">
           <button
-            onClick={handleCreateFolder}
-            disabled={createFolder.isPending}
+            onClick={handleCreateNotebook}
+            disabled={createNotebook.isPending}
             className="w-full flex items-center justify-center gap-2 p-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-            {createFolder.isPending ? 'Creating...' : 'New Folder'}
+            {createNotebook.isPending ? 'Creating...' : 'New Notebook'}
           </button>
           </div>
         </footer>

@@ -7,6 +7,7 @@ import { useCountersWorker, type CountResult } from '@/hooks/useCountersWorker'
 import { useAutosave } from '@/hooks/useAutosave'
 import { UserFile } from '@/types/user-files.types'
 import { cn } from '@/lib/utils'
+import { useAuthSession } from '@/hooks/useAuthSession'
 
 interface EditorProps {
   file: UserFile
@@ -34,6 +35,9 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
   // Refs for managing focus and keyboard shortcuts
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const wasFocusedRef = useRef(false)
+  
+  // Auth session for logout detection
+  const { user } = useAuthSession()
   
   // Web Worker for live statistics
   const { compute: computeStats } = useCountersWorker({ debounceMs: 150 })
@@ -158,6 +162,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
 
   // Save status text
   const getSaveStatus = () => {
+    if (!user) return '⚠ Not signed in'
     if (isSaving) return 'Saving…'
     if (justSaved) return '✓ Saved'
     if (isDirty) return 'Typing...'
@@ -166,6 +171,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
 
   // Save status color
   const getSaveStatusColor = () => {
+    if (!user) return 'text-red-600 dark:text-red-400'
     if (isSaving) return 'text-blue-600 dark:text-blue-400'
     if (justSaved) return 'text-green-600 dark:text-green-400'
     if (isDirty) return 'text-gray-500 dark:text-gray-400'
@@ -173,7 +179,28 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
   }
 
   return (
-    <div className={cn('flex flex-col h-full bg-bg-primary', className)}>
+    <div className={cn('flex flex-col h-full bg-bg-primary relative', className)}>
+      {/* Logout Warning Overlay */}
+      {!user && (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md mx-4 text-center">
+            <div className="text-red-600 dark:text-red-400 text-4xl mb-4">⚠</div>
+            <h2 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">
+              Session Expired
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              You have been signed out. Your changes may not be saved.
+            </p>
+            <button
+              onClick={() => window.location.href = '/auth'}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
+            >
+              Sign In Again
+            </button>
+          </div>
+        </div>
+      )}
+      
       {/* Toolbar */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border-dark bg-bg-secondary">
         <div className="flex items-center space-x-2">
@@ -218,9 +245,11 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
             'flex-1 w-full p-4 bg-bg-primary text-text-primary',
             'font-mono text-sm leading-relaxed', // Monospace for code-like editing
             'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
-            'resize-none placeholder:text-text-secondary'
+            'resize-none placeholder:text-text-secondary',
+            !user && 'opacity-50 cursor-not-allowed'
           )}
-          placeholder="Start typing your content here..."
+          placeholder={!user ? "Please sign in to edit your notes..." : "Start typing your content here..."}
+          disabled={!user}
           aria-label="Text editor"
           aria-describedby="editor-stats"
           spellCheck={true}
