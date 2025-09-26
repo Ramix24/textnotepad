@@ -2,7 +2,7 @@
 
 import { ReactNode, useRef, useEffect, KeyboardEvent } from 'react'
 import { FileText, BookOpen } from 'lucide-react'
-import { useNotebooksList, useCreateNotebook, useRenameNotebook, useDeleteNotebook } from '@/hooks/useNotebooks'
+import { useNotebooksList, useRenameNotebook, useDeleteNotebook } from '@/hooks/useNotebooks'
 import type { AppSelection } from './types'
 
 interface NotebooksPanelProps {
@@ -101,7 +101,6 @@ interface NotebooksListProps {
 
 function NotebooksList({ selection, onNotebookSelect, onTrashSelect }: NotebooksListProps) {
   const { data: folders = [], isLoading, error } = useNotebooksList()
-  const createNotebook = useCreateNotebook()
   const renameNotebook = useRenameNotebook()
   const deleteNotebook = useDeleteNotebook()
   
