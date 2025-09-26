@@ -138,7 +138,8 @@ function NotebooksList({ selection, onNotebookSelect, onTrashSelect }: Notebooks
 
   const allNotebooks = [
     { id: null, name: 'All Notes', file_count: 0 }, 
-    ...folders.map(f => ({ id: f.id, name: f.name, file_count: 0 })) // file_count not available in useNotebooksList
+    ...folders.map(f => ({ id: f.id, name: f.name, file_count: 0 })), // file_count not available in useNotebooksList
+    { id: 'trash', name: 'Trash', file_count: 0 } // Add trash to the list for keyboard navigation
   ]
   
   // Find current selected index
@@ -153,7 +154,13 @@ function NotebooksList({ selection, onNotebookSelect, onTrashSelect }: Notebooks
       const direction = key === 'ArrowDown' ? 1 : -1
       const newIndex = Math.max(0, Math.min(allNotebooks.length - 1, currentIndex + direction))
       const newBookOpen = allNotebooks[newIndex]
-      onNotebookSelect(newBookOpen.id)
+      
+      // Handle special case for trash
+      if (newBookOpen.id === 'trash') {
+        onTrashSelect()
+      } else {
+        onNotebookSelect(newBookOpen.id)
+      }
       
       // Focus the newly selected item
       const items = listboxRef.current?.querySelectorAll('[role="option"]')
@@ -165,7 +172,12 @@ function NotebooksList({ selection, onNotebookSelect, onTrashSelect }: Notebooks
       // Enter/Space is already handled by the button click
     } else if (key === 'Home') {
       e.preventDefault()
-      onNotebookSelect(allNotebooks[0].id)
+      const firstBookOpen = allNotebooks[0]
+      if (firstBookOpen.id === 'trash') {
+        onTrashSelect()
+      } else {
+        onNotebookSelect(firstBookOpen.id)
+      }
       const items = listboxRef.current?.querySelectorAll('[role="option"]')
       if (items && items[0]) {
         ;(items[0] as HTMLElement).focus()
@@ -173,7 +185,11 @@ function NotebooksList({ selection, onNotebookSelect, onTrashSelect }: Notebooks
     } else if (key === 'End') {
       e.preventDefault()
       const lastBookOpen = allNotebooks[allNotebooks.length - 1]
-      onNotebookSelect(lastBookOpen.id)
+      if (lastBookOpen.id === 'trash') {
+        onTrashSelect()
+      } else {
+        onNotebookSelect(lastBookOpen.id)
+      }
       const items = listboxRef.current?.querySelectorAll('[role="option"]')
       if (items && items[allNotebooks.length - 1]) {
         ;(items[allNotebooks.length - 1] as HTMLElement).focus()
@@ -288,27 +304,6 @@ function NotebooksList({ selection, onNotebookSelect, onTrashSelect }: Notebooks
           <span className="font-medium">All Notes</span>
         </button>
 
-        {/* Trash folder */}
-        <button
-          id="folder-trash"
-          role="option"
-          aria-selected={selection.folderId === 'trash'}
-          onClick={onTrashSelect}
-          tabIndex={-1}
-          className={`
-            w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
-            ${selection.folderId === 'trash'
-              ? 'bg-bg-active text-accent-blue'
-              : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
-            }
-          `}
-        >
-          <svg className={`w-4 h-4 ${selection.folderId === 'trash' ? 'text-blue-500 dark:text-text-secondary' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-          <span className="font-medium">Trash</span>
-        </button>
-
         {/* Individual folders */}
         {folders.map((folder) => (
           <div
@@ -364,6 +359,27 @@ function NotebooksList({ selection, onNotebookSelect, onTrashSelect }: Notebooks
             </div>
           </div>
         ))}
+
+        {/* Trash folder - at the bottom */}
+        <button
+          id="folder-trash"
+          role="option"
+          aria-selected={selection.folderId === 'trash'}
+          onClick={onTrashSelect}
+          tabIndex={-1}
+          className={`
+            w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
+            ${selection.folderId === 'trash'
+              ? 'bg-bg-active text-accent-blue'
+              : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
+            }
+          `}
+        >
+          <svg className={`w-4 h-4 ${selection.folderId === 'trash' ? 'text-blue-500 dark:text-text-secondary' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          <span className="font-medium">Trash</span>
+        </button>
         </div>
       
       </div>
