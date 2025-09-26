@@ -164,7 +164,9 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
 function getFilteredFiles(files: UserFile[], selection: AppSelection): UserFile[] {
   if (selection.folderId === 'trash') {
     // Show soft-deleted files only
-    return files.filter(f => f.deleted_at)
+    const deletedFiles = files.filter(f => f.deleted_at)
+    console.log('Debug: Total files:', files.length, 'Deleted files:', deletedFiles.length, 'Sample deleted files:', deletedFiles.slice(0, 3))
+    return deletedFiles
   }
   
   if (selection.mode === 'notes') {
