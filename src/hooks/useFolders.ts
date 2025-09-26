@@ -3,9 +3,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { toast } from 'sonner'
-import type { UserNotebook, CreateNotebookRequest } from '@/types/notebooks.types'
+import type { UserFolder, CreateFolderRequest } from '@/types/folders.types'
 
-const NOTEBOOKS_QUERY_KEY = 'notebooks'
+const FOLDERS_QUERY_KEY = 'folders'
 
 interface ApiResponse<T = unknown> {
   ok: boolean
@@ -13,20 +13,20 @@ interface ApiResponse<T = unknown> {
   error?: string
 }
 
-// Fetch user's notebooks using API route
-export function useNotebooksList() {
+// Fetch user's folders using API route
+export function useFoldersList() {
   const { user } = useAuthSession()
 
   return useQuery({
-    queryKey: [NOTEBOOKS_QUERY_KEY, user?.id],
-    queryFn: async (): Promise<UserNotebook[]> => {
+    queryKey: [FOLDERS_QUERY_KEY, user?.id],
+    queryFn: async (): Promise<UserFolder[]> => {
       if (!user) throw new Error('User not authenticated')
 
       const response = await fetch('/api/folders')
-      const result: ApiResponse<UserNotebook[]> = await response.json()
+      const result: ApiResponse<UserFolder[]> = await response.json()
       
       if (!result.ok || !result.data) {
-        throw new Error(result.error || 'Failed to fetch notebooks')
+        throw new Error(result.error || 'Failed to fetch folders')
       }
       
       return result.data
@@ -35,45 +35,45 @@ export function useNotebooksList() {
   })
 }
 
-// Get notebook by ID
-export function useNotebookById(notebookId?: string | null) {
+// Get folder by ID
+export function useFolderById(folderId?: string | null) {
   const { user } = useAuthSession()
   const queryClient = useQueryClient()
 
   return useQuery({
-    queryKey: [NOTEBOOKS_QUERY_KEY, notebookId, user?.id],
-    queryFn: async (): Promise<UserNotebook | null> => {
-      if (!user || !notebookId) return null
+    queryKey: [FOLDERS_QUERY_KEY, folderId, user?.id],
+    queryFn: async (): Promise<UserFolder | null> => {
+      if (!user || !folderId) return null
 
       // Try to get from cache first
-      const notebooks = queryClient.getQueryData<UserNotebook[]>([NOTEBOOKS_QUERY_KEY, user.id])
-      const cachedNotebook = notebooks?.find(f => f.id === notebookId)
+      const folders = queryClient.getQueryData<UserFolder[]>([FOLDERS_QUERY_KEY, user.id])
+      const cachedNotebook = folders?.find(f => f.id === folderId)
       if (cachedNotebook) return cachedNotebook
 
       // Fallback to API if not in cache
-      const response = await fetch(`/api/folders/${notebookId}`)
+      const response = await fetch(`/api/folders/${folderId}`)
       if (response.status === 404) return null
       
-      const result: ApiResponse<UserNotebook> = await response.json()
+      const result: ApiResponse<UserFolder> = await response.json()
       
       if (!result.ok || !result.data) {
         if (result.error === 'Notebook not found') return null
-        throw new Error(result.error || 'Failed to fetch notebook')
+        throw new Error(result.error || 'Failed to fetch folder')
       }
       
       return result.data
     },
-    enabled: !!user && !!notebookId,
+    enabled: !!user && !!folderId,
   })
 }
 
-// Create notebook with optimistic updates
-export function useCreateNotebook() {
+// Create folder with optimistic updates
+export function useCreateFolder() {
   const { user } = useAuthSession()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (request: CreateNotebookRequest): Promise<UserNotebook> => {
+    mutationFn: async (request: CreateFolderRequest): Promise<UserFolder> => {
       if (!user) throw new Error('User not authenticated')
 
       const response = await fetch('/api/folders', {
@@ -84,24 +84,24 @@ export function useCreateNotebook() {
         body: JSON.stringify(request),
       })
       
-      const result: ApiResponse<UserNotebook> = await response.json()
+      const result: ApiResponse<UserFolder> = await response.json()
       
       if (!result.ok || !result.data) {
-        throw new Error(result.error || 'Failed to create notebook')
+        throw new Error(result.error || 'Failed to create folder')
       }
       
       return result.data
     },
     onMutate: async (request) => {
       // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: [NOTEBOOKS_QUERY_KEY, user?.id] })
+      await queryClient.cancelQueries({ queryKey: [FOLDERS_QUERY_KEY, user?.id] })
 
       // Snapshot the previous value
-      const previousNotebooks = queryClient.getQueryData<UserNotebook[]>([NOTEBOOKS_QUERY_KEY, user?.id])
+      const previousNotebooks = queryClient.getQueryData<UserFolder[]>([FOLDERS_QUERY_KEY, user?.id])
 
       // Optimistically update to the new value
       if (previousNotebooks && user) {
-        const optimisticNotebook: UserNotebook = {
+        const optimisticNotebook: UserFolder = {
           id: `temp-${Date.now()}`,
           user_id: user.id,
           name: request.name,
@@ -109,8 +109,8 @@ export function useCreateNotebook() {
           updated_at: new Date().toISOString(),
         }
         
-        queryClient.setQueryData<UserNotebook[]>(
-          [NOTEBOOKS_QUERY_KEY, user.id],
+        queryClient.setQueryData<UserFolder[]>(
+          [FOLDERS_QUERY_KEY, user.id],
           [...previousNotebooks, optimisticNotebook]
         )
       }
@@ -126,28 +126,28 @@ export function useCreateNotebook() {
     onError: (error: any, request, context) => {
       // If the mutation fails, use the context to roll back
       if (context?.previousNotebooks && user) {
-        queryClient.setQueryData([NOTEBOOKS_QUERY_KEY, user.id], context.previousNotebooks)
+        queryClient.setQueryData([FOLDERS_QUERY_KEY, user.id], context.previousNotebooks)
       }
       
-      console.error('Failed to create notebook:', error)
-      toast.error('Failed to create notebook', {
+      console.error('Failed to create folder:', error)
+      toast.error('Failed to create folder', {
         description: error.message || 'An unexpected error occurred.',
       })
     },
     onSettled: () => {
       // Always refetch after error or success
-      queryClient.invalidateQueries({ queryKey: [NOTEBOOKS_QUERY_KEY] })
+      queryClient.invalidateQueries({ queryKey: [FOLDERS_QUERY_KEY] })
     },
   })
 }
 
-// Rename notebook with optimistic updates
-export function useRenameNotebook() {
+// Rename folder with optimistic updates
+export function useRenameFolder() {
   const { user } = useAuthSession()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ id, name }: { id: string; name: string }): Promise<UserNotebook> => {
+    mutationFn: async ({ id, name }: { id: string; name: string }): Promise<UserFolder> => {
       if (!user) throw new Error('User not authenticated')
 
       const response = await fetch(`/api/folders/${id}`, {
@@ -158,29 +158,29 @@ export function useRenameNotebook() {
         body: JSON.stringify({ name }),
       })
       
-      const result: ApiResponse<UserNotebook> = await response.json()
+      const result: ApiResponse<UserFolder> = await response.json()
       
       if (!result.ok || !result.data) {
-        throw new Error(result.error || 'Failed to rename notebook')
+        throw new Error(result.error || 'Failed to rename folder')
       }
       
       return result.data
     },
     onMutate: async ({ id, name }) => {
       // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: [NOTEBOOKS_QUERY_KEY, user?.id] })
+      await queryClient.cancelQueries({ queryKey: [FOLDERS_QUERY_KEY, user?.id] })
 
       // Snapshot the previous value
-      const previousNotebooks = queryClient.getQueryData<UserNotebook[]>([NOTEBOOKS_QUERY_KEY, user?.id])
+      const previousNotebooks = queryClient.getQueryData<UserFolder[]>([FOLDERS_QUERY_KEY, user?.id])
 
       // Optimistically update to the new value
       if (previousNotebooks && user) {
-        queryClient.setQueryData<UserNotebook[]>(
-          [NOTEBOOKS_QUERY_KEY, user.id],
-          previousNotebooks.map(notebook => 
-            notebook.id === id 
-              ? { ...notebook, name, updated_at: new Date().toISOString() }
-              : notebook
+        queryClient.setQueryData<UserFolder[]>(
+          [FOLDERS_QUERY_KEY, user.id],
+          previousNotebooks.map(folder => 
+            folder.id === id 
+              ? { ...folder, name, updated_at: new Date().toISOString() }
+              : folder
           )
         )
       }
@@ -196,54 +196,54 @@ export function useRenameNotebook() {
     onError: (error: any, variables, context) => {
       // If the mutation fails, use the context to roll back
       if (context?.previousNotebooks && user) {
-        queryClient.setQueryData([NOTEBOOKS_QUERY_KEY, user.id], context.previousNotebooks)
+        queryClient.setQueryData([FOLDERS_QUERY_KEY, user.id], context.previousNotebooks)
       }
       
-      console.error('Failed to rename notebook:', error)
-      toast.error('Failed to rename notebook', {
+      console.error('Failed to rename folder:', error)
+      toast.error('Failed to rename folder', {
         description: error.message || 'An unexpected error occurred.',
       })
     },
     onSettled: () => {
       // Always refetch after error or success
-      queryClient.invalidateQueries({ queryKey: [NOTEBOOKS_QUERY_KEY] })
+      queryClient.invalidateQueries({ queryKey: [FOLDERS_QUERY_KEY] })
     },
   })
 }
 
-// Delete notebook with optimistic updates
-export function useDeleteNotebook() {
+// Delete folder with optimistic updates
+export function useDeleteFolder() {
   const { user } = useAuthSession()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (notebookId: string): Promise<{ id: string }> => {
+    mutationFn: async (folderId: string): Promise<{ id: string }> => {
       if (!user) throw new Error('User not authenticated')
 
-      const response = await fetch(`/api/folders/${notebookId}`, {
+      const response = await fetch(`/api/folders/${folderId}`, {
         method: 'DELETE',
       })
       
       const result: ApiResponse<{ id: string }> = await response.json()
       
       if (!result.ok || !result.data) {
-        throw new Error(result.error || 'Failed to delete notebook')
+        throw new Error(result.error || 'Failed to delete folder')
       }
       
       return result.data
     },
-    onMutate: async (notebookId) => {
+    onMutate: async (folderId) => {
       // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: [NOTEBOOKS_QUERY_KEY, user?.id] })
+      await queryClient.cancelQueries({ queryKey: [FOLDERS_QUERY_KEY, user?.id] })
 
       // Snapshot the previous value
-      const previousNotebooks = queryClient.getQueryData<UserNotebook[]>([NOTEBOOKS_QUERY_KEY, user?.id])
+      const previousNotebooks = queryClient.getQueryData<UserFolder[]>([FOLDERS_QUERY_KEY, user?.id])
 
       // Optimistically update to the new value
       if (previousNotebooks && user) {
-        queryClient.setQueryData<UserNotebook[]>(
-          [NOTEBOOKS_QUERY_KEY, user.id],
-          previousNotebooks.filter(notebook => notebook.id !== notebookId)
+        queryClient.setQueryData<UserFolder[]>(
+          [FOLDERS_QUERY_KEY, user.id],
+          previousNotebooks.filter(folder => folder.id !== folderId)
         )
       }
 
@@ -255,23 +255,23 @@ export function useDeleteNotebook() {
       queryClient.invalidateQueries({ queryKey: ['files'] })
       
       toast.success('Notebook deleted', {
-        description: 'The notebook was deleted. Files have been moved to All Notes.',
+        description: 'The folder was deleted. Files have been moved to All Notes.',
       })
     },
-    onError: (error: any, notebookId, context) => {
+    onError: (error: any, folderId, context) => {
       // If the mutation fails, use the context to roll back
       if (context?.previousNotebooks && user) {
-        queryClient.setQueryData([NOTEBOOKS_QUERY_KEY, user.id], context.previousNotebooks)
+        queryClient.setQueryData([FOLDERS_QUERY_KEY, user.id], context.previousNotebooks)
       }
       
-      console.error('Failed to delete notebook:', error)
-      toast.error('Failed to delete notebook', {
+      console.error('Failed to delete folder:', error)
+      toast.error('Failed to delete folder', {
         description: error.message || 'An unexpected error occurred.',
       })
     },
     onSettled: () => {
       // Always refetch after error or success
-      queryClient.invalidateQueries({ queryKey: [NOTEBOOKS_QUERY_KEY] })
+      queryClient.invalidateQueries({ queryKey: [FOLDERS_QUERY_KEY] })
     },
   })
 }

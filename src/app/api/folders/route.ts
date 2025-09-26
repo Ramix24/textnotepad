@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabaseServer'
 import { z } from 'zod'
-import { UserNotebook, CreateNotebookRequest } from '@/types/notebooks.types'
+import { UserFolder, CreateFolderRequest } from '@/types/folders.types'
 
 interface ApiResponse<T = unknown> {
   ok: boolean
@@ -16,7 +16,7 @@ const createNotebookSchema = z.object({
 /**
  * GET /api/folders - List all notebooks for authenticated user
  */
-export async function GET(): Promise<NextResponse<ApiResponse<UserNotebook[]>>> {
+export async function GET(): Promise<NextResponse<ApiResponse<UserFolder[]>>> {
   try {
     const supabase = await createServerClient()
     
@@ -57,7 +57,7 @@ export async function GET(): Promise<NextResponse<ApiResponse<UserNotebook[]>>> 
 /**
  * POST /api/folders - Create a new folder
  */
-export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<UserNotebook>>> {
+export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<UserFolder>>> {
   try {
     const supabase = await createServerClient()
     
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     }
 
     // Parse request body
-    let body: CreateNotebookRequest
+    let body: CreateFolderRequest
     try {
       body = await request.json()
     } catch {

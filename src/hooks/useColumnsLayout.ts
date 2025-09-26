@@ -23,7 +23,7 @@ const COL2_MIN = 260
 const COL2_MAX = 560
 
 const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
-  col1: 200, // Fixed notebooks panel width (increased from 76px for notebook names)
+  col1: 200, // Fixed folders panel width (increased from 76px for folder names)
   col2: 360, // Default context list width  
   col2Min: COL2_MIN,
   col2Max: COL2_MAX,
@@ -51,7 +51,7 @@ function migrateSelection(stored: any): AppSelection {
     const validModes = ['notes', 'messages']
     const mode = validModes.includes(stored.mode) ? stored.mode : 'notes'
     
-    // Validate notebookId - should be null or string (actual validation happens in NotebooksPanel)
+    // Validate folderId - should be null or string (actual validation happens in FoldersPanel)
     let folderId = stored.folderId || null
     if (folderId && typeof folderId !== 'string') {
       console.warn('Invalid folderId type in persisted state, resetting to null')

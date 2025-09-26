@@ -7,7 +7,7 @@ import { useKeyboardNav } from '@/hooks/useKeyboardNav'
 import { useCreateFile } from '@/hooks/useFiles'
 import { useSupabase } from '@/components/SupabaseProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
-import { NotebooksPanel } from './NotebooksPanel'
+import { FoldersPanel } from './FoldersPanel'
 import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -310,14 +310,14 @@ export function AppShell3({
             }}
             data-testid="folders-column"
           >
-            <NotebooksPanel 
+            <FoldersPanel 
               className="h-full"
               selection={layout.selection}
               onSelectionChange={layout.setSelection}
               onMobileAdvance={() => layout.isMobile && layout.setActivePane(2)}
             >
               {sectionsContent}
-            </NotebooksPanel>
+            </FoldersPanel>
           </div>
         )}
 
