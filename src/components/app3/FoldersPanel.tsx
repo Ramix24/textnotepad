@@ -126,7 +126,7 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect }: FoldersListPr
 
   // Edge case: Validate current selection against available folders
   useEffect(() => {
-    if (isFeatureEnabled && selection.folderId && selection.folderId !== 'all' && !isLoading) {
+    if (isFeatureEnabled && selection.folderId && selection.folderId !== 'all' && selection.folderId !== 'trash' && !isLoading) {
       const folderExists = folders.some(f => f.id === selection.folderId)
       if (!folderExists) {
         // Invalid folder selection, falling back to All Notes
