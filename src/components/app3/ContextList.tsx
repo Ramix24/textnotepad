@@ -127,6 +127,18 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
   // Filter files based on current mode and folder
   const filteredFiles = getFilteredFiles(files, selection)
 
+  if (selection.folderId === 'trash') {
+    return (
+      <TrashView 
+        files={filteredFiles}
+        isLoading={isLoading}
+        selectedFileId={selection.fileId}
+        onFileSelect={handleFileSelect}
+        fileOps={fileOps}
+      />
+    )
+  }
+
   if (selection.mode === 'notes') {
     return (
       <NotesView 
@@ -141,18 +153,6 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
     )
   }
 
-  if (selection.mode === 'trash') {
-    return (
-      <TrashView 
-        files={filteredFiles}
-        isLoading={isLoading}
-        selectedFileId={selection.fileId}
-        onFileSelect={handleFileSelect}
-        fileOps={fileOps}
-      />
-    )
-  }
-
   if (selection.mode === 'messages') {
     return <MessagesView />
   }
@@ -162,7 +162,7 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
 
 // Helper function to filter files based on selection
 function getFilteredFiles(files: UserFile[], selection: AppSelection): UserFile[] {
-  if (selection.mode === 'trash') {
+  if (selection.folderId === 'trash') {
     // Show soft-deleted files only
     return files.filter(f => f.deleted_at)
   }

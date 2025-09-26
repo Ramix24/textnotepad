@@ -3,7 +3,7 @@
 import { ReactNode, useRef, useEffect, KeyboardEvent } from 'react'
 import { FileText, BookOpen } from 'lucide-react'
 import { useNotebooksList, useCreateNotebook, useRenameNotebook, useDeleteNotebook } from '@/hooks/useNotebooks'
-import type { Mode, AppSelection } from './types'
+import type { AppSelection } from './types'
 
 interface NotebooksPanelProps {
   children?: ReactNode
@@ -45,111 +45,56 @@ interface DefaultNotebooksContentProps {
 }
 
 function DefaultNotebooksContent({ selection, onSelectionChange, onMobileAdvance }: DefaultNotebooksContentProps) {
-  const toolbarRef = useRef<HTMLDivElement>(null)
-  const modes: Mode[] = ['notes', 'messages', 'trash']
-  
-  const handleModeChange = (mode: Mode) => {
-    // For trash mode, preserve the current file selection temporarily
-    // It will be cleared automatically if the file doesn't exist in the new mode
-    const updates: Partial<AppSelection> = { mode, folderId: null }
-    
-    // Only clear fileId when switching away from the current mode to force a clean state
-    if (mode === 'notes' || mode === 'messages') {
-      updates.fileId = null
-    }
-    // For trash mode, let the ContextList handle clearing invalid selections
-    
-    onSelectionChange(updates)
+  const handleTrashSelect = () => {
+    // Trash is now a special folder, not a mode
+    onSelectionChange({ mode: 'notes', folderId: 'trash', fileId: null })
     onMobileAdvance?.() // Auto-advance to pane 2 on mobile
   }
 
-  const handleBookOpenSelect = (folderId: string | null) => {
+  const handleNotebookSelect = (folderId: string | null) => {
     onSelectionChange({ mode: 'notes', folderId, fileId: null })
     onMobileAdvance?.() // Auto-advance to pane 2 on mobile
   }
 
-  const handleToolbarKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    const { key } = e
-    const currentIndex = modes.indexOf(selection.mode)
-    
-    if (key === 'ArrowLeft' || key === 'ArrowRight') {
-      e.preventDefault()
-      const direction = key === 'ArrowRight' ? 1 : -1
-      const newIndex = Math.max(0, Math.min(modes.length - 1, currentIndex + direction))
-      const newMode = modes[newIndex]
-      
-      // Skip disabled messages mode
-      if (newMode === 'messages') {
-        const nextIndex = direction > 0 ? newIndex + 1 : newIndex - 1
-        if (nextIndex >= 0 && nextIndex < modes.length) {
-          handleModeChange(modes[nextIndex])
-        }
-      } else {
-        handleModeChange(newMode)
-      }
+  const handleCreateNotebook = () => {
+    const name = prompt('Enter folder name:')
+    if (name && name.trim()) {
+      // TODO: Implement folder creation
+      alert('Folder creation will be implemented soon!')
     }
   }
+
 
   return (
     <div className="flex flex-col h-full">
       {/* Header toolbar */}
       <header className="flex-shrink-0 px-4 py-3 border-b border-border-dark bg-bg-secondary">
-        <div 
-          ref={toolbarRef}
-          className="flex gap-1"
-          role="tablist"
-          aria-label="Content modes"
-          onKeyDown={handleToolbarKeyDown}
-        >
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-medium text-text-primary">Notes</h2>
           <button
-            onClick={() => handleModeChange('notes')}
-            className={`px-3 py-1 text-sm font-medium rounded transition-colors flex-1 ${
-              selection.mode === 'notes' 
-                ? 'bg-bg-active text-accent-blue' 
-                : 'text-text-secondary hover:text-accent-blue hover:bg-[color:var(--bg-active)]/40'
-            }`}
-            role="tab"
-            aria-selected={selection.mode === 'notes'}
-            aria-controls="folders-content"
-            id="tab-notes"
+            onClick={handleCreateNotebook}
+            className="px-3 py-1 text-sm font-medium text-accent-blue hover:bg-bg-active rounded transition-colors flex items-center gap-1"
+            title="Create new folder"
           >
-            Notes
-          </button>
-          <button
-            onClick={() => handleModeChange('trash')}
-            className={`px-3 py-1 text-sm font-medium rounded transition-colors flex-1 ${
-              selection.mode === 'trash' 
-                ? 'bg-bg-active text-accent-blue' 
-                : 'text-text-secondary hover:text-accent-blue hover:bg-[color:var(--bg-active)]/40'
-            }`}
-            role="tab"
-            aria-selected={selection.mode === 'trash'}
-            aria-controls="folders-content"
-            id="tab-trash"
-          >
-            Trash
+            <span className="text-xs">+</span>
+            New Folder
           </button>
         </div>
       </header>
       
       
-      {/* Notebooks list or mode-specific content */}
+      {/* Notebooks list */}
       <div 
         id="folders-content"
         className="flex-1 overflow-auto"
         role="tabpanel"
-        aria-labelledby={`tab-${selection.mode}`}
+        aria-labelledby="folders-tab"
       >
-        {selection.mode === 'notes' ? (
-          <NotebooksList 
-            selection={selection}
-            onNotebookSelect={handleBookOpenSelect}
-          />
-        ) : selection.mode === 'messages' ? (
-          <MessagesPlaceholder />
-        ) : selection.mode === 'trash' ? (
-          <TrashPlaceholder />
-        ) : null}
+        <NotebooksList 
+          selection={selection}
+          onNotebookSelect={handleNotebookSelect}
+          onTrashSelect={handleTrashSelect}
+        />
       </div>
     </div>
   )
@@ -158,9 +103,10 @@ function DefaultNotebooksContent({ selection, onSelectionChange, onMobileAdvance
 interface NotebooksListProps {
   selection: AppSelection
   onNotebookSelect: (folderId: string | null) => void
+  onTrashSelect: () => void
 }
 
-function NotebooksList({ selection, onNotebookSelect }: NotebooksListProps) {
+function NotebooksList({ selection, onNotebookSelect, onTrashSelect }: NotebooksListProps) {
   const { data: folders = [], isLoading, error } = useNotebooksList()
   const createNotebook = useCreateNotebook()
   const renameNotebook = useRenameNotebook()
@@ -356,6 +302,27 @@ function NotebooksList({ selection, onNotebookSelect }: NotebooksListProps) {
           <span className="font-medium">All Notes</span>
         </button>
 
+        {/* Trash folder */}
+        <button
+          id="folder-trash"
+          role="option"
+          aria-selected={selection.folderId === 'trash'}
+          onClick={onTrashSelect}
+          tabIndex={-1}
+          className={`
+            w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
+            ${selection.folderId === 'trash'
+              ? 'bg-bg-active text-accent-blue'
+              : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
+            }
+          `}
+        >
+          <svg className={`w-4 h-4 ${selection.folderId === 'trash' ? 'text-blue-500 dark:text-text-secondary' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          <span className="font-medium">Trash</span>
+        </button>
+
         {/* Individual folders */}
         {folders.map((folder) => (
           <div
@@ -413,51 +380,8 @@ function NotebooksList({ selection, onNotebookSelect }: NotebooksListProps) {
         ))}
         </div>
       
-        {/* Footer */}
-        <footer className="mt-auto pt-4">
-          {/* New Notebook CTA */}
-          <div className="px-3 pb-3 border-t border-gray-200 dark:border-gray-700 pt-3">
-          <button
-            onClick={handleCreateNotebook}
-            disabled={createNotebook.isPending}
-            className="w-full flex items-center justify-center gap-2 p-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            {createNotebook.isPending ? 'Creating...' : 'New Notebook'}
-          </button>
-          </div>
-        </footer>
       </div>
     </div>
   )
 }
 
-function MessagesPlaceholder() {
-  return (
-    <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-      <div className="w-12 h-12 rounded-lg bg-muted mb-4 flex items-center justify-center">
-        <span className="text-lg">💬</span>
-      </div>
-      <h3 className="text-sm font-medium text-foreground mb-2">Messages</h3>
-      <p className="text-xs text-muted-foreground leading-relaxed max-w-[200px]">
-        Messages and conversations will appear here. This feature is coming soon.
-      </p>
-    </div>
-  )
-}
-
-function TrashPlaceholder() {
-  return (
-    <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-      <div className="w-12 h-12 rounded-lg bg-muted mb-4 flex items-center justify-center">
-        <span className="text-lg">🗑️</span>
-      </div>
-      <h3 className="text-sm font-medium text-foreground mb-2">Trash</h3>
-      <p className="text-xs text-muted-foreground leading-relaxed max-w-[200px]">
-        Deleted items will appear here. Click to restore or permanently delete.
-      </p>
-    </div>
-  )
-}

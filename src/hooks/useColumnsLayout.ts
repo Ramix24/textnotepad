@@ -48,7 +48,7 @@ function migrateSelection(stored: any): AppSelection {
   
   // If it's already the new format, validate and sanitize
   if ('mode' in stored) {
-    const validModes = ['notes', 'messages', 'trash']
+    const validModes = ['notes', 'messages']
     const mode = validModes.includes(stored.mode) ? stored.mode : 'notes'
     
     // Validate notebookId - should be null or string (actual validation happens in NotebooksPanel)
@@ -71,13 +71,17 @@ function migrateSelection(stored: any): AppSelection {
   // Migrate from old format
   if ('section' in stored) {
     const mode = stored.section === 'notes' ? 'notes' :
-                 stored.section === 'messages' ? 'messages' :
-                 stored.section === 'trash' ? 'trash' : 'notes'
+                 stored.section === 'messages' ? 'messages' : 'notes'
+    
+    // Handle old trash mode - convert to notes mode with trash folderId
+    let folderId = stored.folderId || null
+    if (stored.section === 'trash') {
+      folderId = 'trash'
+    }
     
     console.info(`Migrating old selection format from section "${stored.section}" to mode "${mode}"`)
     
     // In the old format, there might be different field names
-    let folderId = stored.folderId || null
     const fileId = stored.fileId || stored.selectedFileId || null
     
     // Validate migrated data - just check type, actual validation in NotebooksPanel
@@ -190,7 +194,7 @@ export function useColumnsLayout(
   const updateUrl = useCallback((newSelection: AppSelection) => {
     const params = new URLSearchParams(searchParams?.toString() || '')
     
-    if (newSelection.mode === 'notes' && newSelection.folderId) {
+    if (newSelection.mode === 'notes' && newSelection.folderId && newSelection.folderId !== 'trash') {
       params.set('folder', newSelection.folderId)
     } else {
       params.delete('folder')

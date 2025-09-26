@@ -50,13 +50,19 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
     selection.mode === 'notes' ? selection.fileId : null
   )
 
-  // Handle different modes
+  // Handle special folders and different modes
+  if (selection.folderId === 'trash') {
+    if (selection.fileId) {
+      // Show trash file preview (can use the same editor but read-only)
+      // For now, show trash placeholder
+      return <TrashPlaceholder />
+    }
+    return <DetailViewEmpty mode="trash" />
+  }
+  
   if (selection.mode !== 'notes') {
     if (selection.mode === 'messages') {
       return <MessagesPlaceholder />
-    }
-    if (selection.mode === 'trash') {
-      return <TrashPlaceholder />
     }
     return <DetailViewEmpty mode={selection.mode} />
   }

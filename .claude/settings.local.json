@@ -41,7 +41,8 @@
       "Bash(start http://localhost:3006)",
       "Bash(start http://localhost:3006/app)",
       "Bash(npx supabase:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(npx eslint:*)"
     ],
     "deny": [],
     "ask": [],
