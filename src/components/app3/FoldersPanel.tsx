@@ -2,7 +2,7 @@
 
 import { ReactNode, useRef, useEffect, KeyboardEvent } from 'react'
 import { FileText, BookOpen } from 'lucide-react'
-import { useFoldersList, useRenameFolder, useDeleteFolder } from '@/hooks/useFolders'
+import { useFoldersList, useCreateFolder, useRenameFolder, useDeleteFolder } from '@/hooks/useFolders'
 import type { AppSelection } from './types'
 
 interface FoldersPanelProps {
@@ -45,6 +45,8 @@ interface DefaultFoldersContentProps {
 }
 
 function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }: DefaultFoldersContentProps) {
+  const createFolder = useCreateFolder()
+  
   const handleTrashSelect = () => {
     // Trash is now a special folder, not a mode
     onSelectionChange({ mode: 'notes', folderId: 'trash', fileId: null })
@@ -56,6 +58,13 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
     onMobileAdvance?.() // Auto-advance to pane 2 on mobile
   }
 
+  const handleCreateFolder = () => {
+    const name = prompt('Enter folder name:')
+    if (name && name.trim()) {
+      createFolder.mutate({ name: name.trim() })
+    }
+  }
+
 
 
   return (
@@ -65,12 +74,13 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-medium text-text-primary">Notes</h2>
           <button
-            onClick={() => alert('Folder creation will be implemented soon!')}
-            className="px-3 py-1 text-sm font-medium text-accent-blue hover:bg-bg-active rounded transition-colors flex items-center gap-1"
+            onClick={handleCreateFolder}
+            disabled={createFolder.isPending}
+            className="px-3 py-1 text-sm font-medium text-accent-blue hover:bg-bg-active rounded transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
             title="Create new folder"
           >
             <span className="text-xs">+</span>
-            New Folder
+            {createFolder.isPending ? 'Creating...' : 'New Folder'}
           </button>
         </div>
       </header>
