@@ -144,7 +144,7 @@ export function useCreateFile() {
       // Invalidate and refetch files list
       queryClient.invalidateQueries({ queryKey: filesKeys.lists() })
       
-      toast.success('File created successfully')
+      // File created - no toast needed, user sees result in UI
     },
     onError: (error: Error) => {
       toast.error('Failed to create file', {
@@ -199,7 +199,7 @@ export function useRenameFile() {
       queryClient.invalidateQueries({ queryKey: filesKeys.lists() })
     },
     onSuccess: () => {
-      toast.success('File renamed successfully')
+      // File renamed - no toast needed, user sees result in UI
     },
   })
 }
@@ -245,7 +245,7 @@ export function useDeleteFile() {
       queryClient.invalidateQueries({ queryKey: filesKeys.lists() })
     },
     onSuccess: () => {
-      toast.success('File deleted successfully')
+      // File deleted - no toast needed, user sees result in UI
     },
   })
 }
@@ -275,9 +275,7 @@ export function useRestoreFile() {
       queryClient.invalidateQueries({ queryKey: ['files', 'list'] })
       queryClient.invalidateQueries({ queryKey: ['files', 'detail', restoredFile.id] })
       
-      toast.success('File restored', {
-        description: `"${restoredFile.name}" has been restored successfully.`
-      })
+      // File restored - no toast needed, user sees result in UI
     },
     onError: (error: any) => {
       console.error('Failed to restore file:', error)
@@ -313,9 +311,7 @@ export function usePermanentDeleteFile() {
       queryClient.invalidateQueries({ queryKey: ['files', 'list'] })
       queryClient.removeQueries({ queryKey: ['files', 'detail', fileId] })
       
-      toast.success('File permanently deleted', {
-        description: 'The file has been permanently removed and cannot be recovered.'
-      })
+      // File permanently deleted - no toast needed, user sees result in UI
     },
     onError: (error: any) => {
       console.error('Failed to permanently delete file:', error)
