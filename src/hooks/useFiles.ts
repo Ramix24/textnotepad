@@ -112,10 +112,10 @@ const filesKeys = {
 /**
  * Hook for fetching the list of user files
  */
-export function useFilesList(includeDeleted: boolean = false) {
+export function useFilesList() {
   return useQuery({
-    queryKey: [...filesKeys.lists(), includeDeleted ? 'with-deleted' : 'active-only'],
-    queryFn: () => fetchFiles(includeDeleted),
+    queryKey: filesKeys.lists(),
+    queryFn: () => fetchFiles(true), // Always fetch all files including deleted
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
