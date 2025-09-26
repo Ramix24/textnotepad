@@ -33,6 +33,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
   
   // Refs for managing focus and keyboard shortcuts
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const wasFocusedRef = useRef(false)
   
   // Web Worker for live statistics
   const { compute: computeStats } = useCountersWorker({ debounceMs: 150 })
@@ -45,6 +46,11 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
       // Show brief "just saved" indicator
       setJustSaved(true)
       setTimeout(() => setJustSaved(false), 1500)
+      
+      // Restore focus if it was focused before save
+      if (wasFocusedRef.current && textareaRef.current) {
+        textareaRef.current.focus()
+      }
     },
     onConflict: (conflictingFile) => {
       // Handle version conflict - refresh content with server version
@@ -207,15 +213,14 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange }: EditorP
           onChange={(e) => handleContentChange(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
+          onFocus={() => { wasFocusedRef.current = true }}
           className={cn(
             'flex-1 w-full p-4 bg-bg-primary text-text-primary',
             'font-mono text-sm leading-relaxed', // Monospace for code-like editing
             'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
-            'resize-none placeholder:text-text-secondary',
-            'disabled:opacity-50 disabled:cursor-not-allowed'
+            'resize-none placeholder:text-text-secondary'
           )}
           placeholder="Start typing your content here..."
-          disabled={isSaving}
           aria-label="Text editor"
           aria-describedby="editor-stats"
           spellCheck={true}
