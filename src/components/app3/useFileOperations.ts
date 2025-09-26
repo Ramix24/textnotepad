@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { UserFile } from '@/types/user-files.types'
-import { useCreateFile, useRenameFile, useDeleteFile } from '@/hooks/useFiles'
+import { useCreateFile, useRenameFile, useDeleteFile, useRestoreFile, usePermanentDeleteFile } from '@/hooks/useFiles'
 
 interface UseFileOperationsOptions {
   onFileSelect?: (fileId: string) => void
@@ -15,6 +15,8 @@ export function useFileOperations(options: UseFileOperationsOptions = {}) {
   const createFile = useCreateFile()
   const renameFile = useRenameFile()
   const deleteFile = useDeleteFile()
+  const restoreFile = useRestoreFile()
+  const permanentDeleteFile = usePermanentDeleteFile()
   
   const [renamingFileId, setRenamingFileId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
@@ -109,6 +111,24 @@ export function useFileOperations(options: UseFileOperationsOptions = {}) {
     }
   }
 
+  const handleRestore = async (file: UserFile) => {
+    try {
+      await restoreFile.mutateAsync(file.id)
+      onFileDeleted?.(file.id) // Trigger parent update
+    } catch {
+      // Error handling is done in the hook
+    }
+  }
+
+  const handlePermanentDelete = async (file: UserFile) => {
+    try {
+      await permanentDeleteFile.mutateAsync(file.id)
+      onFileDeleted?.(file.id) // Trigger parent update
+    } catch {
+      // Error handling is done in the hook
+    }
+  }
+
   return {
     // State
     renamingFileId,
@@ -118,6 +138,8 @@ export function useFileOperations(options: UseFileOperationsOptions = {}) {
     createFile,
     renameFile,
     deleteFile,
+    restoreFile,
+    permanentDeleteFile,
     
     // Handlers
     handleCreateFile,
@@ -126,6 +148,8 @@ export function useFileOperations(options: UseFileOperationsOptions = {}) {
     handleRenameCommit,
     handleRenameCancel,
     handleDelete,
+    handleRestore,
+    handlePermanentDelete,
     
     // Setters for direct manipulation
     setRenameValue,

@@ -248,3 +248,79 @@ export function useDeleteFile() {
     },
   })
 }
+
+/**
+ * Hook for restoring a soft-deleted file
+ */
+export function useRestoreFile() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (fileId: string): Promise<UserFile> => {
+      const response = await fetch(`/api/files/${fileId}?action=restore`, {
+        method: 'POST',
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to restore file')
+      }
+      
+      const data = await response.json()
+      return data.data
+    },
+    onSuccess: (restoredFile) => {
+      // Invalidate and refetch files list
+      queryClient.invalidateQueries({ queryKey: ['files', 'list'] })
+      queryClient.invalidateQueries({ queryKey: ['files', 'detail', restoredFile.id] })
+      
+      toast.success('File restored', {
+        description: `"${restoredFile.name}" has been restored successfully.`
+      })
+    },
+    onError: (error: any) => {
+      console.error('Failed to restore file:', error)
+      toast.error('Failed to restore file', {
+        description: error.message || 'An unexpected error occurred while restoring the file.'
+      })
+    }
+  })
+}
+
+/**
+ * Hook for permanently deleting a file
+ */
+export function usePermanentDeleteFile() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (fileId: string): Promise<{ id: string }> => {
+      const response = await fetch(`/api/files/${fileId}?action=permanent-delete`, {
+        method: 'POST',
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to permanently delete file')
+      }
+      
+      const data = await response.json()
+      return data.data
+    },
+    onSuccess: (result, fileId) => {
+      // Invalidate and refetch files list
+      queryClient.invalidateQueries({ queryKey: ['files', 'list'] })
+      queryClient.removeQueries({ queryKey: ['files', 'detail', fileId] })
+      
+      toast.success('File permanently deleted', {
+        description: 'The file has been permanently removed and cannot be recovered.'
+      })
+    },
+    onError: (error: any) => {
+      console.error('Failed to permanently delete file:', error)
+      toast.error('Failed to permanently delete file', {
+        description: error.message || 'An unexpected error occurred while deleting the file.'
+      })
+    }
+  })
+}

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabaseServer'
-import { getFileById, renameFile, softDeleteFile } from '@/lib/userFiles.repo'
+import { getFileById, renameFile, softDeleteFile, restoreFile, permanentDeleteFile } from '@/lib/userFiles.repo'
 import { UserFile } from '@/types/user-files.types'
 
 interface ApiResponse<T = unknown> {
@@ -191,6 +191,84 @@ export async function DELETE(
     
     return NextResponse.json(
       { error: 'Failed to delete file' },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * POST /api/files/[id]?action=restore - Restore a soft-deleted file
+ * POST /api/files/[id]?action=permanent-delete - Permanently delete a file
+ */
+export async function POST(
+  request: NextRequest,
+  { params }: RouteParams
+): Promise<NextResponse<ApiResponse<UserFile | { id: string }>>> {
+  const { id } = await params
+  const url = new URL(request.url)
+  const action = url.searchParams.get('action')
+
+  try {
+    const supabase = await createServerClient()
+
+    if (action === 'restore') {
+      // Restore a soft-deleted file
+      const restoredFile = await restoreFile(supabase, { id })
+      
+      return NextResponse.json({
+        data: restoredFile
+      }, { status: 200 })
+      
+    } else if (action === 'permanent-delete') {
+      // Permanently delete a file
+      const result = await permanentDeleteFile(supabase, { id })
+      
+      return NextResponse.json({
+        data: result
+      }, { status: 200 })
+      
+    } else {
+      return NextResponse.json(
+        { error: 'Invalid action. Use ?action=restore or ?action=permanent-delete' },
+        { status: 400 }
+      )
+    }
+    
+  } catch (error) {
+    console.error(`POST /api/files/${id} error:`, error)
+    
+    if (error instanceof Error) {
+      if (error.message.includes('not found') || error.message.includes('access denied')) {
+        return NextResponse.json(
+          { error: 'File not found' },
+          { status: 404 }
+        )
+      }
+      
+      if (error.message.includes('not in trash')) {
+        return NextResponse.json(
+          { error: 'File is not in trash' },
+          { status: 400 }
+        )
+      }
+      
+      if (error.message.includes('already restored')) {
+        return NextResponse.json(
+          { error: 'File is already restored' },
+          { status: 400 }
+        )
+      }
+      
+      if (error.message.includes('User not authenticated')) {
+        return NextResponse.json(
+          { error: 'Unauthorized' },
+          { status: 401 }
+        )
+      }
+    }
+    
+    return NextResponse.json(
+      { error: `Failed to ${action} file` },
       { status: 500 }
     )
   }

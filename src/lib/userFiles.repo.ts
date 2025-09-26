@@ -348,6 +348,87 @@ export async function getOrCreateLatestFile(
   return file
 }
 
+/**
+ * Restore a soft-deleted file (set deleted_at to null)
+ */
+export async function restoreFile(
+  supabase: TypedSupabaseClient,
+  params: { id: string }
+): Promise<UserFile> {
+  const { data: session } = await supabase.auth.getSession()
+  
+  if (!session.session?.user?.id) {
+    throw new Error('User not authenticated')
+  }
+
+  const { data, error } = await supabase
+    .from('user_files')
+    .update({
+      deleted_at: null,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', params.id)
+    .eq('user_id', session.session.user.id)
+    .not('deleted_at', 'is', null) // Only restore files that are actually deleted
+    .select()
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      throw new Error('File not found or already restored')
+    }
+    throw new Error(`Failed to restore file: ${error.message}`)
+  }
+
+  return data
+}
+
+/**
+ * Permanently delete a file (hard delete from database)
+ */
+export async function permanentDeleteFile(
+  supabase: TypedSupabaseClient,
+  params: { id: string }
+): Promise<{ id: string }> {
+  const { data: session } = await supabase.auth.getSession()
+  
+  if (!session.session?.user?.id) {
+    throw new Error('User not authenticated')
+  }
+
+  // First check if the file exists and is soft-deleted
+  const { data: existingFile, error: checkError } = await supabase
+    .from('user_files')
+    .select('id, deleted_at')
+    .eq('id', params.id)
+    .eq('user_id', session.session.user.id)
+    .single()
+
+  if (checkError) {
+    if (checkError.code === 'PGRST116') {
+      throw new Error('File not found or access denied')
+    }
+    throw new Error(`Failed to check file: ${checkError.message}`)
+  }
+
+  if (!existingFile.deleted_at) {
+    throw new Error('Cannot permanently delete a file that is not in trash')
+  }
+
+  // Permanently delete the file
+  const { error } = await supabase
+    .from('user_files')
+    .delete()
+    .eq('id', params.id)
+    .eq('user_id', session.session.user.id)
+
+  if (error) {
+    throw new Error(`Failed to permanently delete file: ${error.message}`)
+  }
+
+  return { id: params.id }
+}
+
 // TODO Sprint 5: Replace this simple repo with full CRUD operations including:
 // - File listing with pagination and search
 // - Bulk operations (delete multiple files)

@@ -139,7 +139,15 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
   }
 
   if (selection.mode === 'trash') {
-    return <TrashView />
+    return (
+      <TrashView 
+        files={filteredFiles}
+        isLoading={isLoading}
+        selectedFileId={selection.fileId}
+        onFileSelect={handleFileSelect}
+        fileOps={fileOps}
+      />
+    )
   }
 
   if (selection.mode === 'messages') {
@@ -289,18 +297,213 @@ function NotesEmptyState({ onNewNote, isCreating }: { onNewNote: () => void, isC
   )
 }
 
-function TrashView() {
+function TrashView({ 
+  files, 
+  isLoading, 
+  selectedFileId, 
+  onFileSelect, 
+  fileOps
+}: {
+  files: UserFile[]
+  isLoading: boolean
+  selectedFileId?: string | null
+  onFileSelect: (file: UserFile) => void
+  fileOps: ReturnType<typeof useFileOperations>
+}) {
+  const [sortBy, setSortBy] = useState<SortOption>(getDefaultSort())
+  
+  // Sort files based on current sort option
+  const sortedFiles = sortFiles(files, sortBy)
+
+  const handleRestoreFile = async (file: UserFile) => {
+    try {
+      // Call the restore functionality (we'll implement this)
+      await fileOps.handleRestore?.(file)
+    } catch (error) {
+      console.error('Failed to restore file:', error)
+    }
+  }
+
+  const handlePermanentDelete = async (file: UserFile) => {
+    if (confirm(`Permanently delete "${file.name}"? This cannot be undone.`)) {
+      try {
+        await fileOps.handlePermanentDelete?.(file)
+      } catch (error) {
+        console.error('Failed to permanently delete file:', error)
+      }
+    }
+  }
+
+  return (
+    <div className="flex flex-col">
+      <header className="flex-shrink-0 p-4 border-b border-border-dark bg-bg-secondary">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🗑️</span>
+            <h2 className="text-sm font-medium text-text-primary">Trash</h2>
+          </div>
+          
+          {files.length > 0 && (
+            <SortDropdown 
+              value={sortBy} 
+              onChange={setSortBy}
+            />
+          )}
+        </div>
+      </header>
+      
+      <div className="flex-1 overflow-auto">
+        {isLoading ? (
+          <div className="p-6 text-center">
+            <div className="text-sm text-text-secondary">Loading deleted items...</div>
+          </div>
+        ) : sortedFiles.length === 0 ? (
+          <TrashEmptyState />
+        ) : (
+          <div role="listbox" className="p-2 space-y-1">
+            {sortedFiles.map((file) => (
+              <TrashFileItem
+                key={file.id}
+                file={file}
+                isSelected={selectedFileId === file.id}
+                onSelect={onFileSelect}
+                onRestore={() => handleRestoreFile(file)}
+                onPermanentDelete={() => handlePermanentDelete(file)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary">
+        <div className="flex items-center justify-between text-xs text-text-secondary">
+          <div className="flex items-center gap-2">
+            <span>{files.length} deleted items</span>
+            {files.length > 0 && (
+              <>
+                <span>·</span>
+                <span>Select an item to preview or restore</span>
+              </>
+            )}
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
+}
+
+function TrashEmptyState() {
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
       <div className="w-12 h-12 rounded-lg bg-bg-secondary mb-4 flex items-center justify-center">
         <span className="text-lg">🗑️</span>
       </div>
-      <h3 className="text-sm font-medium text-text-primary mb-2">Trash</h3>
+      <h3 className="text-sm font-medium text-text-primary mb-2">Trash is empty</h3>
       <p className="text-xs text-text-secondary leading-relaxed max-w-[200px]">
-        Deleted items will appear here. Coming soon with RLS implementation.
+        Deleted notes will appear here. You can restore them or delete them permanently.
       </p>
     </div>
   )
+}
+
+function TrashFileItem({ 
+  file, 
+  isSelected, 
+  onSelect, 
+  onRestore, 
+  onPermanentDelete 
+}: {
+  file: UserFile
+  isSelected: boolean
+  onSelect: (file: UserFile) => void
+  onRestore: () => void
+  onPermanentDelete: () => void
+}) {
+  const deletedDate = file.deleted_at ? new Date(file.deleted_at) : null
+  const timeAgo = deletedDate ? formatTimeAgo(deletedDate) : 'Unknown'
+
+  return (
+    <div
+      className={`group relative p-3 rounded-lg border transition-all cursor-pointer ${
+        isSelected
+          ? 'bg-bg-active border-accent-blue shadow-sm'
+          : 'bg-bg-primary border-border-dark hover:bg-bg-secondary hover:border-border-light'
+      }`}
+      onClick={() => onSelect(file)}
+      role="option"
+      aria-selected={isSelected}
+    >
+      {/* File content preview */}
+      <div className="flex items-start justify-between">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className={`text-sm font-medium truncate ${
+              isSelected ? 'text-accent-blue' : 'text-text-secondary'
+            }`}>
+              {file.name}
+            </h3>
+            <span className="text-xs text-text-secondary opacity-60">
+              (deleted)
+            </span>
+          </div>
+          
+          <p className="text-xs text-text-secondary line-clamp-2 mb-2 opacity-75">
+            {file.content.substring(0, 100)}
+            {file.content.length > 100 ? '...' : ''}
+          </p>
+          
+          <div className="flex items-center gap-3 text-xs text-text-secondary">
+            <span>Deleted {timeAgo}</span>
+            <span>•</span>
+            <span>{file.word_count} words</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Action buttons - show on hover */}
+      <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onRestore()
+          }}
+          className="p-1.5 text-green-600 hover:bg-green-100 dark:hover:bg-green-900 rounded transition-colors"
+          title="Restore file"
+        >
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+        
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onPermanentDelete()
+          }}
+          className="p-1.5 text-red-600 hover:bg-red-100 dark:hover:bg-red-900 rounded transition-colors"
+          title="Delete permanently"
+        >
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// Helper function to format time ago
+function formatTimeAgo(date: Date): string {
+  const now = new Date()
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+  
+  if (diffInSeconds < 60) return 'just now'
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`
+  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`
+  
+  return date.toLocaleDateString()
 }
 
 function MessagesView() {
