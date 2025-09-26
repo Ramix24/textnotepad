@@ -56,13 +56,6 @@ function DefaultNotebooksContent({ selection, onSelectionChange, onMobileAdvance
     onMobileAdvance?.() // Auto-advance to pane 2 on mobile
   }
 
-  const handleCreateNotebook = () => {
-    const name = prompt('Enter folder name:')
-    if (name && name.trim()) {
-      // TODO: Implement folder creation
-      alert('Folder creation will be implemented soon!')
-    }
-  }
 
 
   return (
@@ -72,7 +65,7 @@ function DefaultNotebooksContent({ selection, onSelectionChange, onMobileAdvance
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-medium text-text-primary">Notes</h2>
           <button
-            onClick={handleCreateNotebook}
+            onClick={() => alert('Folder creation will be implemented soon!')}
             className="px-3 py-1 text-sm font-medium text-accent-blue hover:bg-bg-active rounded transition-colors flex items-center gap-1"
             title="Create new folder"
           >
@@ -117,12 +110,6 @@ function NotebooksList({ selection, onNotebookSelect, onTrashSelect }: Notebooks
   // Check feature flag - default to true if not set
   const isFeatureEnabled = process.env.NEXT_PUBLIC_FEATURE_FOLDERS !== 'false'
 
-  const handleCreateNotebook = () => {
-    const name = prompt('Enter folder name:')
-    if (name && name.trim()) {
-      createNotebook.mutate({ name: name.trim() })
-    }
-  }
 
   const handleRenameNotebook = (folderId: string, currentName: string) => {
     const name = prompt('Enter new folder name:', currentName)
