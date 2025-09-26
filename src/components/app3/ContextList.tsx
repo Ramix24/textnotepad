@@ -53,12 +53,15 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
   
   // Edge case: Invalid folder detection and recovery is now handled by FoldersPanel with real data
 
-  // Edge case: File no longer exists
+  // Edge case: File no longer exists in current mode
   useEffect(() => {
     if (selection.fileId && files.length > 0 && !isLoading) {
-      const fileExists = files.some(f => f.id === selection.fileId)
-      if (!fileExists) {
-        console.warn(`Selected file "${selection.fileId}" no longer exists, clearing selection`)
+      // Check if file exists in the current mode's filtered files
+      const filteredFiles = getFilteredFiles(files, selection)
+      const fileExistsInMode = filteredFiles.some(f => f.id === selection.fileId)
+      
+      if (!fileExistsInMode) {
+        console.warn(`Selected file "${selection.fileId}" not available in ${selection.mode} mode, clearing selection`)
         onSelectionChange({
           ...selection,
           fileId: null

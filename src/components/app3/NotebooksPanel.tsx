@@ -49,7 +49,17 @@ function DefaultNotebooksContent({ selection, onSelectionChange, onMobileAdvance
   const modes: Mode[] = ['notes', 'messages', 'trash']
   
   const handleModeChange = (mode: Mode) => {
-    onSelectionChange({ mode, folderId: null, fileId: null })
+    // For trash mode, preserve the current file selection temporarily
+    // It will be cleared automatically if the file doesn't exist in the new mode
+    const updates: Partial<AppSelection> = { mode, folderId: null }
+    
+    // Only clear fileId when switching away from the current mode to force a clean state
+    if (mode === 'notes' || mode === 'messages') {
+      updates.fileId = null
+    }
+    // For trash mode, let the ContextList handle clearing invalid selections
+    
+    onSelectionChange(updates)
     onMobileAdvance?.() // Auto-advance to pane 2 on mobile
   }
 
