@@ -180,7 +180,7 @@ function NotesView({
   onFileSelect, 
   onNewNote,
   fileOps,
-  selection
+  selection: _selection
 }: {
   files: UserFile[]
   isLoading: boolean
