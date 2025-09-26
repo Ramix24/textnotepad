@@ -37,10 +37,11 @@ function validateFileName(name?: string): string {
 }
 
 /**
- * Get all files for a user (ordered by most recent, excluding deleted)
+ * Get all files for a user (ordered by most recent, optionally including deleted)
  */
 export async function listFilesForUser(
-  supabase: TypedSupabaseClient
+  supabase: TypedSupabaseClient,
+  includeDeleted: boolean = false
 ): Promise<UserFile[]> {
   const { data: session } = await supabase.auth.getSession()
   
@@ -48,12 +49,17 @@ export async function listFilesForUser(
     throw new Error('User not authenticated')
   }
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('user_files')
     .select('*')
     .eq('user_id', session.session.user.id)
-    .is('deleted_at', null)
-    .order('updated_at', { ascending: false })
+
+  // Only filter out deleted files if includeDeleted is false
+  if (!includeDeleted) {
+    query = query.is('deleted_at', null)
+  }
+
+  const { data, error } = await query.order('updated_at', { ascending: false })
 
   if (error) {
     throw new Error(`Failed to list files: ${error.message}`)

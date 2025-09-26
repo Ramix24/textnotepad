@@ -16,8 +16,9 @@ interface CreateFileRequest {
 
 
 // API functions
-async function fetchFiles(): Promise<UserFile[]> {
-  const response = await fetch('/api/files')
+async function fetchFiles(includeDeleted: boolean = false): Promise<UserFile[]> {
+  const url = includeDeleted ? '/api/files?include_deleted=true' : '/api/files'
+  const response = await fetch(url)
   
   if (!response.ok) {
     const errorData: ApiResponse = await response.json()
@@ -111,10 +112,10 @@ const filesKeys = {
 /**
  * Hook for fetching the list of user files
  */
-export function useFilesList() {
+export function useFilesList(includeDeleted: boolean = false) {
   return useQuery({
-    queryKey: filesKeys.lists(),
-    queryFn: fetchFiles,
+    queryKey: [...filesKeys.lists(), includeDeleted ? 'with-deleted' : 'active-only'],
+    queryFn: () => fetchFiles(includeDeleted),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }

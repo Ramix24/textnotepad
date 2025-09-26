@@ -49,7 +49,9 @@ interface DefaultContextContentProps {
 }
 
 function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }: DefaultContextContentProps) {
-  const { data: files = [], isLoading } = useFilesList()
+  // Include deleted files when in trash mode
+  const includeDeleted = selection.mode === 'trash'
+  const { data: files = [], isLoading } = useFilesList(includeDeleted)
   
   // Edge case: Invalid folder detection and recovery is now handled by FoldersPanel with real data
 

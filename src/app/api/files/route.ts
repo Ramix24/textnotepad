@@ -16,9 +16,11 @@ interface CreateFileRequest {
 /**
  * GET /api/files - List all files for authenticated user
  */
-export async function GET(): Promise<NextResponse<ApiResponse<UserFile[]>>> {
+export async function GET(request: NextRequest): Promise<NextResponse<ApiResponse<UserFile[]>>> {
   try {
     const supabase = await createServerClient()
+    const url = new URL(request.url)
+    const includeDeleted = url.searchParams.get('include_deleted') === 'true'
     
     // Check authentication
     const { data: { session }, error: authError } = await supabase.auth.getSession()
@@ -29,7 +31,7 @@ export async function GET(): Promise<NextResponse<ApiResponse<UserFile[]>>> {
       )
     }
 
-    const files = await listFilesForUser(supabase)
+    const files = await listFilesForUser(supabase, includeDeleted)
     
     return NextResponse.json({ data: files })
   } catch (error) {
