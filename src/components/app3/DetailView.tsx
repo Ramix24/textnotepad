@@ -227,22 +227,6 @@ function MessagesPlaceholder() {
   )
 }
 
-function TrashPlaceholder() {
-  return (
-    <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-border-dark to-bg-secondary mb-6 flex items-center justify-center border border-border-dark">
-        <div className="w-8 h-8 rounded-lg bg-bg-secondary flex items-center justify-center">
-          <span className="text-lg">🗑️</span>
-        </div>
-      </div>
-      
-      <h3 className="text-lg font-medium text-text-primary mb-2">Trash</h3>
-      <p className="text-sm text-text-secondary leading-relaxed max-w-[300px] mb-6">
-        Deleted items and their previews will appear here. Select an item from the trash list to view or restore it.
-      </p>
-    </div>
-  )
-}
 
 function DetailViewError({ error }: { error: string }) {
   return (
