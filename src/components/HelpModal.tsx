@@ -140,7 +140,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
               />
               <ShortcutRow 
                 trigger="Ctrl+K" 
-                description="Global search (when not in editor)" 
+                description="Open search interface" 
               />
               <ShortcutRow 
                 trigger="Ctrl+/" 
@@ -150,6 +150,42 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
                 trigger="?" 
                 description="Show this help modal" 
               />
+            </div>
+          </section>
+
+          {/* Search Features */}
+          <section>
+            <h3 className="text-lg font-medium text-text-primary mb-4 flex items-center gap-2">
+              🔍 <span>Search Features</span>
+            </h3>
+            <div className="grid gap-3">
+              <ShortcutRow 
+                trigger="Search by title/content" 
+                description="Type to search through all your notes instantly" 
+              />
+              <ShortcutRow 
+                trigger="Tasks filter" 
+                description="Find notes with tasks (- [ ] or - [x])" 
+              />
+              <ShortcutRow 
+                trigger="Recent filter" 
+                description="Show notes updated within last 7 days" 
+              />
+              <ShortcutRow 
+                trigger="Click TextNotepad.com" 
+                description="Open search interface (C2: all notes, C3: search)" 
+              />
+              <ShortcutRow 
+                trigger="All Notes button" 
+                description="Show all notes with search interface" 
+              />
+            </div>
+            <div className="mt-4 p-3 bg-bg-secondary rounded-lg">
+              <h4 className="text-sm font-medium text-text-primary mb-2">Task Detection:</h4>
+              <div className="space-y-1 text-sm text-text-secondary">
+                <p>• <code className="bg-bg-active px-1 rounded">- [ ] Buy groceries</code> → Unchecked task</p>
+                <p>• <code className="bg-bg-active px-1 rounded">- [x] Finished work</code> → Completed task</p>
+              </div>
             </div>
           </section>
 

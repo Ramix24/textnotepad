@@ -74,7 +74,8 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
     currentFolderId: selection.mode === 'notes' ? selection.folderId : null,
     onFileSelect: (fileId) => {
       onSelectionChange({ 
-        ...selection,
+        mode: 'notes', // Always switch to notes mode when selecting a file
+        folderId: selection.mode === 'search' ? null : selection.folderId, // Keep current folder unless in search mode
         fileId
       })
       onMobileAdvance?.() // Auto-advance to pane 3 on mobile

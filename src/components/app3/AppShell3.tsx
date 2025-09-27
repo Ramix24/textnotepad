@@ -263,6 +263,21 @@ export function AppShell3({
           <div className="flex-1"></div>
 
           <div className="flex items-center gap-4">
+            {/* Search Button */}
+            <button
+              onClick={() => {
+                layout.setSelection({ mode: 'search', folderId: null, fileId: null, searchQuery: '' })
+                if (layout.isMobile || layout.isTablet) {
+                  layout.setActivePane(3)
+                }
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-[color:var(--bg-active)]/40 rounded transition-colors"
+              title="Open search interface (Ctrl+K)"
+            >
+              <Search className="w-4 h-4" />
+              <span className="hidden sm:inline">Search</span>
+            </button>
+            
             {/* Help Button */}
             <button
               onClick={() => setIsHelpOpen(true)}
