@@ -39,6 +39,8 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   
   // Refs for managing focus and keyboard shortcuts
   const wasFocusedRef = useRef(false)
+  const isActivelyTypingRef = useRef(false)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   
   // Markdown editor hook with keyboard shortcuts
   const { 
@@ -55,6 +57,19 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     onChange: (newContent: string) => {
       // Skip changes if in read-only mode
       if (readOnly) return
+      
+      // Mark user as actively typing
+      isActivelyTypingRef.current = true
+      
+      // Clear existing typing timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+      
+      // Set timeout to mark typing as stopped after 2 seconds
+      typingTimeoutRef.current = setTimeout(() => {
+        isActivelyTypingRef.current = false
+      }, 2000)
       
       // Trigger autosave
       markDirty(newContent)
@@ -81,7 +96,16 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   const { isSaving, hasPendingChanges, markDirty, forceSave } = useAutosave({
     file,
     onSaved: (updatedFile) => {
-      onFileUpdate?.(updatedFile)
+      // Only update file metadata, never the content during active typing
+      if (!isActivelyTypingRef.current) {
+        onFileUpdate?.(updatedFile)
+      } else {
+        // Update only the file metadata (version, timestamps) but preserve current content
+        onFileUpdate?.({
+          ...updatedFile,
+          content: content // Preserve current editor content
+        })
+      }
       
       // Restore focus if it was focused before save
       if (wasFocusedRef.current && textareaRef.current) {
@@ -89,11 +113,19 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
       }
     },
     onConflict: (conflictingFile) => {
-      // Handle version conflict - refresh content with server version
-      setContent(conflictingFile.content)
-      toast.warning('File was updated elsewhere', {
-        description: 'Your content has been refreshed with the latest version.'
-      })
+      // Only update content if user is not actively typing
+      if (!isActivelyTypingRef.current) {
+        setContent(conflictingFile.content)
+        toast.warning('File was updated elsewhere', {
+          description: 'Your content has been refreshed with the latest version.'
+        })
+      } else {
+        // Defer the conflict resolution until user stops typing
+        toast.warning('File conflict detected', {
+          description: 'The file was modified elsewhere. Changes will sync when you finish typing.',
+          duration: 5000
+        })
+      }
     },
     config: {
       debounceMs: 1000 // Save 1 second after typing stops
@@ -147,6 +179,15 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     
     initializeStats()
   }, [content, computeStats])
+
+  // Cleanup typing timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+    }
+  }, [])
 
   // Track dirty state for UI indicators
   const isDirty = content !== file.content || hasPendingChanges

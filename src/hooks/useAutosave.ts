@@ -171,7 +171,7 @@ export function useAutosave({
     // Schedule new save - this will get the latest content from the ref
     debounceTimerRef.current = setTimeout(() => {
       const contentToSave = pendingContentRef.current
-      if (contentToSave !== null) {
+      if (contentToSave !== null && !saveMutation.isPending) {
         // Clear pending content and start save
         pendingContentRef.current = null
         saveMutation.mutate(contentToSave)
