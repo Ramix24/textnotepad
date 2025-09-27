@@ -34,6 +34,15 @@ export function SearchInterface({
       setShowFilters(false)
     }
   }, [selection.mode])
+  
+  // Clear search when searchQuery is explicitly set to empty (for re-triggering search)
+  useEffect(() => {
+    if (selection.searchQuery === '') {
+      setSearchQuery('')
+      setActiveFilter('all')
+      setShowFilters(false)
+    }
+  }, [selection.searchQuery])
 
   // Update selection when search query changes
   useEffect(() => {
