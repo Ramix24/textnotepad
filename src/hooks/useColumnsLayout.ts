@@ -49,7 +49,7 @@ function migrateSelection(stored: any): AppSelection {
   
   // If it's already the new format, validate and sanitize
   if ('mode' in stored) {
-    const validModes = ['notes', 'messages', 'search']
+    const validModes = ['notes', 'messages', 'search', 'help']
     const mode = validModes.includes(stored.mode) ? stored.mode : 'search'
     
     // Validate folderId - should be null or string (actual validation happens in FoldersPanel)

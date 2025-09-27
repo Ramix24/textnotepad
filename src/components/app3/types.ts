@@ -25,7 +25,7 @@ export interface LayoutActions {
   setIsResizing: (resizing: boolean) => void
 }
 
-export type Mode = 'notes' | 'messages' | 'search'
+export type Mode = 'notes' | 'messages' | 'search' | 'help'
 
 // Legacy type for compatibility - remove when SectionsRail is fully replaced
 export type Section = 'folders' | 'notes' | 'messages' | 'trash'

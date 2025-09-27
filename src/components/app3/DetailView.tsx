@@ -5,6 +5,7 @@ import { useFileById } from '@/hooks/useFiles'
 import { Editor } from '@/components/Editor'
 import { EditorSkeleton } from '@/components/EditorSkeleton'
 import { SearchInterface } from './SearchInterface'
+import { HelpInterface } from './HelpInterface'
 import type { AppSelection } from './types'
 
 interface DetailViewProps {
@@ -38,6 +39,10 @@ export function DetailView({
             selection={selection}
             onSelectionChange={onSelectionChange!}
             onMobileAdvance={onMobileAdvance}
+            className="h-full"
+          />
+        ) : selection.mode === 'help' ? (
+          <HelpInterface 
             className="h-full"
           />
         ) : (
@@ -178,7 +183,7 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
   return <DetailViewEmpty mode="notes" />
 }
 
-function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' | 'search' }) {
+function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' | 'search' | 'help' }) {
   const getEmptyContent = () => {
     switch (mode) {
       case 'notes':
@@ -207,6 +212,13 @@ function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' | 'sea
           icon: '🔍',
           title: 'Search your notes',
           description: 'Use the search interface to find notes by title or content.',
+          showActions: false
+        }
+      case 'help':
+        return {
+          icon: '⌨️',
+          title: 'Help & Shortcuts',
+          description: 'Learn keyboard shortcuts, markdown syntax, and search features.',
           showActions: false
         }
     }

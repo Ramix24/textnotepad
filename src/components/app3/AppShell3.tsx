@@ -11,7 +11,6 @@ import { FoldersPanel } from './FoldersPanel'
 import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
 import { ThemeToggle } from '@/components/theme-toggle'
-import { HelpModal } from '@/components/HelpModal'
 import { BookOpen, FileText, HelpCircle, Search } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -34,7 +33,6 @@ export function AppShell3({
   const containerRef = useRef<HTMLDivElement>(null)
   const { supabase } = useSupabase()
   const { user } = useAuthSession()
-  const [isHelpOpen, setIsHelpOpen] = React.useState(false)
   
   // Refs for focusing columns
   const sectionsRef = useRef<HTMLDivElement>(null)
@@ -167,13 +165,19 @@ export function AppShell3({
         }
       } else if ((e.metaKey || e.ctrlKey) && e.key === '/') {
         e.preventDefault()
-        setIsHelpOpen(true)
+        layout.setSelection({ mode: 'help', folderId: null, fileId: null })
+        if (layout.isMobile || layout.isTablet) {
+          layout.setActivePane(3)
+        }
       } else if (e.key === '?' && !e.metaKey && !e.ctrlKey && !e.altKey) {
         // Only trigger if not in an input field
         const activeElement = document.activeElement
         if (activeElement?.tagName !== 'INPUT' && activeElement?.tagName !== 'TEXTAREA') {
           e.preventDefault()
-          setIsHelpOpen(true)
+          layout.setSelection({ mode: 'help', folderId: null, fileId: null })
+          if (layout.isMobile || layout.isTablet) {
+            layout.setActivePane(3)
+          }
         }
       }
     }
@@ -280,7 +284,12 @@ export function AppShell3({
             
             {/* Help Button */}
             <button
-              onClick={() => setIsHelpOpen(true)}
+              onClick={() => {
+                layout.setSelection({ mode: 'help', folderId: null, fileId: null })
+                if (layout.isMobile || layout.isTablet) {
+                  layout.setActivePane(3)
+                }
+              }}
               className="flex items-center gap-2 px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-[color:var(--bg-active)]/40 rounded transition-colors"
               title="Keyboard shortcuts (Ctrl+/ or ?)"
             >
@@ -408,12 +417,6 @@ export function AppShell3({
       {/* Mobile tab bar */}
       {layout.breakpoint === 'mobile' && <MobileTabBar />}
 
-      
-      {/* Help Modal */}
-      <HelpModal
-        isOpen={isHelpOpen}
-        onClose={() => setIsHelpOpen(false)}
-      />
     </div>
   )
 }
