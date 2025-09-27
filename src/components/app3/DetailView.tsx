@@ -134,6 +134,10 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
 
   // No file selected in notes mode
   if (!selection.fileId) {
+    // Show different empty state for INBOX vs other modes
+    if (selection.folderId === 'inbox') {
+      return <DetailViewEmpty mode="inbox" />
+    }
     return <DetailViewEmpty mode="notes" />
   }
 
@@ -183,9 +187,16 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
   return <DetailViewEmpty mode="notes" />
 }
 
-function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' | 'search' | 'help' }) {
+function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' | 'search' | 'help' | 'inbox' }) {
   const getEmptyContent = () => {
     switch (mode) {
+      case 'inbox':
+        return {
+          icon: '📥',
+          title: 'Welcome to your INBOX',
+          description: 'Select a note from the list or create a new note using the button in the header.',
+          showActions: false
+        }
       case 'notes':
         return {
           icon: '🔒',

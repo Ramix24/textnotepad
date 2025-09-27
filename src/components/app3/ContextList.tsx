@@ -194,8 +194,8 @@ function getFilteredFiles(files: UserFile[], selection: AppSelection): UserFile[
   }
   
   if (selection.folderId === 'inbox') {
-    // INBOX: show uncategorized notes (folder_id = null)
-    return files.filter(f => !f.deleted_at && !(f as any).folder_id)
+    // INBOX: show uncategorized notes (folder_id = null or undefined)
+    return files.filter(f => !f.deleted_at && ((f as any).folder_id === null || (f as any).folder_id === undefined))
   }
   
   if (selection.mode === 'notes') {
