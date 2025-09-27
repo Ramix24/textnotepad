@@ -2,12 +2,17 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useCountersWorker, type CountResult } from '@/hooks/useCountersWorker'
 import { useAutosave } from '@/hooks/useAutosave'
 import { UserFile } from '@/types/user-files.types'
 import { cn } from '@/lib/utils'
 import { useAuthSession } from '@/hooks/useAuthSession'
+import { useMarkdownEditor } from '../../hooks/useMarkdownEditor'
+import { EditorHeader } from '../../components/editor/EditorHeader'
+import { MarkdownToolbar } from '../../components/editor/MarkdownToolbar'
+import { MarkdownPreview } from '../../components/editor/MarkdownPreview'
 
 interface EditorProps {
   file: UserFile
@@ -30,12 +35,39 @@ interface EditorProps {
  */
 export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly = false }: EditorProps) {
   // Local state management
-  const [content, setContent] = useState(file.content)
   const [stats, setStats] = useState<CountResult | null>(null)
   
   // Refs for managing focus and keyboard shortcuts
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const wasFocusedRef = useRef(false)
+  
+  // Markdown editor hook with keyboard shortcuts
+  const { 
+    content, 
+    setContent, 
+    viewMode, 
+    setMode, 
+    textareaRef, 
+    handleKeyDown: handleMarkdownKeyDown, 
+    insertLink 
+  } = useMarkdownEditor(file.content, {
+    onChange: (newContent: string) => {
+      // Skip changes if in read-only mode
+      if (readOnly) return
+      
+      // Trigger autosave
+      markDirty(newContent)
+      
+      // Set dirty state for UI indicators
+      onDirtyChange?.(file.id, true)
+      
+      // Calculate statistics asynchronously (don't await)
+      computeStats(newContent).then(newStats => {
+        setStats(newStats)
+      }).catch(() => {
+        // Ignore stats calculation errors
+      })
+    }
+  })
   
   // Auth session for logout detection
   const { user } = useAuthSession()
@@ -48,9 +80,6 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     file,
     onSaved: (updatedFile) => {
       onFileUpdate?.(updatedFile)
-      // Show brief "just saved" indicator
-      setJustSaved(true)
-      setTimeout(() => setJustSaved(false), 1500)
       
       // Restore focus if it was focused before save
       if (wasFocusedRef.current && textareaRef.current) {
@@ -69,31 +98,18 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     }
   })
 
-  // Handle content changes
-  const handleContentChange = useCallback((newContent: string) => {
-    // Skip changes if in read-only mode
+  // Handle file name changes
+  const handleNameChange = useCallback((newName: string) => {
     if (readOnly) return
-    
-    // Update content immediately for responsive typing
-    setContent(newContent)
-    
-    // Trigger autosave
-    markDirty(newContent)
-    
-    // Set dirty state for UI indicators
-    onDirtyChange?.(file.id, true)
-    
-    // Calculate statistics asynchronously (don't await)
-    computeStats(newContent).then(newStats => {
-      setStats(newStats)
-    }).catch(() => {
-      // Ignore stats calculation errors
-    })
-  }, [readOnly, markDirty, file.id, onDirtyChange, computeStats])
+    onFileUpdate?.({ ...file, name: newName })
+  }, [readOnly, file, onFileUpdate])
 
 
-  // Keyboard shortcuts
-  const handleKeyDown = useCallback(async (event: React.KeyboardEvent) => {
+  // Combined keyboard shortcuts
+  const handleKeyDown = useCallback(async (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Handle markdown shortcuts first
+    handleMarkdownKeyDown(event)
+    
     // Ctrl/Cmd + S for force save
     if ((event.ctrlKey || event.metaKey) && event.key === 's') {
       event.preventDefault()
@@ -102,7 +118,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         await forceSave()
       }
     }
-  }, [isSaving, forceSave])
+  }, [isSaving, forceSave, handleMarkdownKeyDown])
 
   // Force save on blur (when user clicks away or tabs out)
   const handleBlur = useCallback(async () => {
@@ -111,22 +127,10 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     }
   }, [isSaving, forceSave])
 
-  // Initialize content when file prop changes (only run when file is actually different)
-  const prevFileRef = useRef<UserFile | null>(null)
-  
+  // Update dirty state based on content changes
   useEffect(() => {
-    // Only update if the file has actually changed (by ID and version)
-    if (!prevFileRef.current || 
-        prevFileRef.current.id !== file.id || 
-        prevFileRef.current.version !== file.version) {
-      
-      setContent(file.content)
-      onDirtyChange?.(file.id, false)
-      
-      // Update the ref to track the current file
-      prevFileRef.current = file
-    }
-  }, [file, onDirtyChange])
+    onDirtyChange?.(file.id, content !== file.content)
+  }, [content, file.content, file.id, onDirtyChange])
 
   // Initialize stats on mount
   useEffect(() => {
@@ -143,43 +147,11 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   }, [content, computeStats])
 
   // Track dirty state for UI indicators
-  const [isDirty, setIsDirty] = useState(false)
-  const [justSaved, setJustSaved] = useState(false)
-  
-  // Update dirty state when content changes (with debounce to avoid flicker)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsDirty(content !== file.content)
-    }, 100)
-    return () => clearTimeout(timer)
-  }, [content, file.content])
-  
-  // Clear dirty state when save completes
-  useEffect(() => {
-    if (!isSaving && content === file.content) {
-      setIsDirty(false)
-      onDirtyChange?.(file.id, false)
-    } else if (isDirty) {
-      onDirtyChange?.(file.id, true)
-    }
-  }, [isSaving, isDirty, content, file.content, file.id, onDirtyChange])
+  const isDirty = content !== file.content
 
-  // Save status text
-  const getSaveStatus = () => {
-    if (!user) return '⚠ Not signed in'
-    if (isSaving) return 'Saving…'
-    if (justSaved) return '✓ Saved'
-    if (isDirty) return 'Typing...'
-    return 'Saved'
-  }
-
-  // Save status color
-  const getSaveStatusColor = () => {
-    if (!user) return 'text-red-600 dark:text-red-400'
-    if (isSaving) return 'text-blue-600 dark:text-blue-400'
-    if (justSaved) return 'text-green-600 dark:text-green-400'
-    if (isDirty) return 'text-gray-500 dark:text-gray-400'
-    return 'text-green-600 dark:text-green-400'
+  // Format time for display
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString()
   }
 
   return (
@@ -205,65 +177,125 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         </div>
       )}
       
-      {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border-dark bg-bg-secondary">
-        <div className="flex items-center space-x-2">
-          {/* File name with dirty indicator */}
-          <h1 className="text-lg font-medium text-text-primary">
-            {file.name}
-          </h1>
-          {isDirty && (
-            <span 
-              className="text-amber-600 dark:text-amber-400 text-xl leading-none"
-              title="Unsaved changes"
-              aria-label="Unsaved changes"
-            >
-              ●
-            </span>
-          )}
-          
-          {/* File metadata */}
-          <span className="text-sm text-text-secondary">
-            v{file.version}
-          </span>
+      {/* Editor Header */}
+      <EditorHeader
+        name={file.name}
+        version={file.version}
+        savedAt={formatTime(file.updated_at)}
+        saving={isSaving}
+        isDirty={isDirty}
+        onNameChange={handleNameChange}
+      />
+      
+      {/* Markdown Toolbar */}
+      {!readOnly && (
+        <MarkdownToolbar
+          textareaRef={textareaRef}
+          setContent={setContent}
+          insertLink={insertLink}
+          disabled={!user}
+        />
+      )}
+      
+      {/* View Mode Toggle */}
+      <div className="h-10 bg-bg-secondary border-b border-border-dark flex items-center justify-between px-3">
+        <div className="flex items-center gap-1">
+          <Button
+            variant={viewMode === 'edit' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setMode('edit')}
+            disabled={readOnly}
+            className="text-xs h-7"
+          >
+            Edit
+          </Button>
+          <Button
+            variant={viewMode === 'preview' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setMode('preview')}
+            disabled={readOnly}
+            className="text-xs h-7"
+          >
+            Preview
+          </Button>
+          <Button
+            variant={viewMode === 'split' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setMode('split')}
+            disabled={readOnly}
+            className="text-xs h-7"
+          >
+            Split
+          </Button>
         </div>
         
-        {/* Save status */}
-        <div className="flex items-center space-x-3">
-          <span className={cn('text-sm font-medium', getSaveStatusColor())}>
-            {getSaveStatus()}
-          </span>
+        <div className="text-xs text-text-secondary">
+          Shortcuts: Ctrl+B (bold), Ctrl+I (italic), Ctrl+K (link), Ctrl+Shift+P (preview)
         </div>
       </div>
 
       {/* Main editor area */}
-      <div className="flex-1 flex flex-col">
-        <textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(e) => handleContentChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={handleBlur}
-          onFocus={() => { wasFocusedRef.current = true }}
-          className={cn(
-            'flex-1 w-full p-4 bg-bg-primary text-text-primary',
-            'font-mono text-sm leading-relaxed', // Monospace for code-like editing
-            'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
-            'resize-none placeholder:text-text-secondary',
-            !user && 'opacity-50 cursor-not-allowed',
-            readOnly && 'opacity-75 cursor-default bg-bg-secondary'
-          )}
-          placeholder={!user ? "Please sign in to edit your notes..." : readOnly ? "This file is read-only..." : "Start typing your content here..."}
-          disabled={!user}
-          readOnly={readOnly}
-          aria-label={readOnly ? "Text editor (read-only)" : "Text editor"}
-          aria-describedby="editor-stats"
-          spellCheck={true}
-          autoComplete="off"
-          data-testid="editor-textarea"
-          autoCorrect="off"
-          autoCapitalize="sentences"
-        />
+      <div className="flex-1 overflow-auto">
+        {viewMode === 'split' ? (
+          <div className="flex h-full">
+            {/* Editor pane */}
+            <div className="flex-1 border-r border-border-dark">
+              <textarea
+                ref={textareaRef}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={handleBlur}
+                onFocus={() => { wasFocusedRef.current = true }}
+                className={cn(
+                  'w-full h-full p-4 bg-bg-primary text-text-primary',
+                  'font-mono text-sm leading-relaxed',
+                  'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
+                  'resize-none placeholder:text-text-secondary',
+                  !user && 'opacity-50 cursor-not-allowed',
+                  readOnly && 'opacity-75 cursor-default bg-bg-secondary'
+                )}
+                placeholder={!user ? "Please sign in to edit your notes..." : readOnly ? "This file is read-only..." : "Start writing in Markdown..."}
+                disabled={!user}
+                readOnly={readOnly}
+                aria-label={readOnly ? "Markdown editor (read-only)" : "Markdown editor"}
+                spellCheck={true}
+                autoComplete="off"
+                data-testid="editor-textarea"
+              />
+            </div>
+            {/* Preview pane */}
+            <div className="flex-1">
+              <MarkdownPreview content={content} className="h-full overflow-auto" />
+            </div>
+          </div>
+        ) : viewMode === 'preview' ? (
+          <MarkdownPreview content={content} className="h-full overflow-auto" />
+        ) : (
+          <textarea
+            ref={textareaRef}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            onFocus={() => { wasFocusedRef.current = true }}
+            className={cn(
+              'w-full h-full p-4 bg-bg-primary text-text-primary',
+              'font-mono text-sm leading-relaxed',
+              'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
+              'resize-none placeholder:text-text-secondary',
+              !user && 'opacity-50 cursor-not-allowed',
+              readOnly && 'opacity-75 cursor-default bg-bg-secondary'
+            )}
+            placeholder={!user ? "Please sign in to edit your notes..." : readOnly ? "This file is read-only..." : "Start writing in Markdown..."}
+            disabled={!user}
+            readOnly={readOnly}
+            aria-label={readOnly ? "Markdown editor (read-only)" : "Markdown editor"}
+            spellCheck={true}
+            autoComplete="off"
+            data-testid="editor-textarea"
+          />
+        )}
       </div>
 
       {/* Status bar */}
