@@ -176,10 +176,11 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
 
   // Edge case: Validate current selection against available folders
   useEffect(() => {
-    if (isFeatureEnabled && selection.folderId && selection.folderId !== 'all' && selection.folderId !== 'trash' && !isLoading) {
+    if (isFeatureEnabled && selection.folderId && selection.folderId !== 'all' && selection.folderId !== 'trash' && selection.folderId !== 'inbox' && !isLoading) {
       const folderExists = folders.some(f => f.id === selection.folderId)
       if (!folderExists) {
         // Invalid folder selection, falling back to All Notes
+        console.log('🔍 DEBUG: Invalid folder detected, falling back to All Notes. folderId:', selection.folderId)
         onFolderSelect(null)
         return
       }
