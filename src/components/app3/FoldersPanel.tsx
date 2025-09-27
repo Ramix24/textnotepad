@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode, useRef, useEffect, KeyboardEvent } from 'react'
-import { FileText, BookOpen } from 'lucide-react'
+import { FileText, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useFoldersList, useCreateFolder, useRenameFolder, useDeleteFolder } from '@/hooks/useFolders'
 import type { AppSelection } from './types'
 
@@ -11,6 +11,8 @@ interface FoldersPanelProps {
   selection: AppSelection
   onSelectionChange: (selection: Partial<AppSelection>) => void
   onMobileAdvance?: () => void // For mobile navigation to pane 2
+  isCollapsed?: boolean
+  onToggleCollapsed?: () => void
 }
 
 export function FoldersPanel({ 
@@ -18,7 +20,9 @@ export function FoldersPanel({
   className = '',
   selection,
   onSelectionChange,
-  onMobileAdvance
+  onMobileAdvance,
+  isCollapsed = false,
+  onToggleCollapsed
 }: FoldersPanelProps) {
   
   return (
@@ -32,6 +36,8 @@ export function FoldersPanel({
           selection={selection}
           onSelectionChange={onSelectionChange}
           onMobileAdvance={onMobileAdvance}
+          isCollapsed={isCollapsed}
+          onToggleCollapsed={onToggleCollapsed}
         />
       )}
     </div>
@@ -42,9 +48,11 @@ interface DefaultFoldersContentProps {
   selection: AppSelection
   onSelectionChange: (selection: Partial<AppSelection>) => void
   onMobileAdvance?: () => void
+  isCollapsed?: boolean
+  onToggleCollapsed?: () => void
 }
 
-function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }: DefaultFoldersContentProps) {
+function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance, isCollapsed = false, onToggleCollapsed }: DefaultFoldersContentProps) {
   const createFolder = useCreateFolder()
   
   const handleTrashSelect = () => {
@@ -73,14 +81,31 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
       {/* Header toolbar */}
       <header className="flex-shrink-0 px-4 py-3 border-b border-border-dark bg-bg-secondary">
         <div className="flex items-center justify-between">
-          <button
-            onClick={handleCreateFolder}
-            disabled={createFolder.isPending}
-            className="px-3 py-1.5 text-xs font-medium bg-accent-blue text-white rounded-md hover:opacity-90 disabled:opacity-50 transition-colors"
-            title="Create new folder"
-          >
-            {createFolder.isPending ? 'Creating...' : 'New Folder'}
-          </button>
+          {!isCollapsed && (
+            <button
+              onClick={handleCreateFolder}
+              disabled={createFolder.isPending}
+              className="px-3 py-1.5 text-xs font-medium bg-accent-blue text-white rounded-md hover:opacity-90 disabled:opacity-50 transition-colors"
+              title="Create new folder"
+            >
+              {createFolder.isPending ? 'Creating...' : 'New Folder'}
+            </button>
+          )}
+          
+          {/* Toggle button */}
+          {onToggleCollapsed && (
+            <button
+              onClick={onToggleCollapsed}
+              className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-bg-active rounded transition-colors ml-auto"
+              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {isCollapsed ? (
+                <ChevronRight className="w-4 h-4" />
+              ) : (
+                <ChevronLeft className="w-4 h-4" />
+              )}
+            </button>
+          )}
         </div>
       </header>
       
@@ -100,6 +125,7 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
             onSelectionChange({ mode: 'search', folderId: null, fileId: null, searchQuery: '' })
             onMobileAdvance?.()
           }}
+          isCollapsed={isCollapsed}
         />
       </div>
     </div>
@@ -111,9 +137,10 @@ interface FoldersListProps {
   onFolderSelect: (folderId: string | null) => void
   onTrashSelect: () => void
   onAllNotesSelect: () => void
+  isCollapsed?: boolean
 }
 
-function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelect }: FoldersListProps) {
+function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelect, isCollapsed = false }: FoldersListProps) {
   const { data: folders = [], isLoading, error } = useFoldersList()
   const renameFolder = useRenameFolder()
   const deleteFolder = useDeleteFolder()
@@ -231,10 +258,11 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
       <div className="p-3">
         <button
           onClick={onAllNotesSelect}
-          className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
+          className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
+          title={isCollapsed ? "All Notes" : undefined}
         >
           <FileText className="h-4 w-4 text-text-secondary" />
-          <span className="font-medium">All Notes</span>
+          {!isCollapsed && <span className="font-medium">All Notes</span>}
         </button>
       </div>
     )
@@ -247,17 +275,18 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
           {/* All Notes button */}
           <button
             onClick={onAllNotesSelect}
-            className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
+            title={isCollapsed ? "All Notes" : undefined}
           >
             <FileText className="h-4 w-4 text-text-secondary" />
-            <span className="font-medium">All Notes</span>
+            {!isCollapsed && <span className="font-medium transition-opacity duration-300">All Notes</span>}
           </button>
           
           {/* Loading skeleton for folders */}
           {[1, 2, 3].map((i) => (
-            <div key={i} className="w-full flex items-center gap-3 p-2">
+            <div key={i} className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'}`}>
               <BookOpen className="h-4 w-4 text-text-secondary" />
-              <div className="h-4 w-20 bg-gray-300 dark:bg-gray-700 rounded animate-pulse" />
+              {!isCollapsed && <div className="h-4 w-20 bg-gray-300 dark:bg-gray-700 rounded animate-pulse" />}
             </div>
           ))}
         </div>
@@ -273,10 +302,11 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
           {/* All Notes button - always available */}
           <button
             onClick={onAllNotesSelect}
-            className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
+            title={isCollapsed ? "All Notes" : undefined}
           >
             <FileText className="h-4 w-4 text-text-secondary" />
-            <span className="font-medium">All Notes</span>
+            {!isCollapsed && <span className="font-medium transition-opacity duration-300">All Notes</span>}
           </button>
         </div>
         
@@ -308,17 +338,18 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
           onClick={onAllNotesSelect}
           tabIndex={-1}
           className={`
-            w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
+            w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
             ${selection.folderId === null && (selection.mode === 'notes' || selection.mode === 'search')
               ? 'bg-accent-blue text-white'
               : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
             }
           `}
+          title={isCollapsed ? "All Notes" : undefined}
         >
           <svg className={`w-4 h-4 ${selection.folderId === null && (selection.mode === 'notes' || selection.mode === 'search') ? 'text-white' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <span className="font-medium">All Notes</span>
+          {!isCollapsed && <span className="font-medium">All Notes</span>}
         </button>
 
         {/* Individual folders */}
@@ -334,20 +365,22 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
               onClick={() => onFolderSelect(folder.id)}
               tabIndex={-1}
               className={`
-                w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400 pr-16
+                w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2 pr-16'} rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
                 ${selection.folderId === folder.id
                   ? 'bg-accent-blue text-white'
                   : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
                 }
               `}
+              title={isCollapsed ? folder.name : undefined}
             >
               <svg className={`w-4 h-4 ${selection.folderId === folder.id ? 'text-white' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
               </svg>
-              <span className="font-medium">{folder.name}</span>
+              {!isCollapsed && <span className="font-medium transition-opacity duration-300">{folder.name}</span>}
             </button>
             
-            {/* Context menu for folder actions */}
+            {/* Context menu for folder actions - hide when collapsed */}
+            {!isCollapsed && (
             <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
               <button
                 onClick={(e) => {
@@ -374,6 +407,7 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
                 </svg>
               </button>
             </div>
+            )}
           </div>
         ))}
 
@@ -385,17 +419,18 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
           onClick={onTrashSelect}
           tabIndex={-1}
           className={`
-            w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
+            w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
             ${selection.folderId === 'trash'
               ? 'bg-accent-blue text-white'
               : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
             }
           `}
+          title={isCollapsed ? "Trash" : undefined}
         >
           <svg className={`w-4 h-4 ${selection.folderId === 'trash' ? 'text-white' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
-          <span className="font-medium">Trash</span>
+          {!isCollapsed && <span className="font-medium transition-opacity duration-300">Trash</span>}
         </button>
         </div>
       

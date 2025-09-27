@@ -174,6 +174,22 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
     )
   }
 
+  if (selection.mode === 'help') {
+    // In help mode, maintain search view in C2 (show all notes)
+    const allNotes = files.filter(f => !f.deleted_at)
+    return (
+      <NotesView 
+        files={allNotes}
+        isLoading={isLoading}
+        selectedFileId={selection.fileId}
+        onFileSelect={handleFileSelect}
+        onNewNote={handleNewNote}
+        fileOps={fileOps}
+        selection={selection}
+      />
+    )
+  }
+
   return null
 }
 
@@ -199,6 +215,11 @@ function getFilteredFiles(files: UserFile[], selection: AppSelection): UserFile[
   
   if (selection.mode === 'search') {
     // In search mode, always show all notes (like All Notes)
+    return files.filter(f => !f.deleted_at)
+  }
+  
+  if (selection.mode === 'help') {
+    // In help mode, show all notes (like search mode)
     return files.filter(f => !f.deleted_at)
   }
   

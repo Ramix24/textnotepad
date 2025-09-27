@@ -5,7 +5,8 @@ export interface BreakpointConfig {
 }
 
 export interface ColumnWidths {
-  col1: number // Fixed width for sections rail
+  col1: number // Width for sections rail when expanded
+  col1Collapsed: number // Width for sections rail when collapsed (icon-only)
   col2: number // Resizable width for context list
   col2Min: number
   col2Max: number
@@ -17,12 +18,14 @@ export interface LayoutState {
   activePanel: 'sections' | 'list' | 'detail' // For tablet/mobile switching
   col2Width: number
   isResizing: boolean
+  isCol1Collapsed: boolean // Whether C1 is collapsed to icon-only view
 }
 
 export interface LayoutActions {
   setActivePanel: (panel: LayoutState['activePanel']) => void
   setCol2Width: (width: number) => void
   setIsResizing: (resizing: boolean) => void
+  toggleCol1Collapsed: () => void
 }
 
 export type Mode = 'notes' | 'messages' | 'search' | 'help'

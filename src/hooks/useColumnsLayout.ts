@@ -23,7 +23,8 @@ const COL2_MIN = 260
 const COL2_MAX = 560
 
 const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
-  col1: 200, // Fixed folders panel width (increased from 76px for folder names)
+  col1: 200, // Expanded folders panel width 
+  col1Collapsed: 48, // Collapsed folders panel width (icon-only)
   col2: 360, // Default context list width  
   col2Min: COL2_MIN,
   col2Max: COL2_MAX,
@@ -40,7 +41,8 @@ const DEFAULT_SELECTION: AppSelection = {
 const STORAGE_KEYS = {
   COL2_WIDTH: 'layout:c2w',
   ACTIVE_PANEL: 'layout:active-panel', 
-  SELECTION: 'tnp:selection' // New key for folder-based selection
+  SELECTION: 'tnp:selection', // New key for folder-based selection
+  COL1_COLLAPSED: 'layout:c1-collapsed'
 }
 
 // Migration function to handle old selection format
@@ -139,6 +141,10 @@ export function useColumnsLayout(
   )
   
   const [isResizing, setIsResizing] = useState(false)
+  
+  const [isCol1Collapsed, setIsCol1Collapsed] = useState(() =>
+    getPreference(STORAGE_KEYS.COL1_COLLAPSED, false)
+  )
 
   // Selection state with migration and URL sync
   const [selection, setSelectionState] = useState<AppSelection>(() => {
@@ -188,6 +194,15 @@ export function useColumnsLayout(
 
     setIsResizing: useCallback((resizing: boolean) => {
       setIsResizing(resizing)
+    }, []),
+
+    toggleCol1Collapsed: useCallback(() => {
+      setIsCol1Collapsed(prev => {
+        const newValue = !prev
+        // Persist immediately
+        setTimeout(() => getPreference(STORAGE_KEYS.COL1_COLLAPSED, newValue), 0)
+        return newValue
+      })
     }, [])
   }
 
@@ -239,7 +254,8 @@ export function useColumnsLayout(
     breakpoint,
     activePanel,
     col2Width,
-    isResizing
+    isResizing,
+    isCol1Collapsed
   }
 
   // Derived visibility states based on breakpoint and activePanel

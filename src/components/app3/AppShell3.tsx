@@ -331,9 +331,11 @@ export function AppShell3({
           <div 
             ref={sectionsRef}
             tabIndex={-1}
-            className="flex-shrink-0 outline-none focus:ring-2 focus:ring-primary/50 focus:ring-inset"
+            className="flex-shrink-0 outline-none focus:ring-2 focus:ring-primary/50 focus:ring-inset transition-all duration-300 ease-in-out"
             style={{ 
-              width: layout.breakpoint === 'desktop' ? layout.columnWidths.col1 : '100%' 
+              width: layout.breakpoint === 'desktop' 
+                ? (layout.state.isCol1Collapsed ? layout.columnWidths.col1Collapsed : layout.columnWidths.col1)
+                : '100%' 
             }}
             data-testid="folders-column"
           >
@@ -342,6 +344,8 @@ export function AppShell3({
               selection={layout.selection}
               onSelectionChange={layout.setSelection}
               onMobileAdvance={() => layout.isMobile && layout.setActivePane(2)}
+              isCollapsed={layout.state.isCol1Collapsed}
+              onToggleCollapsed={layout.actions.toggleCol1Collapsed}
             >
               {sectionsContent}
             </FoldersPanel>
