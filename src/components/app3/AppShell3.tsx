@@ -292,7 +292,7 @@ export function AppShell3({
       {/* Main layout container */}
       <div 
         ref={containerRef}
-        className="flex-1 flex overflow-hidden"
+        className="flex-1 flex overflow-hidden h-full"
         style={{
           gridTemplateColumns: layout.breakpoint === 'desktop' 
             ? `${layout.columnWidths.col1}px ${layout.state.col2Width}px 1fr`

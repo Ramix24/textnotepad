@@ -78,7 +78,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   const { compute: computeStats } = useCountersWorker({ debounceMs: 150 })
   
   // Autosave hook
-  const { isSaving, markDirty, forceSave } = useAutosave({
+  const { isSaving, hasPendingChanges, markDirty, forceSave } = useAutosave({
     file,
     onSaved: (updatedFile) => {
       onFileUpdate?.(updatedFile)
@@ -149,7 +149,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   }, [content, computeStats])
 
   // Track dirty state for UI indicators
-  const isDirty = content !== file.content
+  const isDirty = content !== file.content || hasPendingChanges
 
   // Format time for display
   const formatTime = (dateString: string) => {
@@ -176,6 +176,14 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
               Sign In Again
             </button>
           </div>
+        </div>
+      )}
+      
+      {/* Subtle saving progress bar */}
+      {isSaving && (
+        <div className="h-0.5 bg-transparent overflow-hidden relative">
+          <div className="absolute inset-0 bg-blue-500/20"></div>
+          <div className="h-full bg-blue-500 w-full animate-pulse opacity-80"></div>
         </div>
       )}
       

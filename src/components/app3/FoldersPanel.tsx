@@ -23,7 +23,7 @@ export function FoldersPanel({
   
   return (
     <div 
-      className={`flex flex-col bg-bg-secondary border-r border-border-dark ${className}`}
+      className={`flex flex-col h-full bg-bg-secondary border-r border-border-dark ${className}`}
       role="navigation"
       aria-label="Notebooks and Modes"
     >

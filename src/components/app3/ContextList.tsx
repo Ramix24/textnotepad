@@ -27,7 +27,7 @@ export function ContextList({
   
   return (
     <div 
-      className={`flex flex-col bg-bg-primary border-r border-border-dark ${className}`}
+      className={`flex flex-col h-full bg-bg-primary border-r border-border-dark ${className}`}
       role="main"
       aria-label="Context List"
     >

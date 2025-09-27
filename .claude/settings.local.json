@@ -43,7 +43,9 @@
       "Bash(npx supabase:*)",
       "Bash(npm run lint:*)",
       "Bash(npx eslint:*)",
-      "WebFetch(domain:textnotepad.vercel.app)"
+      "WebFetch(domain:textnotepad.vercel.app)",
+      "Bash(timeout:*)",
+      "Bash(start http://localhost:3005)"
     ],
     "deny": [],
     "ask": [],

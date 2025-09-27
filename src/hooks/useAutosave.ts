@@ -21,6 +21,7 @@ export interface UseAutosaveOptions {
 
 export interface UseAutosaveReturn {
   isSaving: boolean
+  hasPendingChanges: boolean
   markDirty: (newContent: string) => void
   forceSave: () => Promise<void>
   cancelPendingSave: () => void
@@ -217,6 +218,7 @@ export function useAutosave({
 
   return {
     isSaving: saveMutation.isPending,
+    hasPendingChanges: pendingContentRef.current !== null,
     markDirty,
     forceSave,
     cancelPendingSave,
