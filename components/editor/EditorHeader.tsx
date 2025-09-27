@@ -1,5 +1,7 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+
 interface EditorHeaderProps {
   name: string
   version?: number
@@ -17,16 +19,28 @@ export function EditorHeader({
   isDirty,
   onNameChange,
 }: EditorHeaderProps) {
+  const [showTyping, setShowTyping] = useState(false)
+  
+  // Debounce the "Typing..." indicator to reduce flashing
+  useEffect(() => {
+    if (isDirty && !saving) {
+      const timer = setTimeout(() => setShowTyping(true), 200) // Show after 200ms of typing
+      return () => clearTimeout(timer)
+    } else {
+      setShowTyping(false)
+    }
+  }, [isDirty, saving])
+  
   const getSaveStatus = () => {
     if (saving) return 'Saving…'
-    if (isDirty) return 'Typing...'
+    if (showTyping) return 'Typing...'
     if (savedAt) return `Saved • ${savedAt}`
     return 'Ready'
   }
 
   const getSaveStatusColor = () => {
     if (saving) return 'text-blue-600 dark:text-blue-400'
-    if (isDirty) return 'text-amber-600 dark:text-amber-400'
+    if (showTyping) return 'text-amber-600 dark:text-amber-400'
     return 'text-green-600 dark:text-green-400'
   }
 
@@ -41,28 +55,16 @@ export function EditorHeader({
       <div className="flex items-center gap-2 text-xs text-text-secondary">
         {version && <span>v{version}</span>}
         
-        {/* Save status indicator with animation */}
-        <div className="flex items-center gap-1">
-          {saving && (
-            <div className="flex items-center">
-              {/* Subtle pulsing animation for saving */}
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            </div>
-          )}
-          {isDirty && !saving && (
-            <div className="flex items-center">
-              {/* Typing indicator */}
-              <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
-            </div>
-          )}
-          {!isDirty && !saving && savedAt && (
-            <div className="flex items-center">
-              {/* Saved indicator */}
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            </div>
-          )}
+        {/* Save status indicator - simplified and less flashy */}
+        <div className="flex items-center gap-2">
+          {/* Single status dot that changes color smoothly */}
+          <div className={`w-2 h-2 rounded-full transition-all duration-500 ${
+            saving ? 'bg-blue-500' : 
+            showTyping ? 'bg-amber-500' : 
+            'bg-green-500'
+          }`}></div>
           
-          <span className={`transition-colors duration-300 ${getSaveStatusColor()}`}>
+          <span className={`transition-colors duration-500 ${getSaveStatusColor()}`}>
             {getSaveStatus()}
           </span>
         </div>

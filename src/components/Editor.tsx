@@ -179,13 +179,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         </div>
       )}
       
-      {/* Subtle saving progress bar */}
-      {isSaving && (
-        <div className="h-0.5 bg-transparent overflow-hidden relative">
-          <div className="absolute inset-0 bg-blue-500/20"></div>
-          <div className="h-full bg-blue-500 w-full animate-pulse opacity-80"></div>
-        </div>
-      )}
+      {/* Remove the distracting progress bar */}
       
       {/* Top Bar - File info and save status */}
       <EditorHeader
