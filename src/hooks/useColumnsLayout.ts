@@ -31,9 +31,10 @@ const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
 }
 
 const DEFAULT_SELECTION: AppSelection = {
-  mode: 'notes',
+  mode: 'search',
   folderId: null,
-  fileId: null
+  fileId: null,
+  searchQuery: ''
 }
 
 const STORAGE_KEYS = {
@@ -48,8 +49,8 @@ function migrateSelection(stored: any): AppSelection {
   
   // If it's already the new format, validate and sanitize
   if ('mode' in stored) {
-    const validModes = ['notes', 'messages']
-    const mode = validModes.includes(stored.mode) ? stored.mode : 'notes'
+    const validModes = ['notes', 'messages', 'search']
+    const mode = validModes.includes(stored.mode) ? stored.mode : 'search'
     
     // Validate folderId - should be null or string (actual validation happens in FoldersPanel)
     let folderId = stored.folderId || null
@@ -65,7 +66,7 @@ function migrateSelection(stored: any): AppSelection {
       fileId = null
     }
     
-    return { mode, folderId, fileId }
+    return { mode, folderId, fileId, searchQuery: stored.searchQuery || '' }
   }
   
   // Migrate from old format
@@ -90,7 +91,7 @@ function migrateSelection(stored: any): AppSelection {
       folderId = null
     }
     
-    return { mode, folderId, fileId }
+    return { mode, folderId, fileId, searchQuery: '' }
   }
   
   console.warn('Unknown selection format in persisted state, using defaults')

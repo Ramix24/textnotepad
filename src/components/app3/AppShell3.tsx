@@ -11,7 +11,6 @@ import { FoldersPanel } from './FoldersPanel'
 import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
 import { ThemeToggle } from '@/components/theme-toggle'
-import { GlobalSearchModal } from '@/components/global-search-modal'
 import { HelpModal } from '@/components/HelpModal'
 import { BookOpen, FileText, HelpCircle, Search } from 'lucide-react'
 import { toast } from 'sonner'
@@ -35,7 +34,6 @@ export function AppShell3({
   const containerRef = useRef<HTMLDivElement>(null)
   const { supabase } = useSupabase()
   const { user } = useAuthSession()
-  const [isSearchOpen, setIsSearchOpen] = React.useState(false)
   const [isHelpOpen, setIsHelpOpen] = React.useState(false)
   
   // Refs for focusing columns
@@ -144,20 +142,6 @@ export function AppShell3({
     }
   }, [supabase])
 
-  // Handle file selection from search
-  const handleFileSelect = useCallback((fileId: string) => {
-    layout.setSelection({
-      ...layout.selection,
-      mode: 'notes',
-      fileId
-    })
-    
-    // Focus detail view after selecting file
-    if (layout.isMobile || layout.isTablet) {
-      layout.setActivePane(3)
-    }
-    setTimeout(() => detailRef.current?.focus(), 100)
-  }, [layout])
 
   // Global keyboard navigation
   useKeyboardNav({
@@ -176,7 +160,11 @@ export function AppShell3({
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
-        setIsSearchOpen(true)
+        // Trigger search mode instead of modal
+        layout.setSelection({ mode: 'search', folderId: null, fileId: null, searchQuery: '' })
+        if (layout.isMobile || layout.isTablet) {
+          layout.setActivePane(3)
+        }
       } else if ((e.metaKey || e.ctrlKey) && e.key === '/') {
         e.preventDefault()
         setIsHelpOpen(true)
@@ -192,7 +180,7 @@ export function AppShell3({
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [layout])
 
   // Mobile tab bar with better active states
   const MobileTabBar = () => {
@@ -271,23 +259,8 @@ export function AppShell3({
             TextNotepad.com
           </button>
           
-          {/* Global Search Modal (quick file jump) */}
-          <div className="flex-1 max-w-md mx-8">
-            <div 
-              className="relative cursor-pointer"
-              onClick={() => setIsSearchOpen(true)}
-            >
-              <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <div className="w-full pl-10 pr-4 py-2 text-sm border border-border-dark rounded-lg bg-bg-primary text-text-secondary placeholder:text-text-secondary hover:bg-bg-secondary transition-colors">
-                Search notes...
-              </div>
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <kbd className="px-1.5 py-0.5 text-[10px] bg-bg-active text-text-secondary rounded font-mono">⌘K</kbd>
-              </div>
-            </div>
-          </div>
+          {/* Spacer for center alignment */}
+          <div className="flex-1"></div>
 
           <div className="flex items-center gap-4">
             {/* Help Button */}
@@ -420,12 +393,6 @@ export function AppShell3({
       {/* Mobile tab bar */}
       {layout.breakpoint === 'mobile' && <MobileTabBar />}
 
-      {/* Global Search Modal */}
-      <GlobalSearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onFileSelect={handleFileSelect}
-      />
       
       {/* Help Modal */}
       <HelpModal
