@@ -57,6 +57,7 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance, 
   
   const handleInboxSelect = () => {
     // INBOX is a special folder for uncategorized notes
+    console.log('🔍 DEBUG: INBOX button clicked, setting selection to:', { mode: 'notes', folderId: 'inbox', fileId: null })
     onSelectionChange({ mode: 'notes', folderId: 'inbox', fileId: null })
     onMobileAdvance?.() // Auto-advance to pane 2 on mobile
   }

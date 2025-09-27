@@ -118,18 +118,24 @@ export function useColumnsLayout(
   // Selection state with migration and URL sync
   const [selection, setSelectionState] = useState<AppSelection>(() => {
     const stored = getPreference(STORAGE_KEYS.SELECTION, null)
+    console.log('🔍 DEBUG: stored localStorage:', stored)
     const migrated = migrateSelection(stored)
+    console.log('🔍 DEBUG: migrated selection:', migrated)
     
     // Override with URL params if present
     const folderParam = searchParams?.get('folder')
+    console.log('🔍 DEBUG: URL folder param:', folderParam)
     if (folderParam) {
-      return {
+      const urlOverride = {
         ...migrated,
-        mode: 'notes',
+        mode: 'notes' as const,
         folderId: folderParam
       }
+      console.log('🔍 DEBUG: URL override applied:', urlOverride)
+      return urlOverride
     }
     
+    console.log('🔍 DEBUG: final selection:', migrated)
     return migrated
   })
 
@@ -192,6 +198,9 @@ export function useColumnsLayout(
   // Selection actions
   const setSelection = useCallback((next: Partial<AppSelection>) => {
     const newSelection = { ...selection, ...next }
+    console.log('🔍 DEBUG: setSelection called with:', next)
+    console.log('🔍 DEBUG: current selection:', selection)
+    console.log('🔍 DEBUG: new selection:', newSelection)
     setSelectionState(newSelection)
     debouncedSetSelection(newSelection)
     updateUrl(newSelection)
