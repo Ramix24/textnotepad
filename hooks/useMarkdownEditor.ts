@@ -60,10 +60,97 @@ export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEdit
 
   // Keyboard shortcuts handler
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!e.ctrlKey && !e.metaKey) return
-
     const textarea = e.currentTarget
     const { selectionStart: start, selectionEnd: end, value } = textarea
+
+    // Handle Tab key for indentation (markdown-friendly 2 spaces)
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      
+      if (e.shiftKey) {
+        // Shift+Tab: Remove indentation (outdent)
+        const beforeCursor = value.slice(0, start)
+        const afterCursor = value.slice(end)
+        
+        if (start === end) {
+          // Single cursor - remove up to 2 spaces before cursor
+          const lineStart = beforeCursor.lastIndexOf('\n') + 1
+          const lineBeforeCursor = beforeCursor.slice(lineStart)
+          
+          if (lineBeforeCursor.startsWith('  ')) {
+            // Remove 2 spaces
+            const newContent = beforeCursor.slice(0, lineStart) + lineBeforeCursor.slice(2) + afterCursor
+            updateContent(newContent)
+            requestAnimationFrame(() => {
+              textarea.setSelectionRange(start - 2, start - 2)
+              textarea.focus()
+            })
+          } else if (lineBeforeCursor.startsWith(' ')) {
+            // Remove 1 space
+            const newContent = beforeCursor.slice(0, lineStart) + lineBeforeCursor.slice(1) + afterCursor
+            updateContent(newContent)
+            requestAnimationFrame(() => {
+              textarea.setSelectionRange(start - 1, start - 1)
+              textarea.focus()
+            })
+          }
+        } else {
+          // Selection - outdent all selected lines
+          const beforeSelection = value.slice(0, start)
+          const selectedText = value.slice(start, end)
+          const afterSelection = value.slice(end)
+          
+          const lines = selectedText.split('\n')
+          const outdentedLines = lines.map(line => {
+            if (line.startsWith('  ')) return line.slice(2)
+            if (line.startsWith(' ')) return line.slice(1)
+            return line
+          })
+          
+          const newSelectedText = outdentedLines.join('\n')
+          const newContent = beforeSelection + newSelectedText + afterSelection
+          updateContent(newContent)
+          
+          requestAnimationFrame(() => {
+            textarea.setSelectionRange(start, start + newSelectedText.length)
+            textarea.focus()
+          })
+        }
+      } else {
+        // Tab: Add indentation (indent)
+        if (start === end) {
+          // Single cursor - insert 2 spaces
+          const newContent = value.slice(0, start) + '  ' + value.slice(start)
+          updateContent(newContent)
+          requestAnimationFrame(() => {
+            textarea.setSelectionRange(start + 2, start + 2)
+            textarea.focus()
+          })
+        } else {
+          // Selection - indent all selected lines
+          const beforeSelection = value.slice(0, start)
+          const selectedText = value.slice(start, end)
+          const afterSelection = value.slice(end)
+          
+          const lines = selectedText.split('\n')
+          const indentedLines = lines.map(line => '  ' + line)
+          const newSelectedText = indentedLines.join('\n')
+          
+          const newContent = beforeSelection + newSelectedText + afterSelection
+          updateContent(newContent)
+          
+          requestAnimationFrame(() => {
+            textarea.setSelectionRange(start, start + newSelectedText.length)
+            textarea.focus()
+          })
+        }
+      }
+      return
+    }
+
+    // Existing Ctrl/Cmd shortcuts
+    if (!e.ctrlKey && !e.metaKey) return
+
     const before = value.slice(0, start)
     const selected = value.slice(start, end)
     const after = value.slice(end)

@@ -70,7 +70,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   })
   
   // Auth session for logout detection
-  const { user } = useAuthSession()
+  const { user, loading: authLoading } = useAuthSession()
   
   // Web Worker for live statistics
   const { compute: computeStats } = useCountersWorker({ debounceMs: 150 })
@@ -157,7 +157,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   return (
     <div className={cn('flex flex-col h-full bg-bg-primary relative', className)}>
       {/* Logout Warning Overlay */}
-      {!user && (
+      {!user && !authLoading && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md mx-4 text-center">
             <div className="text-red-600 dark:text-red-400 text-4xl mb-4">⚠</div>
@@ -230,7 +230,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         </div>
         
         <div className="text-xs text-text-secondary">
-          Shortcuts: Ctrl+B (bold), Ctrl+I (italic), Ctrl+K (link), Ctrl+Shift+P (preview)
+          Shortcuts: Ctrl+B (bold), Ctrl+I (italic), Ctrl+K (link), Tab (indent), Ctrl+Shift+P (preview)
         </div>
       </div>
 

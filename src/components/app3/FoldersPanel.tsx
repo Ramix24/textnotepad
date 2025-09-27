@@ -72,14 +72,12 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
       {/* Header toolbar */}
       <header className="flex-shrink-0 px-4 py-3 border-b border-border-dark bg-bg-secondary">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium text-text-primary">Notes</h2>
           <button
             onClick={handleCreateFolder}
             disabled={createFolder.isPending}
-            className="px-3 py-1 text-sm font-medium text-accent-blue hover:bg-bg-active rounded transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 text-xs font-medium bg-accent-blue text-white rounded-md hover:opacity-90 disabled:opacity-50 transition-colors"
             title="Create new folder"
           >
-            <span className="text-xs">+</span>
             {createFolder.isPending ? 'Creating...' : 'New Folder'}
           </button>
         </div>
