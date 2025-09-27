@@ -120,10 +120,6 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
     fileOps.handleFileClick(file)
   }
 
-  const handleNewNote = () => {
-    // Create file in current folder context
-    fileOps.handleCreateFile()
-  }
 
   // Filter files based on current mode and folder
   const filteredFiles = getFilteredFiles(files, selection)
@@ -147,7 +143,6 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
         isLoading={isLoading}
         selectedFileId={selection.fileId}
         onFileSelect={handleFileSelect}
-        onNewNote={handleNewNote}
         fileOps={fileOps}
         selection={selection}
       />
@@ -167,7 +162,6 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
         isLoading={isLoading}
         selectedFileId={selection.fileId}
         onFileSelect={handleFileSelect}
-        onNewNote={handleNewNote}
         fileOps={fileOps}
         selection={selection}
       />
@@ -183,7 +177,6 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
         isLoading={isLoading}
         selectedFileId={selection.fileId}
         onFileSelect={handleFileSelect}
-        onNewNote={handleNewNote}
         fileOps={fileOps}
         selection={selection}
       />
@@ -198,6 +191,11 @@ function getFilteredFiles(files: UserFile[], selection: AppSelection): UserFile[
   if (selection.folderId === 'trash') {
     // Show soft-deleted files only
     return files.filter(f => f.deleted_at)
+  }
+  
+  if (selection.folderId === 'inbox') {
+    // INBOX: show uncategorized notes (folder_id = null)
+    return files.filter(f => !f.deleted_at && !(f as any).folder_id)
   }
   
   if (selection.mode === 'notes') {
@@ -232,7 +230,6 @@ function NotesView({
   isLoading, 
   selectedFileId, 
   onFileSelect, 
-  onNewNote,
   fileOps,
   selection: _selection
 }: {
@@ -240,7 +237,6 @@ function NotesView({
   isLoading: boolean
   selectedFileId?: string | null
   onFileSelect: (file: UserFile) => void
-  onNewNote: () => void
   fileOps: ReturnType<typeof useFileOperations>
   selection: AppSelection
 }) {
@@ -253,15 +249,7 @@ function NotesView({
   return (
     <div className="flex flex-col h-full">
       <header className="flex-shrink-0 p-4 border-b border-border-dark bg-bg-secondary">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={onNewNote}
-            disabled={fileOps.createFile.isPending}
-            className="px-3 py-1.5 text-xs font-medium bg-accent-blue text-white rounded-md hover:opacity-90 disabled:opacity-50 transition-colors"
-          >
-            {fileOps.createFile.isPending ? 'Creating...' : 'New Note'}
-          </button>
-          
+        <div className="flex items-center justify-end">
           {files.length > 0 && (
             <SortDropdown 
               value={sortBy} 
@@ -277,7 +265,7 @@ function NotesView({
             <div className="text-sm text-text-secondary">Loading notes...</div>
           </div>
         ) : sortedFiles.length === 0 ? (
-          <NotesEmptyState onNewNote={onNewNote} isCreating={fileOps.createFile.isPending} />
+          <NotesEmptyState />
         ) : (
           <div role="listbox" className="p-2 space-y-1">
             {sortedFiles.map((file) => (
@@ -322,23 +310,16 @@ function NotesView({
   )
 }
 
-function NotesEmptyState({ onNewNote, isCreating }: { onNewNote: () => void, isCreating: boolean }) {
+function NotesEmptyState() {
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
       <div className="w-12 h-12 rounded-lg bg-bg-secondary mb-4 flex items-center justify-center">
         <span className="text-lg">📝</span>
       </div>
       <h3 className="text-sm font-medium text-text-primary mb-2">No notes in this folder</h3>
-      <p className="text-xs text-text-secondary leading-relaxed max-w-[200px] mb-4">
-        Start writing your first note in this folder
+      <p className="text-xs text-text-secondary leading-relaxed max-w-[200px]">
+        Use the &ldquo;New Note&rdquo; button in the header to create your first note
       </p>
-      <button
-        onClick={onNewNote}
-        disabled={isCreating}
-        className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
-      >
-        {isCreating ? 'Creating...' : '+ New Note'}
-      </button>
     </div>
   )
 }

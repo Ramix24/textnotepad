@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode, useRef, useEffect, KeyboardEvent } from 'react'
-import { FileText, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react'
+import { FileText, BookOpen, ChevronLeft, ChevronRight, Inbox } from 'lucide-react'
 import { useFoldersList, useCreateFolder, useRenameFolder, useDeleteFolder } from '@/hooks/useFolders'
 import type { AppSelection } from './types'
 
@@ -55,6 +55,12 @@ interface DefaultFoldersContentProps {
 function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance, isCollapsed = false, onToggleCollapsed }: DefaultFoldersContentProps) {
   const createFolder = useCreateFolder()
   
+  const handleInboxSelect = () => {
+    // INBOX is a special folder for uncategorized notes
+    onSelectionChange({ mode: 'notes', folderId: 'inbox', fileId: null })
+    onMobileAdvance?.() // Auto-advance to pane 2 on mobile
+  }
+
   const handleTrashSelect = () => {
     // Trash is now a special folder, not a mode
     onSelectionChange({ mode: 'notes', folderId: 'trash', fileId: null })
@@ -119,6 +125,7 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance, 
       >
         <FoldersList 
           selection={selection}
+          onInboxSelect={handleInboxSelect}
           onFolderSelect={handleFolderSelect}
           onTrashSelect={handleTrashSelect}
           onAllNotesSelect={() => {
@@ -134,13 +141,14 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance, 
 
 interface FoldersListProps {
   selection: AppSelection
+  onInboxSelect: () => void
   onFolderSelect: (folderId: string | null) => void
   onTrashSelect: () => void
   onAllNotesSelect: () => void
   isCollapsed?: boolean
 }
 
-function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelect, isCollapsed = false }: FoldersListProps) {
+function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, onAllNotesSelect, isCollapsed = false }: FoldersListProps) {
   const { data: folders = [], isLoading, error } = useFoldersList()
   const renameFolder = useRenameFolder()
   const deleteFolder = useDeleteFolder()
@@ -181,6 +189,7 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
   const sortedFolders = [...folders].sort((a, b) => a.name.localeCompare(b.name))
   
   const allFolders = [
+    { id: 'inbox', name: 'INBOX', file_count: 0 }, // Special INBOX folder always first
     { id: null, name: 'All Notes', file_count: 0 }, 
     ...sortedFolders.map(f => ({ id: f.id, name: f.name, file_count: 0 })), // file_count not available in useFoldersList
     { id: 'trash', name: 'Trash', file_count: 0 } // Add trash to the list for keyboard navigation
@@ -199,9 +208,11 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
       const newIndex = Math.max(0, Math.min(allFolders.length - 1, currentIndex + direction))
       const newBookOpen = allFolders[newIndex]
       
-      // Handle special case for trash
+      // Handle special cases
       if (newBookOpen.id === 'trash') {
         onTrashSelect()
+      } else if (newBookOpen.id === 'inbox') {
+        onInboxSelect()
       } else {
         onFolderSelect(newBookOpen.id)
       }
@@ -219,6 +230,8 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
       const firstBookOpen = allFolders[0]
       if (firstBookOpen.id === 'trash') {
         onTrashSelect()
+      } else if (firstBookOpen.id === 'inbox') {
+        onInboxSelect()
       } else {
         onFolderSelect(firstBookOpen.id)
       }
@@ -231,6 +244,8 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
       const lastBookOpen = allFolders[allFolders.length - 1]
       if (lastBookOpen.id === 'trash') {
         onTrashSelect()
+      } else if (lastBookOpen.id === 'inbox') {
+        onInboxSelect()
       } else {
         onFolderSelect(lastBookOpen.id)
       }
@@ -253,17 +268,27 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
 
   // Handle loading state
   if (!isFeatureEnabled) {
-    // Only show All Notes when feature is disabled
+    // Show INBOX and All Notes when feature is disabled
     return (
       <div className="p-3">
-        <button
-          onClick={onAllNotesSelect}
-          className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
-          title={isCollapsed ? "All Notes" : undefined}
-        >
-          <FileText className="h-4 w-4 text-text-secondary" />
-          {!isCollapsed && <span className="font-medium">All Notes</span>}
-        </button>
+        <div className="space-y-1">
+          <button
+            onClick={onInboxSelect}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
+            title={isCollapsed ? "INBOX" : undefined}
+          >
+            <Inbox className="h-4 w-4 text-text-secondary" />
+            {!isCollapsed && <span className="font-medium">INBOX</span>}
+          </button>
+          <button
+            onClick={onAllNotesSelect}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
+            title={isCollapsed ? "All Notes" : undefined}
+          >
+            <FileText className="h-4 w-4 text-text-secondary" />
+            {!isCollapsed && <span className="font-medium">All Notes</span>}
+          </button>
+        </div>
       </div>
     )
   }
@@ -272,6 +297,16 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
     return (
       <div className="p-3">
         <div className="space-y-1">
+          {/* INBOX button */}
+          <button
+            onClick={onInboxSelect}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
+            title={isCollapsed ? "INBOX" : undefined}
+          >
+            <Inbox className="h-4 w-4 text-text-secondary" />
+            {!isCollapsed && <span className="font-medium transition-opacity duration-300">INBOX</span>}
+          </button>
+          
           {/* All Notes button */}
           <button
             onClick={onAllNotesSelect}
@@ -299,6 +334,16 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
     return (
       <div className="p-3">
         <div className="space-y-1">
+          {/* INBOX button - always available */}
+          <button
+            onClick={onInboxSelect}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
+            title={isCollapsed ? "INBOX" : undefined}
+          >
+            <Inbox className="h-4 w-4 text-text-secondary" />
+            {!isCollapsed && <span className="font-medium transition-opacity duration-300">INBOX</span>}
+          </button>
+          
           {/* All Notes button - always available */}
           <button
             onClick={onAllNotesSelect}
@@ -331,6 +376,26 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSelec
         aria-activedescendant={`folder-${selection.folderId || 'all'}`}
         tabIndex={0}
       >
+        {/* INBOX - Special folder for uncategorized notes */}
+        <button
+          id="folder-inbox"
+          role="option"
+          aria-selected={selection.folderId === 'inbox'}
+          onClick={onInboxSelect}
+          tabIndex={-1}
+          className={`
+            w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
+            ${selection.folderId === 'inbox'
+              ? 'bg-accent-blue text-white'
+              : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
+            }
+          `}
+          title={isCollapsed ? "INBOX" : undefined}
+        >
+          <Inbox className={`w-4 h-4 ${selection.folderId === 'inbox' ? 'text-white' : 'text-gray-500 dark:text-gray-500'}`} />
+          {!isCollapsed && <span className="font-medium transition-opacity duration-300">INBOX</span>}
+        </button>
+
         <button
           id="folder-all"
           role="option"

@@ -32,8 +32,8 @@ const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
 }
 
 const DEFAULT_SELECTION: AppSelection = {
-  mode: 'search',
-  folderId: null,
+  mode: 'notes',
+  folderId: 'inbox',
   fileId: null,
   searchQuery: ''
 }
