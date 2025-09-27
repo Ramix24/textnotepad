@@ -55,18 +55,20 @@ export function SearchInterface({
 
   // Filter and search files
   const filteredFiles = useMemo(() => {
+    // Only show results when there's an actual search query
+    if (!searchQuery.trim()) {
+      return [] // Show empty state when no search query
+    }
+    
     // Only show non-deleted files
     const activeFiles = allFiles.filter(f => !f.deleted_at)
     
     // Apply search query
-    let searchResults = activeFiles
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      searchResults = activeFiles.filter(file => 
-        file.name.toLowerCase().includes(query) ||
-        file.content.toLowerCase().includes(query)
-      )
-    }
+    const query = searchQuery.toLowerCase()
+    const searchResults = activeFiles.filter(file => 
+      file.name.toLowerCase().includes(query) ||
+      file.content.toLowerCase().includes(query)
+    )
 
     // Apply filters
     switch (activeFilter) {
