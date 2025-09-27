@@ -13,7 +13,7 @@ import { DetailView } from './DetailView'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { GlobalSearchModal } from '@/components/global-search-modal'
 import { HelpModal } from '@/components/HelpModal'
-import { BookOpen, FileText, Edit3, HelpCircle } from 'lucide-react'
+import { BookOpen, FileText, HelpCircle, Search } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface AppShell3Props {
@@ -197,9 +197,12 @@ export function AppShell3({
   // Mobile tab bar with better active states
   const MobileTabBar = () => {
     const tabs = [
-      { key: 'notebooks', label: 'Notebooks', icon: BookOpen, pane: 1 as const },
-      { key: 'notes', label: 'Notes', icon: FileText, pane: 2 as const },
-      { key: 'editor', label: 'Editor', icon: Edit3, pane: 3 as const }
+      { key: 'notebooks', label: 'Notebooks', icon: BookOpen, pane: 1 as const, action: () => layout.setActivePane(1) },
+      { key: 'notes', label: 'Notes', icon: FileText, pane: 2 as const, action: () => layout.setActivePane(2) },
+      { key: 'search', label: 'Search', icon: Search, pane: 3 as const, action: () => {
+        layout.setSelection({ mode: 'search', folderId: null, fileId: null, searchQuery: '' })
+        layout.setActivePane(3)
+      }}
     ]
 
     return (
@@ -208,11 +211,11 @@ export function AppShell3({
         data-testid="mobile-tab-bar"
       >
         {tabs.map((tab) => {
-          const isActive = layout.activePane === tab.pane
+          const isActive = tab.key === 'search' ? layout.selection.mode === 'search' : layout.activePane === tab.pane
           return (
             <button
               key={tab.key}
-              onClick={() => layout.setActivePane(tab.pane)}
+              onClick={tab.action}
               className={`
                 flex-1 flex flex-col items-center justify-center gap-1 text-xs font-medium transition-all duration-200 relative
                 ${isActive 
@@ -259,9 +262,13 @@ export function AppShell3({
       {/* Header */}
       <header className="h-14 border-b border-border-dark bg-bg-secondary flex-shrink-0">
         <div className="flex items-center justify-between h-full px-6">
-          <div className="text-lg font-medium text-text-primary">
+          <button 
+            onClick={() => layout.setSelection({ mode: 'search', folderId: null, fileId: null, searchQuery: '' })}
+            className="text-lg font-medium text-text-primary hover:text-accent-blue transition-colors cursor-pointer"
+            title="Search all notes"
+          >
             TextNotepad.com
-          </div>
+          </button>
           
           {/* Global Search */}
           <div className="flex-1 max-w-md mx-8">
@@ -400,6 +407,8 @@ export function AppShell3({
               onDirtyChange={(_fileId, _isDirty) => {
                 // Could track dirty state here
               }}
+              onSelectionChange={layout.setSelection}
+              onMobileAdvance={() => (layout.isMobile || layout.isTablet) && layout.setActivePane(3)}
             >
               {detailContent}
             </DetailView>

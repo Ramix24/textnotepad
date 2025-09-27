@@ -57,6 +57,7 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
     onSelectionChange({ mode: 'notes', folderId, fileId: null })
     onMobileAdvance?.() // Auto-advance to pane 2 on mobile
   }
+  
 
   const handleCreateFolder = () => {
     const name = prompt('Enter folder name:')
@@ -95,6 +96,10 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance }
           selection={selection}
           onFolderSelect={handleFolderSelect}
           onTrashSelect={handleTrashSelect}
+          onAllNotesSearch={() => {
+            onSelectionChange({ mode: 'search', folderId: null, fileId: null, searchQuery: '' })
+            onMobileAdvance?.()
+          }}
         />
       </div>
     </div>
@@ -105,9 +110,10 @@ interface FoldersListProps {
   selection: AppSelection
   onFolderSelect: (folderId: string | null) => void
   onTrashSelect: () => void
+  onAllNotesSearch: () => void
 }
 
-function FoldersList({ selection, onFolderSelect, onTrashSelect }: FoldersListProps) {
+function FoldersList({ selection, onFolderSelect, onTrashSelect, onAllNotesSearch }: FoldersListProps) {
   const { data: folders = [], isLoading, error } = useFoldersList()
   const renameFolder = useRenameFolder()
   const deleteFolder = useDeleteFolder()
@@ -224,7 +230,7 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect }: FoldersListPr
     return (
       <div className="p-3">
         <button
-          onClick={() => onFolderSelect(null)}
+          onClick={onAllNotesSearch}
           className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
         >
           <FileText className="h-4 w-4 text-text-secondary" />
@@ -240,7 +246,7 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect }: FoldersListPr
         <div className="space-y-1">
           {/* All Notes button */}
           <button
-            onClick={() => onFolderSelect(null)}
+            onClick={onAllNotesSearch}
             className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
           >
             <FileText className="h-4 w-4 text-text-secondary" />
@@ -266,7 +272,7 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect }: FoldersListPr
         <div className="space-y-1">
           {/* All Notes button - always available */}
           <button
-            onClick={() => onFolderSelect(null)}
+            onClick={onAllNotesSearch}
             className="w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active"
           >
             <FileText className="h-4 w-4 text-text-secondary" />
@@ -298,18 +304,18 @@ function FoldersList({ selection, onFolderSelect, onTrashSelect }: FoldersListPr
         <button
           id="folder-all"
           role="option"
-          aria-selected={selection.folderId === null}
-          onClick={() => onFolderSelect(null)}
+          aria-selected={(selection.folderId === null && selection.mode === 'notes') || selection.mode === 'search'}
+          onClick={onAllNotesSearch}
           tabIndex={-1}
           className={`
             w-full flex items-center gap-3 p-2 rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
-            ${selection.folderId === null
+            ${(selection.folderId === null && selection.mode === 'notes') || selection.mode === 'search'
               ? 'bg-accent-blue text-white'
               : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
             }
           `}
         >
-          <svg className={`w-4 h-4 ${selection.folderId === null ? 'text-white' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`w-4 h-4 ${(selection.folderId === null && selection.mode === 'notes') || selection.mode === 'search' ? 'text-white' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <span className="font-medium">All Notes</span>

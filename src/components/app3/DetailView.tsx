@@ -4,6 +4,7 @@ import { ReactNode } from 'react'
 import { useFileById } from '@/hooks/useFiles'
 import { Editor } from '@/components/Editor'
 import { EditorSkeleton } from '@/components/EditorSkeleton'
+import { SearchInterface } from './SearchInterface'
 import type { AppSelection } from './types'
 
 interface DetailViewProps {
@@ -12,6 +13,8 @@ interface DetailViewProps {
   selection: AppSelection
   onFileUpdate?: (updatedFile: any) => void
   onDirtyChange?: (fileId: string, isDirty: boolean) => void
+  onSelectionChange?: (selection: Partial<AppSelection>) => void
+  onMobileAdvance?: () => void
 }
 
 export function DetailView({ 
@@ -19,7 +22,9 @@ export function DetailView({
   className = '', 
   selection,
   onFileUpdate,
-  onDirtyChange
+  onDirtyChange,
+  onSelectionChange,
+  onMobileAdvance
 }: DetailViewProps) {
   return (
     <div 
@@ -28,11 +33,20 @@ export function DetailView({
       aria-label="Detail View"
     >
       {children || (
-        <DefaultDetailContent 
-          selection={selection}
-          onFileUpdate={onFileUpdate}
-          onDirtyChange={onDirtyChange}
-        />
+        selection.mode === 'search' ? (
+          <SearchInterface 
+            selection={selection}
+            onSelectionChange={onSelectionChange!}
+            onMobileAdvance={onMobileAdvance}
+            className="h-full"
+          />
+        ) : (
+          <DefaultDetailContent 
+            selection={selection}
+            onFileUpdate={onFileUpdate}
+            onDirtyChange={onDirtyChange}
+          />
+        )
       )}
     </div>
   )
@@ -164,7 +178,7 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
   return <DetailViewEmpty mode="notes" />
 }
 
-function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' }) {
+function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' | 'search' }) {
   const getEmptyContent = () => {
     switch (mode) {
       case 'notes':
@@ -186,6 +200,13 @@ function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' }) {
           icon: '🗑️',
           title: 'No deleted item selected',
           description: 'Select a deleted item from the list to preview or restore it.',
+          showActions: false
+        }
+      case 'search':
+        return {
+          icon: '🔍',
+          title: 'Search your notes',
+          description: 'Use the search interface to find notes by title or content.',
           showActions: false
         }
     }
