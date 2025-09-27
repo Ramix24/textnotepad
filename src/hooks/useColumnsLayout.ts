@@ -46,57 +46,26 @@ const STORAGE_KEYS = {
 }
 
 // Migration function to handle old selection format
-function migrateSelection(stored: any): AppSelection {
+function migrateSelection(stored: unknown): AppSelection {
   if (!stored) return DEFAULT_SELECTION
   
-  // If it's already the new format, validate and sanitize
-  if ('mode' in stored) {
-    const validModes = ['notes', 'messages', 'search', 'help']
-    const mode = validModes.includes(stored.mode) ? stored.mode : 'search'
-    
-    // Validate folderId - should be null or string (actual validation happens in FoldersPanel)
-    let folderId = stored.folderId || null
-    if (folderId && typeof folderId !== 'string') {
-      console.warn('Invalid folderId type in persisted state, resetting to null')
-      folderId = null
+  // Force all users to start with INBOX for better organization
+  if (stored && typeof stored === 'object' && 'mode' in stored) {
+    const storedObj = stored as Record<string, unknown>
+    return { 
+      mode: 'notes', 
+      folderId: 'inbox', 
+      fileId: null, 
+      searchQuery: (storedObj.searchQuery as string) || '' 
     }
-    
-    // Validate fileId - should be null or string
-    let fileId = stored.fileId || null
-    if (fileId && typeof fileId !== 'string') {
-      console.warn('Invalid fileId type in persisted state, resetting to null')
-      fileId = null
-    }
-    
-    return { mode, folderId, fileId, searchQuery: stored.searchQuery || '' }
   }
   
   // Migrate from old format
-  if ('section' in stored) {
-    const mode = stored.section === 'notes' ? 'notes' :
-                 stored.section === 'messages' ? 'messages' : 'notes'
-    
-    // Handle old trash mode - convert to notes mode with trash folderId
-    let folderId = stored.folderId || null
-    if (stored.section === 'trash') {
-      folderId = 'trash'
-    }
-    
-    console.info(`Migrating old selection format from section "${stored.section}" to mode "${mode}"`)
-    
-    // In the old format, there might be different field names
-    const fileId = stored.fileId || stored.selectedFileId || null
-    
-    // Validate migrated data - just check type, actual validation in NotebooksPanel
-    if (folderId && typeof folderId !== 'string') {
-      console.warn(`Invalid migrated folderId type, resetting to null`)
-      folderId = null
-    }
-    
-    return { mode, folderId, fileId, searchQuery: '' }
+  if (stored && typeof stored === 'object' && 'section' in stored) {
+    // Force start with INBOX for all migrated users
+    return { mode: 'notes', folderId: 'inbox', fileId: null, searchQuery: '' }
   }
   
-  console.warn('Unknown selection format in persisted state, using defaults')
   return DEFAULT_SELECTION
 }
 
