@@ -21,10 +21,19 @@ export function SearchInterface({
   onSelectionChange,
   onMobileAdvance
 }: SearchInterfaceProps) {
-  const [searchQuery, setSearchQuery] = useState(selection.searchQuery || '')
+  const [searchQuery, setSearchQuery] = useState('')
   const [activeFilter, setActiveFilter] = useState<SearchFilter>('all')
   const [showFilters, setShowFilters] = useState(false)
   const { data: allFiles = [] } = useFilesList()
+
+  // Clear search when entering search mode
+  useEffect(() => {
+    if (selection.mode === 'search') {
+      setSearchQuery('')
+      setActiveFilter('all')
+      setShowFilters(false)
+    }
+  }, [selection.mode])
 
   // Update selection when search query changes
   useEffect(() => {
@@ -167,12 +176,12 @@ export function SearchInterface({
               <Search className="w-8 h-8 text-text-secondary" />
             </div>
             <h3 className="text-lg font-medium text-text-primary mb-2">
-              {searchQuery.trim() ? 'No results found' : 'Start searching'}
+              {searchQuery.trim() ? 'No results found' : 'Search your notes'}
             </h3>
             <p className="text-text-secondary max-w-md leading-relaxed">
               {searchQuery.trim() 
                 ? `No notes found matching "${searchQuery}". Try different keywords or check your spelling.`
-                : 'Type in the search box above to find notes by title or content.'
+                : 'Type in the search box above to find notes by title or content. Use filters to narrow down results.'
               }
             </p>
           </div>

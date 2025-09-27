@@ -61,7 +61,7 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
       const fileExistsInMode = filteredFiles.some(f => f.id === selection.fileId)
       
       if (!fileExistsInMode) {
-        console.warn(`Selected file "${selection.fileId}" not available in ${selection.mode} mode, clearing selection`)
+        // Selected file not available in current mode, clearing selection
         onSelectionChange({
           ...selection,
           fileId: null
@@ -108,7 +108,7 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
         if (!nextFile && selection.folderId !== null) {
           const allFiles = files.filter(f => !f.deleted_at)
           if (allFiles.length > 0) {
-            console.info('No files remaining in current folder, but files exist in All Notes')
+            // No files remaining in current folder, but files exist in All Notes
             // User can manually switch to All Notes if desired
           }
         }
@@ -195,6 +195,7 @@ function getFilteredFiles(files: UserFile[], selection: AppSelection): UserFile[
   
   if (selection.folderId === 'inbox') {
     // INBOX: show uncategorized notes (folder_id = null or undefined)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return files.filter(f => !f.deleted_at && ((f as any).folder_id === null || (f as any).folder_id === undefined))
   }
   
@@ -208,6 +209,7 @@ function getFilteredFiles(files: UserFile[], selection: AppSelection): UserFile[
     }
     
     // Specific folder: filter by folder_id
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return activeFiles.filter(f => (f as any).folder_id === selection.folderId)
   }
   
@@ -249,7 +251,18 @@ function NotesView({
   return (
     <div className="flex flex-col h-full">
       <header className="flex-shrink-0 p-4 border-b border-border-dark bg-bg-secondary">
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => fileOps.handleCreateFile()}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-accent-blue text-white rounded-md hover:opacity-90 transition-colors"
+            title="Create new note in current folder"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            <span className="hidden sm:inline">New Note</span>
+          </button>
+          
           {files.length > 0 && (
             <SortDropdown 
               value={sortBy} 
@@ -347,8 +360,8 @@ function TrashView({
     try {
       // Call the restore functionality (we'll implement this)
       await fileOps.handleRestore?.(file)
-    } catch (error) {
-      console.error('Failed to restore file:', error)
+    } catch {
+      // Error handling is done in the hook
     }
   }
 
@@ -356,8 +369,8 @@ function TrashView({
     if (confirm(`Permanently delete "${file.name}"? This cannot be undone.`)) {
       try {
         await fileOps.handlePermanentDelete?.(file)
-      } catch (error) {
-        console.error('Failed to permanently delete file:', error)
+      } catch {
+        // Error handling is done in the hook
       }
     }
   }

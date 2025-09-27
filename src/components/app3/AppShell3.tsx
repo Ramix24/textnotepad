@@ -11,7 +11,7 @@ import { FoldersPanel } from './FoldersPanel'
 import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
 import { ThemeToggle } from '@/components/theme-toggle'
-import { BookOpen, FileText, HelpCircle, Search, Plus } from 'lucide-react'
+import { BookOpen, FileText, HelpCircle, Search } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface AppShell3Props {
@@ -261,44 +261,6 @@ export function AppShell3({
             title="Open search interface (shows all notes in C2, search in C3)"
           >
             TextNotepad.com
-          </button>
-          
-          {/* New Note Button */}
-          <button
-            onClick={async () => {
-              if (!user) {
-                toast.error('Please sign in to create notes')
-                return
-              }
-              
-              try {
-                const newFile = await createFile.mutateAsync({
-                  name: 'Untitled',
-                  folder_id: null // INBOX contains notes with folder_id = null
-                })
-                
-                // Navigate to INBOX and select the new file
-                layout.setSelection({ 
-                  mode: 'notes', 
-                  folderId: 'inbox', 
-                  fileId: newFile.id 
-                })
-                
-                // Auto-advance to detail view on mobile
-                if (layout.isMobile) {
-                  layout.setActivePane(3)
-                }
-              } catch (error) {
-                console.error('Failed to create file:', error)
-                toast.error('Failed to create note')
-              }
-            }}
-            disabled={createFile.isPending || !user}
-            className="ml-4 flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-accent-blue text-white rounded-md hover:opacity-90 disabled:opacity-50 transition-colors"
-            title="Create new note in INBOX"
-          >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">New Note</span>
           </button>
           
           {/* Spacer for center alignment */}
