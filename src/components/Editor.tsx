@@ -46,6 +46,8 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     setContent, 
     viewMode, 
     setMode, 
+    showLineNumbers,
+    toggleLineNumbers,
     textareaRef, 
     handleKeyDown: handleMarkdownKeyDown, 
     insertLink 
@@ -177,7 +179,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         </div>
       )}
       
-      {/* Editor Header */}
+      {/* Top Bar - File info and save status */}
       <EditorHeader
         name={file.name}
         version={file.version}
@@ -186,60 +188,22 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         isDirty={isDirty}
         onNameChange={handleNameChange}
       />
-      
-      {/* Markdown Toolbar */}
-      {!readOnly && (
-        <MarkdownToolbar
-          textareaRef={textareaRef}
-          setContent={setContent}
-          insertLink={insertLink}
-          disabled={!user}
-        />
-      )}
-      
-      {/* View Mode Toggle */}
-      <div className="h-10 bg-bg-secondary border-b border-border-dark flex items-center justify-between px-3">
-        <div className="flex items-center gap-1">
-          <Button
-            variant={viewMode === 'edit' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setMode('edit')}
-            disabled={readOnly}
-            className="text-xs h-7"
-          >
-            Edit
-          </Button>
-          <Button
-            variant={viewMode === 'preview' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setMode('preview')}
-            disabled={readOnly}
-            className="text-xs h-7"
-          >
-            Preview
-          </Button>
-          <Button
-            variant={viewMode === 'split' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setMode('split')}
-            disabled={readOnly}
-            className="text-xs h-7"
-          >
-            Split
-          </Button>
-        </div>
-        
-        <div className="text-xs text-text-secondary">
-          Shortcuts: Ctrl+B (bold), Ctrl+I (italic), Ctrl+K (link), Tab (indent), Ctrl+Shift+P (preview)
-        </div>
-      </div>
 
       {/* Main editor area */}
       <div className="flex-1 overflow-auto">
         {viewMode === 'split' ? (
           <div className="flex h-full">
             {/* Editor pane */}
-            <div className="flex-1 border-r border-border-dark">
+            <div className="flex-1 border-r border-border-dark relative">
+              {showLineNumbers && (
+                <div className="absolute left-0 top-0 w-12 h-full bg-bg-secondary border-r border-border-dark flex flex-col text-xs text-text-secondary font-mono overflow-hidden z-10">
+                  {content.split('\n').map((_, index) => (
+                    <div key={index + 1} className="px-2 leading-relaxed text-right min-h-[1.5rem] flex items-center justify-end">
+                      {index + 1}
+                    </div>
+                  ))}
+                </div>
+              )}
               <textarea
                 ref={textareaRef}
                 value={content}
@@ -248,10 +212,12 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
                 onBlur={handleBlur}
                 onFocus={() => { wasFocusedRef.current = true }}
                 className={cn(
-                  'w-full h-full p-4 bg-bg-primary text-text-primary',
+                  'w-full h-full bg-bg-primary text-text-primary',
                   'font-mono text-sm leading-relaxed',
                   'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
                   'resize-none placeholder:text-text-secondary',
+                  'whitespace-pre-wrap break-words', // Enable text wrapping
+                  showLineNumbers ? 'pl-16 pr-4 py-4' : 'p-4',
                   !user && 'opacity-50 cursor-not-allowed',
                   readOnly && 'opacity-75 cursor-default bg-bg-secondary'
                 )}
@@ -262,6 +228,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
                 spellCheck={true}
                 autoComplete="off"
                 data-testid="editor-textarea"
+                wrap="soft"
               />
             </div>
             {/* Preview pane */}
@@ -271,6 +238,41 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
           </div>
         ) : viewMode === 'preview' ? (
           <MarkdownPreview content={content} className="h-full overflow-auto" />
+        ) : showLineNumbers ? (
+          <div className="relative h-full">
+            <div className="absolute left-0 top-0 w-12 h-full bg-bg-secondary border-r border-border-dark flex flex-col text-xs text-text-secondary font-mono overflow-hidden">
+              {content.split('\n').map((_, index) => (
+                <div key={index + 1} className="px-2 leading-relaxed text-right min-h-[1.5rem] flex items-center justify-end">
+                  {index + 1}
+                </div>
+              ))}
+            </div>
+            <textarea
+              ref={textareaRef}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onBlur={handleBlur}
+              onFocus={() => { wasFocusedRef.current = true }}
+              className={cn(
+                'w-full h-full pl-16 pr-4 py-4 bg-bg-primary text-text-primary',
+                'font-mono text-sm leading-relaxed',
+                'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
+                'resize-none placeholder:text-text-secondary',
+                'whitespace-pre-wrap break-words', // Enable text wrapping
+                !user && 'opacity-50 cursor-not-allowed',
+                readOnly && 'opacity-75 cursor-default bg-bg-secondary'
+              )}
+              placeholder={!user ? "Please sign in to edit your notes..." : readOnly ? "This file is read-only..." : "Start writing in Markdown..."}
+              disabled={!user}
+              readOnly={readOnly}
+              aria-label={readOnly ? "Markdown editor (read-only)" : "Markdown editor"}
+              spellCheck={true}
+              autoComplete="off"
+              data-testid="editor-textarea"
+              wrap="soft"
+            />
+          </div>
         ) : (
           <textarea
             ref={textareaRef}
@@ -284,6 +286,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
               'font-mono text-sm leading-relaxed',
               'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
               'resize-none placeholder:text-text-secondary',
+              'whitespace-pre-wrap break-words', // Enable text wrapping
               !user && 'opacity-50 cursor-not-allowed',
               readOnly && 'opacity-75 cursor-default bg-bg-secondary'
             )}
@@ -294,9 +297,75 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
             spellCheck={true}
             autoComplete="off"
             data-testid="editor-textarea"
+            wrap="soft"
           />
         )}
       </div>
+
+      {/* Bottom Bar - Markdown toolbar + view toggles + shortcuts */}
+      {!readOnly && (
+        <div className="border-t border-border-dark bg-bg-secondary">
+          {/* Markdown Toolbar */}
+          <MarkdownToolbar
+            textareaRef={textareaRef}
+            setContent={setContent}
+            insertLink={insertLink}
+            disabled={!user}
+          />
+          
+          {/* View Mode Toggle + Line Numbers + Shortcuts */}
+          <div className="h-10 border-t border-border-dark flex items-center justify-between px-3">
+            <div className="flex items-center gap-1">
+              <Button
+                variant={viewMode === 'edit' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setMode('edit')}
+                disabled={readOnly}
+                className="text-xs h-7"
+              >
+                Edit
+              </Button>
+              
+              {/* Preview and Split modes - Desktop only */}
+              <Button
+                variant={viewMode === 'preview' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setMode('preview')}
+                disabled={readOnly}
+                className="text-xs h-7 hidden md:inline-flex"
+              >
+                Preview
+              </Button>
+              <Button
+                variant={viewMode === 'split' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setMode('split')}
+                disabled={readOnly}
+                className="text-xs h-7 hidden lg:inline-flex"
+              >
+                Split
+              </Button>
+              
+              <div className="w-px h-5 bg-border-dark mx-2" />
+              
+              <Button
+                variant={showLineNumbers ? 'default' : 'ghost'}
+                size="sm"
+                onClick={toggleLineNumbers}
+                disabled={readOnly}
+                className="text-xs h-7 hidden sm:inline-flex"
+                title="Toggle line numbers"
+              >
+                #123
+              </Button>
+            </div>
+            
+            <div className="text-xs text-text-secondary hidden lg:block">
+              Shortcuts: Ctrl+B (bold), Ctrl+I (italic), Ctrl+K (link), Tab (indent), Enter (continue lists)
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Status bar */}
       <div className="flex items-center justify-between px-4 py-2 border-t bg-muted/30 text-sm text-muted-foreground">

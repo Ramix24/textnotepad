@@ -10,6 +10,7 @@ export type ViewMode = 'edit' | 'preview' | 'split'
 export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEditorOptions) {
   const [content, setContent] = useState(initialContent)
   const [viewMode, setViewMode] = useState<ViewMode>('edit')
+  const [showLineNumbers, setShowLineNumbers] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const updateContent = useCallback((newContent: string) => {
@@ -22,7 +23,22 @@ export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEdit
   }, [])
 
   const setMode = useCallback((mode: ViewMode) => {
+    // Force edit mode on mobile/tablet
+    if (typeof window !== 'undefined') {
+      const isMobile = window.innerWidth < 768 // md breakpoint
+      const isTablet = window.innerWidth < 1024 // lg breakpoint
+      
+      if (isMobile || (isTablet && mode === 'split')) {
+        setViewMode('edit')
+        return
+      }
+    }
+    
     setViewMode(mode)
+  }, [])
+
+  const toggleLineNumbers = useCallback(() => {
+    setShowLineNumbers(prev => !prev)
   }, [])
 
   const insertLink = useCallback(async () => {
@@ -148,6 +164,64 @@ export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEdit
       return
     }
 
+    // Handle Enter key for list continuation
+    if (e.key === 'Enter') {
+      const beforeCursor = value.slice(0, start)
+      const afterCursor = value.slice(start)
+      
+      // Find the current line
+      const lineStart = beforeCursor.lastIndexOf('\n') + 1
+      const currentLine = beforeCursor.slice(lineStart)
+      
+      // Check for various list patterns
+      const bulletListMatch = currentLine.match(/^(\s*)([-*+])\s/)
+      const numberedListMatch = currentLine.match(/^(\s*)(\d+)\.\s/)
+      const taskListMatch = currentLine.match(/^(\s*)([-*+])\s\[([ x])\]\s/)
+      
+      if (bulletListMatch || numberedListMatch || taskListMatch) {
+        e.preventDefault()
+        
+        let newLine = '\n'
+        
+        if (taskListMatch) {
+          // Task list continuation
+          const [, indent, marker, ] = taskListMatch
+          newLine += `${indent}${marker} [ ] `
+        } else if (bulletListMatch) {
+          // Bullet list continuation
+          const [, indent, marker] = bulletListMatch
+          newLine += `${indent}${marker} `
+        } else if (numberedListMatch) {
+          // Numbered list continuation
+          const [, indent, number] = numberedListMatch
+          const nextNumber = parseInt(number) + 1
+          newLine += `${indent}${nextNumber}. `
+        }
+        
+        // Check if current line is empty (just has the list marker)
+        const contentAfterMarker = currentLine.replace(/^(\s*)([-*+]|\d+\.)\s(\[([ x])\]\s)?/, '')
+        
+        if (contentAfterMarker.trim() === '') {
+          // Empty list item - remove the current line marker and don't continue list
+          const newContent = beforeCursor.slice(0, lineStart) + afterCursor
+          updateContent(newContent)
+          requestAnimationFrame(() => {
+            textarea.setSelectionRange(lineStart, lineStart)
+            textarea.focus()
+          })
+        } else {
+          // Continue the list
+          const newContent = beforeCursor + newLine + afterCursor
+          updateContent(newContent)
+          requestAnimationFrame(() => {
+            textarea.setSelectionRange(start + newLine.length, start + newLine.length)
+            textarea.focus()
+          })
+        }
+        return
+      }
+    }
+
     // Existing Ctrl/Cmd shortcuts
     if (!e.ctrlKey && !e.metaKey) return
 
@@ -211,6 +285,8 @@ export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEdit
     isSplit: viewMode === 'split',
     togglePreview,
     setMode,
+    showLineNumbers,
+    toggleLineNumbers,
     textareaRef,
     handleKeyDown,
     insertLink

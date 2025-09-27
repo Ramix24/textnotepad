@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode, useEffect, useState } from 'react'
-import { useFilesList } from '@/hooks/useFiles'
+import { useFilesList, useEmptyTrash } from '@/hooks/useFiles'
 import { useFileOperations } from './useFileOperations'
 import { FileItem } from './FileItem'
 import { SortDropdown, SortOption } from '@/components/sort-dropdown'
@@ -314,6 +314,7 @@ function TrashView({
   fileOps: ReturnType<typeof useFileOperations>
 }) {
   const [sortBy, setSortBy] = useState<SortOption>(getDefaultSort())
+  const emptyTrash = useEmptyTrash()
   
   // Sort files based on current sort option
   const sortedFiles = sortFiles(files, sortBy)
@@ -337,14 +338,28 @@ function TrashView({
     }
   }
 
+  const handleEmptyTrash = () => {
+    if (files.length === 0) return
+    
+    const confirmed = confirm(`Are you sure you want to permanently delete all ${files.length} files in trash? This action cannot be undone.`)
+    if (confirmed) {
+      const fileIds = files.map(f => f.id)
+      emptyTrash.mutate(fileIds)
+    }
+  }
+
   return (
     <div className="flex flex-col">
       <header className="flex-shrink-0 p-4 border-b border-border-dark bg-bg-secondary">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">🗑️</span>
-            <h2 className="text-sm font-medium text-text-primary">Trash</h2>
-          </div>
+          <button
+            onClick={handleEmptyTrash}
+            disabled={files.length === 0 || emptyTrash.isPending}
+            className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            title="Permanently delete all files in trash"
+          >
+            {emptyTrash.isPending ? 'Emptying...' : 'Empty Trash'}
+          </button>
           
           {files.length > 0 && (
             <SortDropdown 

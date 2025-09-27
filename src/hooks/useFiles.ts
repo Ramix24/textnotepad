@@ -321,3 +321,44 @@ export function usePermanentDeleteFile() {
     }
   })
 }
+
+/**
+ * Hook for emptying the entire trash (permanently deleting all trashed files)
+ */
+export function useEmptyTrash() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (trashedFiles: string[]): Promise<{ deletedCount: number }> => {
+      // Delete all files in parallel
+      const deletePromises = trashedFiles.map(fileId => 
+        fetch(`/api/files/${fileId}?action=permanent-delete`, {
+          method: 'POST',
+        }).then(response => {
+          if (!response.ok) {
+            throw new Error(`Failed to delete file ${fileId}`)
+          }
+          return response.json()
+        })
+      )
+
+      await Promise.all(deletePromises)
+      
+      return { deletedCount: trashedFiles.length }
+    },
+    onSuccess: (result) => {
+      // Invalidate and refetch files list
+      queryClient.invalidateQueries({ queryKey: ['files', 'list'] })
+      
+      toast.success(`Trash emptied successfully`, {
+        description: `${result.deletedCount} files permanently deleted.`
+      })
+    },
+    onError: (error: any) => {
+      console.error('Failed to empty trash:', error)
+      toast.error('Failed to empty trash', {
+        description: error.message || 'An unexpected error occurred while emptying the trash.'
+      })
+    },
+  })
+}
