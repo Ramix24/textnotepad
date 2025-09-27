@@ -1,6 +1,8 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
+import { HelpModal } from '@/components/HelpModal'
+import { HelpCircle } from 'lucide-react'
 
 interface AppShellProps {
   sidebar: ReactNode
@@ -8,6 +10,28 @@ interface AppShellProps {
 }
 
 export function AppShell({ sidebar, content }: AppShellProps) {
+  const [isHelpOpen, setIsHelpOpen] = useState(false)
+
+  // Global keyboard shortcuts for help
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+        e.preventDefault()
+        setIsHelpOpen(true)
+      } else if (e.key === '?' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        // Only trigger if not in an input field
+        const activeElement = document.activeElement
+        if (activeElement?.tagName !== 'INPUT' && activeElement?.tagName !== 'TEXTAREA') {
+          e.preventDefault()
+          setIsHelpOpen(true)
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   return (
     <div className="fixed inset-0 flex overflow-hidden bg-background">
       {/* Sidebar with resize handle */}
@@ -21,8 +45,18 @@ export function AppShell({ sidebar, content }: AppShellProps) {
             <div className="text-sm font-medium text-foreground">
               TextNotepad
             </div>
-            <div className="text-xs text-muted-foreground">
-              Ready
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsHelpOpen(true)}
+                className="flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded transition-colors"
+                title="Keyboard shortcuts (Ctrl+/ or ?)"
+              >
+                <HelpCircle className="w-3 h-3" />
+                <span className="hidden sm:inline">Help</span>
+              </button>
+              <div className="text-xs text-muted-foreground">
+                Ready
+              </div>
             </div>
           </div>
         </header>
@@ -32,6 +66,12 @@ export function AppShell({ sidebar, content }: AppShellProps) {
           {content}
         </main>
       </div>
+      
+      {/* Help Modal */}
+      <HelpModal
+        isOpen={isHelpOpen}
+        onClose={() => setIsHelpOpen(false)}
+      />
     </div>
   )
 }

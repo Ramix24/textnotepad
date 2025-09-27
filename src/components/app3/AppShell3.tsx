@@ -12,7 +12,8 @@ import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { GlobalSearchModal } from '@/components/global-search-modal'
-import { BookOpen, FileText, Edit3 } from 'lucide-react'
+import { HelpModal } from '@/components/HelpModal'
+import { BookOpen, FileText, Edit3, HelpCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface AppShell3Props {
@@ -35,6 +36,7 @@ export function AppShell3({
   const { supabase } = useSupabase()
   const { user } = useAuthSession()
   const [isSearchOpen, setIsSearchOpen] = React.useState(false)
+  const [isHelpOpen, setIsHelpOpen] = React.useState(false)
   
   // Refs for focusing columns
   const sectionsRef = useRef<HTMLDivElement>(null)
@@ -175,6 +177,16 @@ export function AppShell3({
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
         setIsSearchOpen(true)
+      } else if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+        e.preventDefault()
+        setIsHelpOpen(true)
+      } else if (e.key === '?' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        // Only trigger if not in an input field
+        const activeElement = document.activeElement
+        if (activeElement?.tagName !== 'INPUT' && activeElement?.tagName !== 'TEXTAREA') {
+          e.preventDefault()
+          setIsHelpOpen(true)
+        }
       }
     }
 
@@ -270,6 +282,16 @@ export function AppShell3({
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Help Button */}
+            <button
+              onClick={() => setIsHelpOpen(true)}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-[color:var(--bg-active)]/40 rounded transition-colors"
+              title="Keyboard shortcuts (Ctrl+/ or ?)"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span className="hidden sm:inline">Help</span>
+            </button>
+            
             {/* Theme Toggle */}
             <ThemeToggle />
             
@@ -393,6 +415,12 @@ export function AppShell3({
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         onFileSelect={handleFileSelect}
+      />
+      
+      {/* Help Modal */}
+      <HelpModal
+        isOpen={isHelpOpen}
+        onClose={() => setIsHelpOpen(false)}
       />
     </div>
   )
