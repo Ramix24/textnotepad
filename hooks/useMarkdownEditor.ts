@@ -164,7 +164,7 @@ export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEdit
       return
     }
 
-    // Handle Enter key for list continuation
+    // Handle Enter key for list continuation and inline shortcuts
     if (e.key === 'Enter') {
       const beforeCursor = value.slice(0, start)
       const afterCursor = value.slice(start)
@@ -172,6 +172,83 @@ export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEdit
       // Find the current line
       const lineStart = beforeCursor.lastIndexOf('\n') + 1
       const currentLine = beforeCursor.slice(lineStart)
+      
+      // ============= INLINE MARKDOWN SHORTCUTS =============
+      
+      // Heading shortcuts: ## text -> creates heading
+      const headingMatch = currentLine.match(/^(#{1,6})\s+(.*)$/)
+      if (headingMatch && headingMatch[2].trim()) {
+        e.preventDefault()
+        const [, hashes] = headingMatch
+        const newContent = beforeCursor + '\n\n' + hashes + ' ' + afterCursor
+        updateContent(newContent)
+        requestAnimationFrame(() => {
+          const newPos = start + 2 + hashes.length + 1
+          textarea.setSelectionRange(newPos, newPos)
+          textarea.focus()
+        })
+        return
+      }
+      
+      // Quote shortcuts: > text -> creates quote block
+      const quoteMatch = currentLine.match(/^>\s+(.+)$/)
+      if (quoteMatch && quoteMatch[1].trim()) {
+        e.preventDefault()
+        const newContent = beforeCursor + '\n> ' + afterCursor
+        updateContent(newContent)
+        requestAnimationFrame(() => {
+          const newPos = start + 3
+          textarea.setSelectionRange(newPos, newPos)
+          textarea.focus()
+        })
+        return
+      }
+      
+      // Bullet list shortcuts: - text -> creates bullet list
+      const bulletShortcutMatch = currentLine.match(/^-\s+(.+)$/)
+      if (bulletShortcutMatch && bulletShortcutMatch[1].trim()) {
+        e.preventDefault()
+        const newContent = beforeCursor + '\n- ' + afterCursor
+        updateContent(newContent)
+        requestAnimationFrame(() => {
+          const newPos = start + 3
+          textarea.setSelectionRange(newPos, newPos)
+          textarea.focus()
+        })
+        return
+      }
+      
+      // Numbered list shortcuts: 1. text -> creates numbered list
+      const numberedShortcutMatch = currentLine.match(/^(\d+)\.\s+(.+)$/)
+      if (numberedShortcutMatch && numberedShortcutMatch[2].trim()) {
+        e.preventDefault()
+        const currentNum = parseInt(numberedShortcutMatch[1])
+        const nextNum = currentNum + 1
+        const newContent = beforeCursor + '\n' + nextNum + '. ' + afterCursor
+        updateContent(newContent)
+        requestAnimationFrame(() => {
+          const newPos = start + 1 + nextNum.toString().length + 2
+          textarea.setSelectionRange(newPos, newPos)
+          textarea.focus()
+        })
+        return
+      }
+      
+      // Task list shortcuts: [] text -> creates task list
+      const taskShortcutMatch = currentLine.match(/^\[\]\s+(.+)$/)
+      if (taskShortcutMatch && taskShortcutMatch[1].trim()) {
+        e.preventDefault()
+        const newContent = beforeCursor + '\n- [ ] ' + afterCursor
+        updateContent(newContent)
+        requestAnimationFrame(() => {
+          const newPos = start + 7
+          textarea.setSelectionRange(newPos, newPos)
+          textarea.focus()
+        })
+        return
+      }
+      
+      // ============= EXISTING LIST CONTINUATION =============
       
       // Check for various list patterns
       const bulletListMatch = currentLine.match(/^(\s*)([-*+])\s/)
