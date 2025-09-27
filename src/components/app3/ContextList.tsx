@@ -208,7 +208,7 @@ function NotesView({
 
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full">
       <header className="flex-shrink-0 p-4 border-b border-border-dark bg-bg-secondary">
         <div className="flex items-center justify-between">
           <button
@@ -349,7 +349,7 @@ function TrashView({
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full">
       <header className="flex-shrink-0 p-4 border-b border-border-dark bg-bg-secondary">
         <div className="flex items-center justify-between">
           <button
