@@ -262,15 +262,16 @@ export function AppShell3({
       {/* Header */}
       <header className="h-14 border-b border-border-dark bg-bg-secondary flex-shrink-0">
         <div className="flex items-center justify-between h-full px-6">
+          {/* Header click triggers search interface in C3 */}
           <button 
             onClick={() => layout.setSelection({ mode: 'search', folderId: null, fileId: null, searchQuery: '' })}
             className="text-lg font-medium text-text-primary hover:text-accent-blue transition-colors cursor-pointer"
-            title="Search all notes"
+            title="Open search interface (shows all notes in C2, search in C3)"
           >
             TextNotepad.com
           </button>
           
-          {/* Global Search */}
+          {/* Global Search Modal (quick file jump) */}
           <div className="flex-1 max-w-md mx-8">
             <div 
               className="relative cursor-pointer"
