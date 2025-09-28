@@ -29,30 +29,33 @@ export function Logo({ size = 32, className = '' }: LogoProps) {
         width="10" 
         height="8" 
         rx="1" 
-        fill="rgba(255, 255, 255, 0.3)"
+        fill="rgba(255, 255, 255, 0.4)"
+        stroke="rgba(255, 255, 255, 0.6)"
+        strokeWidth="0.5"
       />
       
       {/* Lock shackle (top part) */}
       <path 
         d="M13 15 V12 C13 10.3 14.3 9 16 9 C17.7 9 19 10.3 19 12 V15" 
-        stroke="rgba(255, 255, 255, 0.3)" 
+        stroke="rgba(255, 255, 255, 0.6)" 
         strokeWidth="1.5" 
         fill="none"
       />
       
-      {/* Letter T in white - centered in the lock */}
-      <text 
-        x="16" 
-        y="20.5" 
-        textAnchor="middle" 
-        dominantBaseline="middle" 
-        fill="white" 
-        fontSize="8" 
-        fontWeight="bold" 
-        fontFamily="system-ui, -apple-system, sans-serif"
-      >
-        T
-      </text>
+      {/* Small keyhole in center of lock */}
+      <circle 
+        cx="16" 
+        cy="18.5" 
+        r="1.5" 
+        fill="rgba(30, 58, 138, 0.8)"
+      />
+      <rect 
+        x="15.5" 
+        y="18.5" 
+        width="1" 
+        height="2" 
+        fill="rgba(30, 58, 138, 0.8)"
+      />
     </svg>
   )
 }

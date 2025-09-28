@@ -44,7 +44,7 @@ export function PrivacySecurity() {
             <ul className="space-y-3">
               {securityFeatures.map((feature, index) => (
                 <li key={index} className="flex items-start space-x-3">
-                  <Check className="h-5 w-5 text-tn-accent mt-0.5 flex-shrink-0" />
+                  <Check className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
                   <span className="text-text-secondary">{feature}</span>
                 </li>
               ))}
