@@ -11,6 +11,7 @@ import { FoldersPanel } from './FoldersPanel'
 import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { Logo } from '@/components/ui/logo'
 import { BookOpen, FileText, HelpCircle, Search } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -257,10 +258,11 @@ export function AppShell3({
           {/* Header click triggers search interface in C3 */}
           <button 
             onClick={() => layout.setSelection({ mode: 'search', folderId: null, fileId: null, searchQuery: '' })}
-            className="text-lg font-medium text-text-primary hover:text-accent-blue transition-colors cursor-pointer"
+            className="flex items-center space-x-2 text-text-primary hover:text-accent-blue transition-colors cursor-pointer"
             title="Open search interface (shows all notes in C2, search in C3)"
           >
-            TextNotepad.com
+            <Logo size={28} />
+            <span className="text-lg font-medium">TextNotepad.com</span>
           </button>
           
           {/* Spacer for center alignment */}
