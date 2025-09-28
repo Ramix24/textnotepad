@@ -39,7 +39,6 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   
   // Refs for managing focus and keyboard shortcuts
   const wasFocusedRef = useRef(false)
-  const cursorPositionRef = useRef<{ start: number; end: number } | null>(null)
   const isActivelyTypingRef = useRef(false)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   
@@ -59,14 +58,6 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
       // Skip changes if in read-only mode
       if (readOnly) return
       
-      // Capture current cursor position
-      if (textareaRef.current) {
-        cursorPositionRef.current = {
-          start: textareaRef.current.selectionStart,
-          end: textareaRef.current.selectionEnd
-        }
-      }
-      
       // Mark user as actively typing
       isActivelyTypingRef.current = true
       
@@ -75,18 +66,10 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         clearTimeout(typingTimeoutRef.current)
       }
       
-      // Set timeout to mark typing as stopped after 2 seconds
+      // Set timeout to mark typing as stopped after 3 seconds (longer to match debounce)
       typingTimeoutRef.current = setTimeout(() => {
         isActivelyTypingRef.current = false
-      }, 2000)
-      
-      // Capture cursor position just before triggering autosave
-      if (textareaRef.current) {
-        cursorPositionRef.current = {
-          start: textareaRef.current.selectionStart,
-          end: textareaRef.current.selectionEnd
-        }
-      }
+      }, 3500)
       
       // Trigger autosave
       markDirty(newContent)
@@ -113,28 +96,20 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   const { isSaving, hasPendingChanges, markDirty, forceSave } = useAutosave({
     file,
     onSaved: (updatedFile) => {
-      // Only update file metadata, never the content during active typing
+      // Prevent any content updates during active typing to avoid cursor jumping
       if (!isActivelyTypingRef.current) {
+        // Only update when user is not typing - this prevents cursor disruption
         onFileUpdate?.(updatedFile)
       } else {
-        // Update only the file metadata (version, timestamps) but preserve current content
+        // During typing, only update metadata but preserve current content
         onFileUpdate?.({
           ...updatedFile,
-          content: content // Preserve current editor content
+          content: content // Keep current editor content
         })
       }
       
-      // Always restore cursor position after save, regardless of typing state
-      // Use requestAnimationFrame to ensure DOM updates are complete
-      requestAnimationFrame(() => {
-        if (wasFocusedRef.current && textareaRef.current && cursorPositionRef.current) {
-          textareaRef.current.focus()
-          textareaRef.current.setSelectionRange(
-            cursorPositionRef.current.start,
-            cursorPositionRef.current.end
-          )
-        }
-      })
+      // Simplified cursor restoration - no complex requestAnimationFrame
+      // The cursor should stay in place naturally if we don't update content during typing
     },
     onConflict: (conflictingFile) => {
       // Only update content if user is not actively typing
@@ -178,22 +153,24 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     }
   }, [isSaving, forceSave, handleMarkdownKeyDown])
 
-  // Capture cursor position on selection change
+  // Simplified - no need to manually track cursor position
   const handleSelectionChange = useCallback(() => {
-    if (textareaRef.current) {
-      cursorPositionRef.current = {
-        start: textareaRef.current.selectionStart,
-        end: textareaRef.current.selectionEnd
-      }
-    }
+    // Cursor position tracking removed to prevent jumping issues
+    // The textarea will naturally maintain cursor position without manual intervention
   }, [])
 
-  // Force save on blur (when user clicks away or tabs out)
+  // Save on blur only if there are pending changes and user has stopped typing
   const handleBlur = useCallback(async () => {
-    if (!isSaving) {
-      await forceSave()
+    // Only save if there are actually pending changes and user isn't actively typing
+    if (hasPendingChanges && !isActivelyTypingRef.current && !isSaving) {
+      // Add a small delay to prevent save storms from rapid focus changes
+      setTimeout(async () => {
+        if (hasPendingChanges && !isActivelyTypingRef.current) {
+          await forceSave()
+        }
+      }, 500)
     }
-  }, [isSaving, forceSave])
+  }, [hasPendingChanges, isSaving, forceSave])
 
   // Update dirty state based on content changes
   useEffect(() => {

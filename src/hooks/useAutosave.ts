@@ -8,7 +8,7 @@ import { updateFileContent, calculateContentStats, ConflictError } from '@/lib/u
 import { UserFile } from '@/types/user-files.types'
 
 export interface AutosaveConfig {
-  debounceMs?: number    // Delay after last change (default: 1000ms)
+  debounceMs?: number    // Delay after last change (default: 3000ms)
   throttleMs?: number    // Max frequency of saves (default: 2000ms)
 }
 
@@ -31,7 +31,7 @@ export interface UseAutosaveReturn {
  * Hook for automatic saving of file content with smart debouncing and throttling
  * 
  * Features:
- * - Debounce: Waits for typing to stop before saving (default: 1000ms)
+ * - Debounce: Waits for typing to stop before saving (default: 3000ms)
  * - Throttle: Limits save frequency during continuous typing (default: 2000ms)
  * - Optimistic updates: Immediately updates version locally
  * - Conflict resolution: Handles version conflicts gracefully
@@ -75,7 +75,7 @@ export function useAutosave({
   onConflict,
   config = {}
 }: UseAutosaveOptions): UseAutosaveReturn {
-  const { debounceMs = 1000 } = config
+  const { debounceMs = 3000 } = config
   const { supabase } = useSupabase()
   
   const queryClient = useQueryClient()
