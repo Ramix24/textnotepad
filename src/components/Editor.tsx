@@ -80,6 +80,14 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         isActivelyTypingRef.current = false
       }, 2000)
       
+      // Capture cursor position just before triggering autosave
+      if (textareaRef.current) {
+        cursorPositionRef.current = {
+          start: textareaRef.current.selectionStart,
+          end: textareaRef.current.selectionEnd
+        }
+      }
+      
       // Trigger autosave
       markDirty(newContent)
       
@@ -116,16 +124,17 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         })
       }
       
-      // Restore focus and cursor position if it was focused before save
-      if (wasFocusedRef.current && textareaRef.current) {
-        textareaRef.current.focus()
-        if (cursorPositionRef.current) {
+      // Always restore cursor position after save, regardless of typing state
+      // Use requestAnimationFrame to ensure DOM updates are complete
+      requestAnimationFrame(() => {
+        if (wasFocusedRef.current && textareaRef.current && cursorPositionRef.current) {
+          textareaRef.current.focus()
           textareaRef.current.setSelectionRange(
             cursorPositionRef.current.start,
             cursorPositionRef.current.end
           )
         }
-      }
+      })
     },
     onConflict: (conflictingFile) => {
       // Only update content if user is not actively typing
