@@ -58,7 +58,7 @@ export function Testimonials() {
       // For now, we'll just simulate success
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      setMessage("You're on the list! We'll notify you when the production version launches.")
+      setMessage("You're on the list! We'll notify you when TextNotepad launches.")
       setMessageType("success")
       setEmail("")
       setName("")
@@ -72,7 +72,7 @@ export function Testimonials() {
   }
 
   return (
-    <Section className="bg-bg-secondary/30">
+    <Section id="waitlist" className="bg-bg-secondary/30">
       <Container>
         <MotionDiv
           initial={animations.fadeInUp.initial}
@@ -81,10 +81,10 @@ export function Testimonials() {
           className="text-center space-y-4 mb-16"
         >
           <h2 className="text-3xl lg:text-4xl font-bold text-text-primary">
-            Production waitlist
+            Join the waitlist
           </h2>
           <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-            Want to be notified when the full production version launches? Join our waitlist for exclusive early access and special pricing.
+            Be the first to know when TextNotepad launches. Join our waitlist for exclusive early access and special pricing.
           </p>
         </MotionDiv>
 
@@ -154,7 +154,7 @@ export function Testimonials() {
                           required
                         />
                         <label htmlFor="prod-consent" className="text-sm text-text-secondary leading-5">
-                          I agree to the processing of my email address for production launch notifications. (GDPR)
+                          I agree to the processing of my email address for launch notifications and updates. (GDPR)
                         </label>
                       </div>
 
@@ -175,7 +175,7 @@ export function Testimonials() {
                         disabled={isSubmitting}
                       >
                         <Mail className="h-4 w-4 mr-2" />
-                        {isSubmitting ? "Joining..." : "Join production waitlist"}
+                        {isSubmitting ? "Joining..." : "Join waitlist"}
                       </Button>
                     </form>
 
