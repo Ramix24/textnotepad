@@ -63,7 +63,7 @@ export function Header() {
                     <Link href="/auth">Sign In</Link>
                   </Button>
                   <Button size="sm" asChild className="bg-tn-accent text-white hover:bg-gray-800">
-                    <Link href="/auth">Activate Free Year</Link>
+                    <Link href="/auth">Join Beta</Link>
                   </Button>
                 </>
               )}

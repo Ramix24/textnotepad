@@ -20,10 +20,10 @@ export function Footer() {
             <div className="grid md:grid-cols-4 gap-8">
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
-                  <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                    <span className="text-primary-foreground font-bold text-sm">T</span>
+                  <div className="h-8 w-8 rounded-lg bg-tn-accent flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">T</span>
                   </div>
-                  <span className="text-xl font-semibold">🔒 TextNotepad.com</span>
+                  <span className="text-xl font-semibold text-text-primary">TextNotepad.com</span>
                 </div>
                 <p className="text-muted-foreground text-sm max-w-xs">
                   Privacy is freedom.
