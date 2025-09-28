@@ -39,6 +39,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   
   // Refs for managing focus and keyboard shortcuts
   const wasFocusedRef = useRef(false)
+  const cursorPositionRef = useRef<{ start: number; end: number } | null>(null)
   const isActivelyTypingRef = useRef(false)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   
@@ -57,6 +58,14 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     onChange: (newContent: string) => {
       // Skip changes if in read-only mode
       if (readOnly) return
+      
+      // Capture current cursor position
+      if (textareaRef.current) {
+        cursorPositionRef.current = {
+          start: textareaRef.current.selectionStart,
+          end: textareaRef.current.selectionEnd
+        }
+      }
       
       // Mark user as actively typing
       isActivelyTypingRef.current = true
@@ -107,9 +116,15 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         })
       }
       
-      // Restore focus if it was focused before save
+      // Restore focus and cursor position if it was focused before save
       if (wasFocusedRef.current && textareaRef.current) {
         textareaRef.current.focus()
+        if (cursorPositionRef.current) {
+          textareaRef.current.setSelectionRange(
+            cursorPositionRef.current.start,
+            cursorPositionRef.current.end
+          )
+        }
       }
     },
     onConflict: (conflictingFile) => {
@@ -153,6 +168,16 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
       }
     }
   }, [isSaving, forceSave, handleMarkdownKeyDown])
+
+  // Capture cursor position on selection change
+  const handleSelectionChange = useCallback(() => {
+    if (textareaRef.current) {
+      cursorPositionRef.current = {
+        start: textareaRef.current.selectionStart,
+        end: textareaRef.current.selectionEnd
+      }
+    }
+  }, [])
 
   // Force save on blur (when user clicks away or tabs out)
   const handleBlur = useCallback(async () => {
@@ -254,6 +279,8 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
                 onKeyDown={handleKeyDown}
                 onBlur={handleBlur}
                 onFocus={() => { wasFocusedRef.current = true }}
+                onSelect={handleSelectionChange}
+                onClick={handleSelectionChange}
                 className={cn(
                   'w-full h-full bg-bg-primary text-text-primary',
                   'font-mono text-sm leading-relaxed',
@@ -297,6 +324,8 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
               onKeyDown={handleKeyDown}
               onBlur={handleBlur}
               onFocus={() => { wasFocusedRef.current = true }}
+              onSelect={handleSelectionChange}
+              onClick={handleSelectionChange}
               className={cn(
                 'w-full h-full pl-16 pr-4 py-4 bg-bg-primary text-text-primary',
                 'font-mono text-sm leading-relaxed',
@@ -324,6 +353,8 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
             onFocus={() => { wasFocusedRef.current = true }}
+            onSelect={handleSelectionChange}
+            onClick={handleSelectionChange}
             className={cn(
               'w-full h-full p-4 bg-bg-primary text-text-primary',
               'font-mono text-sm leading-relaxed',
