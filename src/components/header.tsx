@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Container } from "@/components/ui/container"
 import { MotionDiv, animations } from "@/components/ui/motion"
+import { Logo } from "@/components/ui/logo"
 import { useAuthSession } from "@/hooks/useAuthSession"
 
 export function Header() {
@@ -19,9 +20,7 @@ export function Header() {
         <Container>
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-lg bg-tn-accent flex items-center justify-center">
-                <span className="text-white font-bold text-sm">T</span>
-              </div>
+              <Logo size={32} />
               <span className="text-xl font-semibold text-text-primary">TextNotepad.com</span>
             </Link>
 

@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { Container } from "@/components/ui/container"
 import { MotionDiv, animations } from "@/components/ui/motion"
+import { Logo } from "@/components/ui/logo"
 import { Github, Twitter, Mail } from "lucide-react"
 import { FAQShort } from "@/components/faq-short"
 
@@ -20,9 +21,7 @@ export function Footer() {
             <div className="grid md:grid-cols-4 gap-8">
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
-                  <div className="h-8 w-8 rounded-lg bg-tn-accent flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">T</span>
-                  </div>
+                  <Logo size={32} />
                   <span className="text-xl font-semibold text-text-primary">TextNotepad.com</span>
                 </div>
                 <p className="text-muted-foreground text-sm max-w-xs">
