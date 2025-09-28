@@ -260,7 +260,7 @@ function NotesView({
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            <span className="hidden sm:inline">New Note</span>
+            <span className="hidden sm:inline">+ Note</span>
           </button>
           
           {files.length > 0 && (
@@ -331,7 +331,7 @@ function NotesEmptyState() {
       </div>
       <h3 className="text-sm font-medium text-text-primary mb-2">No notes in this folder</h3>
       <p className="text-xs text-text-secondary leading-relaxed max-w-[200px]">
-        Use the &ldquo;New Note&rdquo; button in the header to create your first note
+        Use the &ldquo;+ Note&rdquo; button in the header to create your first note
       </p>
     </div>
   )

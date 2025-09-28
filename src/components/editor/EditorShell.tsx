@@ -25,7 +25,7 @@ export default function EditorShell() {
           </nav>
           <div className="p-2">
             <button className="w-full py-2 rounded-md bg-accent-blue text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-accent-blue">
-              + New Folder
+              + Folder
             </button>
           </div>
         </aside>
@@ -35,7 +35,7 @@ export default function EditorShell() {
           {/* Shared Header for C2+C3 */}
           <header className="absolute left-[200px] right-0 h-12 bg-bg-secondary border-b border-border-dark flex items-center gap-2 px-3">
             <div className="flex items-center gap-2">
-              <button className="px-3 py-1.5 rounded-md bg-accent-blue text-white hover:opacity-90">+ New Note</button>
+              <button className="px-3 py-1.5 rounded-md bg-accent-blue text-white hover:opacity-90">+ Note</button>
               <div className="flex gap-1 text-text-secondary">
                 <button className="px-2 py-1 rounded-md hover:bg-[color:var(--bg-active)]/40 border border-transparent data-[active=true]:border-accent-blue" data-active>
                   Notes

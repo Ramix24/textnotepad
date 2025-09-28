@@ -95,7 +95,7 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance, 
               className="px-3 py-1.5 text-xs font-medium bg-accent-blue text-white rounded-md hover:opacity-90 disabled:opacity-50 transition-colors"
               title="Create new folder"
             >
-              {createFolder.isPending ? 'Creating...' : 'New Folder'}
+              {createFolder.isPending ? 'Creating...' : '+ Folder'}
             </button>
           )}
           
