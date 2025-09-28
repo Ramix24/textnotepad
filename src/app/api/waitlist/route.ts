@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
           source: validatedData.source,
           metadata: {
             user_agent: request.headers.get('user-agent'),
-            ip: request.ip || request.headers.get('x-forwarded-for') || 'unknown',
+            ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
             timestamp: new Date().toISOString()
           }
         }
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           success: false, 
-          message: error.errors[0]?.message || 'Invalid input' 
+          message: error.issues[0]?.message || 'Invalid input' 
         },
         { status: 400 }
       )
