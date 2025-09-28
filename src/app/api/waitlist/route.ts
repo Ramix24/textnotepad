@@ -9,14 +9,31 @@ const waitlistSchema = z.object({
   source: z.enum(['waitlist', 'beta']).default('waitlist')
 })
 
-// Initialize Supabase client for server-side operations
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // Use service role for server operations
-)
+// Initialize Supabase client for server-side operations with error handling
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+if (!supabaseUrl || !supabaseKey) {
+  console.warn('Supabase credentials not found - waitlist endpoints will be disabled')
+}
+
+const supabase = supabaseUrl && supabaseKey 
+  ? createClient(supabaseUrl, supabaseKey)
+  : null
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if Supabase is available
+    if (!supabase) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: 'Waitlist feature not available - please try again later' 
+        },
+        { status: 503 }
+      )
+    }
+
     const body = await request.json()
     
     // Validate input
@@ -100,6 +117,16 @@ export async function POST(request: NextRequest) {
 // GET endpoint to retrieve waitlist stats (authenticated users only)
 export async function GET() {
   try {
+    // Check if Supabase is available
+    if (!supabase) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          message: 'Stats not available - missing configuration' 
+        },
+        { status: 503 }
+      )
+    }
     const { data, error } = await supabase
       .from('waitlist')
       .select('source, created_at')
