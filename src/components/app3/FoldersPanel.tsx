@@ -92,10 +92,13 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance, 
             <button
               onClick={handleCreateFolder}
               disabled={createFolder.isPending}
-              className="px-3 py-1.5 text-xs font-medium bg-accent-blue text-white rounded-md hover:opacity-90 disabled:opacity-50 transition-colors"
+              className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-accent-blue text-white rounded-md hover:opacity-90 disabled:opacity-50 transition-colors"
               title="Create new folder"
             >
-              {createFolder.isPending ? 'Creating...' : '+ Folder'}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <span className="hidden sm:inline">{createFolder.isPending ? 'Creating...' : 'Folder'}</span>
             </button>
           )}
           
