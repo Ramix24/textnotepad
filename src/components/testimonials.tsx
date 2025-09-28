@@ -54,15 +54,30 @@ export function Testimonials() {
     setIsSubmitting(true)
 
     try {
-      // Here you would normally submit to your backend for production waitlist
-      // For now, we'll just simulate success
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      setMessage("You're on the list! We'll notify you when TextNotepad launches.")
-      setMessageType("success")
-      setEmail("")
-      setName("")
-      setConsent(false)
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          name: name.trim() || undefined,
+          source: 'waitlist'
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setMessage(result.message)
+        setMessageType("success")
+        setEmail("")
+        setName("")
+        setConsent(false)
+      } else {
+        setMessage(result.message || "Something went wrong. Please try again.")
+        setMessageType("error")
+      }
     } catch {
       setMessage("Something went wrong. Please try again.")
       setMessageType("error")
