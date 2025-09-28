@@ -37,11 +37,11 @@ export function Hero() {
                 </Button>
               ) : (
                 <Button size="lg" asChild className="bg-accent-blue text-white hover:opacity-90 focus:ring-accent-blue/60">
-                  <Link href="/auth">Start writing securely</Link>
+                  <Link href="#waitlist">Join Beta Waitlist</Link>
                 </Button>
               )}
               <Button size="lg" variant="outline" asChild className="bg-transparent border-accent-blue text-accent-blue hover:bg-[color:var(--bg-active)]/40">
-                <Link href="/demo">Free Trial</Link>
+                <Link href="/demo">Try Demo</Link>
               </Button>
             </div>
             

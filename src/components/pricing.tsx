@@ -1,47 +1,75 @@
 "use client"
 
-import React from "react"
-import Link from "next/link"
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Container } from "@/components/ui/container"
 import { Section } from "@/components/ui/section"
 import { MotionDiv, animations } from "@/components/ui/motion"
-import { Check } from "lucide-react"
-import { useAuthSession } from "@/hooks/useAuthSession"
+import { Check, Mail } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
 
-const trialFeatures = [
-  "Full feature access",
-  "End-to-end encryption",
-  "Unlimited notes",
-  "Access on any device",
-  "Zero tracking & zero ads",
-  "14 days free"
-]
-
-const yearlyFeatures = [
-  "Everything in trial",
-  "Secure note sharing",
-  "Custom encryption keys", 
-  "Offline-first mode",
-  "Priority support",
-  "1 full year access"
-]
-
-const lifetimeFeatures = [
-  "Everything in yearly",
-  "Lifetime access",
-  "Future feature updates",
-  "Premium support",
-  "No recurring payments",
-  "Best value"
+const betaFeatures = [
+  "Priority access to new features",
+  "Help influence the roadmap", 
+  "One-click unsubscribe"
 ]
 
 export function Pricing() {
-  const { user } = useAuthSession()
+  const [email, setEmail] = useState("")
+  const [name, setName] = useState("")
+  const [consent, setConsent] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [message, setMessage] = useState("")
+  const [messageType, setMessageType] = useState<"success" | "error" | "">("")
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMessage("")
+    setMessageType("")
+
+    // Validation
+    if (!email) {
+      setMessage("Please enter a valid email.")
+      setMessageType("error")
+      return
+    }
+
+    if (!email.includes("@")) {
+      setMessage("Please enter a valid email.")
+      setMessageType("error")
+      return
+    }
+
+    if (!consent) {
+      setMessage("Consent is required to join the waitlist.")
+      setMessageType("error")
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      // Here you would normally submit to your backend
+      // For now, we'll just simulate success
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      setMessage("You're on the list! We'll send your beta invite soon.")
+      setMessageType("success")
+      setEmail("")
+      setName("")
+      setConsent(false)
+    } catch {
+      setMessage("Something went wrong. Please try again.")
+      setMessageType("error")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
   
   return (
-    <Section id="pricing">
+    <Section id="waitlist">
       <Container>
         <MotionDiv
           initial={animations.fadeInUp.initial}
@@ -50,138 +78,111 @@ export function Pricing() {
           className="text-center space-y-4 mb-16"
         >
           <h2 className="text-3xl lg:text-4xl font-bold text-text-primary">
-            What You Get
+            Beta waitlist
           </h2>
           <p className="text-xl text-text-secondary max-w-3xl mx-auto leading-7">
-            No hidden costs. No ads. No tracking. Just secure notes.
+            Leave us your email to get early access when we open the beta. Invitations are sent in batches.
           </p>
         </MotionDiv>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {/* 14-Day Trial */}
+        <div className="max-w-2xl mx-auto">
           <MotionDiv
             initial={animations.fadeInUp.initial}
             animate={animations.fadeInUp.animate}
             transition={{ ...animations.fadeInUp.transition, delay: 0.1 }}
           >
-            <Card className="h-full bg-bg-primary border-border-dark">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-2xl font-bold text-text-primary text-center">
-                  14-Day Trial
-                </CardTitle>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-text-primary">Free</div>
-                  <p className="text-text-secondary">Try everything risk-free</p>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-3">
-                  {trialFeatures.map((feature, index) => (
-                    <div key={index} className="flex items-start space-x-3">
-                      <Check className="h-5 w-5 text-accent-blue mt-0.5 flex-shrink-0" />
-                      <span className="text-text-primary">{feature}</span>
+            <Card className="bg-bg-primary border-border-dark">
+              <CardContent className="p-8">
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* Benefits */}
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      {betaFeatures.map((feature, index) => (
+                        <div key={index} className="flex items-start space-x-3">
+                          <Check className="h-5 w-5 text-accent-blue mt-0.5 flex-shrink-0" />
+                          <span className="text-text-primary">{feature}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-                <div className="pt-4">
-                  <Button size="lg" asChild className="w-full bg-accent-blue text-white hover:opacity-90">
-                    <Link href={user ? "/app" : "/auth"}>
-                      {user ? "Open Editor" : "Start Trial"}
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </MotionDiv>
+                  </div>
 
-          {/* 1-Year Plan */}
-          <MotionDiv
-            initial={animations.fadeInUp.initial}
-            animate={animations.fadeInUp.animate}
-            transition={{ ...animations.fadeInUp.transition, delay: 0.2 }}
-          >
-            <Card className="h-full bg-bg-primary border-border-dark relative">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span className="bg-accent-blue text-white px-4 py-1 rounded-full text-sm font-medium">
-                  Most Popular
-                </span>
-              </div>
-              <CardHeader className="pb-4">
-                <CardTitle className="text-2xl font-bold text-text-primary text-center">
-                  1-Year Plan
-                </CardTitle>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-text-primary">$19</div>
-                  <p className="text-text-secondary">One-time payment</p>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-3">
-                  {yearlyFeatures.map((feature, index) => (
-                    <div key={index} className="flex items-start space-x-3">
-                      <Check className="h-5 w-5 text-accent-blue mt-0.5 flex-shrink-0" />
-                      <span className="text-text-primary">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="pt-4">
-                  <Button size="lg" asChild className="w-full bg-accent-blue text-white hover:opacity-90">
-                    <Link href={user ? "/app" : "/auth"}>
-                      {user ? "Upgrade" : "Get 1-Year Access"}
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </MotionDiv>
+                  {/* Waitlist Form */}
+                  <div className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div>
+                        <label htmlFor="name" className="block text-sm font-medium text-text-primary mb-2">
+                          Name (optional)
+                        </label>
+                        <Input
+                          id="name"
+                          type="text"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className="w-full"
+                        />
+                      </div>
 
-          {/* Lifetime Plan */}
-          <MotionDiv
-            initial={animations.fadeInUp.initial}
-            animate={animations.fadeInUp.animate}
-            transition={{ ...animations.fadeInUp.transition, delay: 0.3 }}
-          >
-            <Card className="h-full bg-bg-secondary border-border-dark">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-2xl font-bold text-text-primary text-center">
-                  Lifetime Plan
-                </CardTitle>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-text-primary">$38</div>
-                  <p className="text-text-secondary">Pay once, own forever</p>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-3">
-                  {lifetimeFeatures.map((feature, index) => (
-                    <div key={index} className="flex items-start space-x-3">
-                      <Check className="h-5 w-5 text-accent-blue mt-0.5 flex-shrink-0" />
-                      <span className="text-text-primary">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="pt-4">
-                  <Button size="lg" asChild className="w-full bg-text-primary text-bg-primary hover:opacity-90">
-                    <Link href={user ? "/app" : "/auth"}>
-                      {user ? "Get Lifetime" : "Buy Lifetime Access"}
-                    </Link>
-                  </Button>
+                      <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2">
+                          Email
+                        </label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="e.g. you@example.com"
+                          className="w-full"
+                          required
+                        />
+                      </div>
+
+                      <div className="flex items-start space-x-3">
+                        <Checkbox
+                          id="consent"
+                          checked={consent}
+                          onCheckedChange={(checked) => setConsent(checked as boolean)}
+                          required
+                        />
+                        <label htmlFor="consent" className="text-sm text-text-secondary leading-5">
+                          I agree to the processing of my email address for the purpose of sending a beta invitation. (GDPR)
+                        </label>
+                      </div>
+
+                      {message && (
+                        <div className={`text-sm p-3 rounded-md ${
+                          messageType === "success" 
+                            ? "bg-green-50 text-green-800 border border-green-200" 
+                            : "bg-red-50 text-red-800 border border-red-200"
+                        }`}>
+                          {message}
+                        </div>
+                      )}
+
+                      <Button 
+                        type="submit" 
+                        size="lg" 
+                        className="w-full bg-accent-blue text-white hover:opacity-90"
+                        disabled={isSubmitting}
+                      >
+                        <Mail className="h-4 w-4 mr-2" />
+                        {isSubmitting ? "Joining..." : "Join the waitlist"}
+                      </Button>
+                    </form>
+
+                    <p className="text-xs text-text-secondary text-center">
+                      We don&apos;t share your data with third parties.{" "}
+                      <a href="/privacy" className="text-accent-blue hover:underline">
+                        See our Privacy Policy
+                      </a>{" "}
+                      (short and readable).
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </MotionDiv>
         </div>
-
-        <MotionDiv
-          initial={animations.fadeInUp.initial}
-          animate={animations.fadeInUp.animate}
-          transition={{ ...animations.fadeInUp.transition, delay: 0.4 }}
-          className="text-center mt-16"
-        >
-          <p className="text-2xl font-bold text-text-primary">
-            Simple. Transparent. Yours.
-          </p>
-        </MotionDiv>
       </Container>
     </Section>
   )

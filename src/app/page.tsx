@@ -15,7 +15,7 @@ const jsonLd = {
       "@id": "https://textnotepad.com/#website",
       "url": "https://textnotepad.com/",
       "name": "TextNotepad",
-      "description": "Privacy-first note taking with end-to-end encryption",
+      "description": "Privacy-first note taking with end-to-end encryption. Join our beta waitlist for early access.",
       "potentialAction": [
         {
           "@type": "SearchAction",
@@ -31,40 +31,27 @@ const jsonLd = {
       "@type": "SoftwareApplication",
       "@id": "https://textnotepad.com/#software",
       "name": "TextNotepad",
-      "description": "A modern web-based text editor built for privacy-conscious writers who demand simplicity and focus.",
+      "description": "A modern web-based text editor built for privacy-conscious writers who demand simplicity and focus. Currently in beta.",
       "url": "https://textnotepad.com/",
       "operatingSystem": "Web Browser",
       "applicationCategory": "ProductivityApplication",
       "offers": [
         {
           "@type": "Offer",
-          "name": "Personal Plan",
-          "price": "29",
+          "name": "Beta Access",
+          "price": "0",
           "priceCurrency": "USD",
-          "priceValidUntil": "2025-12-31",
-          "availability": "https://schema.org/InStock",
-          "validFrom": "2024-01-01"
-        },
-        {
-          "@type": "Offer",
-          "name": "Secure Saver",
-          "price": "54",
-          "priceCurrency": "USD",
-          "priceValidUntil": "2025-12-31",
-          "availability": "https://schema.org/InStock",
-          "validFrom": "2024-01-01"
+          "availability": "https://schema.org/PreOrder",
+          "description": "Free beta access via waitlist"
         }
       ],
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "127"
-      },
       "featureList": [
         "Full End-to-End Encryption (E2EE)",
-        "Zero-knowledge storage",
+        "Zero-knowledge storage", 
         "Distraction-free writing",
-        "GDPR compliant, EU hosting"
+        "GDPR compliant, EU hosting",
+        "Priority access to new features",
+        "Help influence the roadmap"
       ]
     },
     {
