@@ -22,9 +22,9 @@ export function Header() {
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center space-x-2">
               <Logo size={32} />
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
                 <span className="text-xl font-semibold text-text-primary">TextNotepad.com</span>
-                <span className="text-sm text-text-secondary bg-bg-secondary px-2 py-0.5 rounded-md font-mono">
+                <span className="text-xs text-white bg-blue-600 px-2 py-1 rounded font-mono font-medium">
                   {formatVersion()}
                 </span>
               </div>
