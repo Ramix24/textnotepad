@@ -42,6 +42,16 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   const isActivelyTypingRef = useRef(false)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   
+  // Protected file content that prevents updates during active editing
+  const [protectedFileContent, setProtectedFileContent] = useState(file.content)
+  
+  // Only update protected content when textarea is not focused
+  useEffect(() => {
+    if (document.activeElement !== textareaRef.current) {
+      setProtectedFileContent(file.content)
+    }
+  }, [file.content])
+  
   // Markdown editor hook with keyboard shortcuts
   const { 
     content, 
@@ -53,7 +63,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     textareaRef, 
     handleKeyDown: handleMarkdownKeyDown, 
     insertLink 
-  } = useMarkdownEditor(file.content, {
+  } = useMarkdownEditor(protectedFileContent, {
     onChange: (newContent: string) => {
       // Skip changes if in read-only mode
       if (readOnly) return
@@ -101,29 +111,27 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
       const cursorEnd = textareaRef.current?.selectionEnd || 0
       const wasTextareaFocused = document.activeElement === textareaRef.current
       
-      // Check if user is actively interacting with the textarea right now
-      const isCurrentlyActive = wasTextareaFocused && isActivelyTypingRef.current
-      
-      // ALWAYS preserve current content during active typing OR when textarea has focus
-      // This is more conservative to prevent any cursor jumping
-      if (isCurrentlyActive || wasTextareaFocused) {
-        // During typing or when focused, update metadata but keep current editor content
+      // NEVER update content when textarea is focused - this is the most aggressive approach
+      // Only update metadata to prevent ANY possibility of cursor jumping
+      if (wasTextareaFocused) {
+        // Textarea is focused - NEVER update content, only metadata
         onFileUpdate?.({
           ...updatedFile,
-          content: content // Preserve current editor content to prevent cursor jump
+          content: content // Force preserve current editor content
+        })
+        
+        // Double-restore cursor position with multiple animation frames
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (textareaRef.current && document.activeElement === textareaRef.current) {
+              textareaRef.current.setSelectionRange(cursorPos, cursorEnd)
+            }
+          })
         })
       } else {
-        // Only update content when textarea is not focused
+        // Textarea not focused - safe to update everything
         onFileUpdate?.(updatedFile)
       }
-      
-      // ALWAYS restore cursor position after DOM updates, regardless of typing state
-      requestAnimationFrame(() => {
-        if (textareaRef.current && wasTextareaFocused) {
-          textareaRef.current.focus()
-          textareaRef.current.setSelectionRange(cursorPos, cursorEnd)
-        }
-      })
     },
     onConflict: (conflictingFile) => {
       // Only update content if user is not actively typing
