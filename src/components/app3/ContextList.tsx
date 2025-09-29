@@ -269,10 +269,10 @@ function NotesView({
 
   return (
     <div className="flex flex-col h-full">
-      <header className="flex-shrink-0 p-4 border-b border-border-dark bg-bg-secondary">
+      <header className="flex-shrink-0 border-b border-border-dark bg-bg-secondary">
         {isCollapsed ? (
           // Collapsed header - minimal with just toggle button
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center p-2">
             {onToggleCollapsed && (
               <button
                 onClick={onToggleCollapsed}
@@ -285,7 +285,7 @@ function NotesView({
           </div>
         ) : (
           // Expanded header - full controls
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-2">
               <button
                 onClick={() => fileOps.handleCreateFile()}

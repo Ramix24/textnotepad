@@ -26,7 +26,7 @@ const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
   col1: 200, // Expanded folders panel width 
   col1Collapsed: 48, // Collapsed folders panel width (icon-only)
   col2: 360, // Default context list width  
-  col2Collapsed: 48, // Collapsed context list width
+  col2Collapsed: 64, // Collapsed context list width (need space for toggle button)
   col2Min: COL2_MIN,
   col2Max: COL2_MAX,
   col3Min: 480 // Minimum detail view width
