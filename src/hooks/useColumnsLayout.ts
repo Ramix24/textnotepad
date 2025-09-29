@@ -270,7 +270,7 @@ export function useColumnsLayout(
       default:
         return {
           showSections: true,
-          showList: !isCol2Collapsed, // Hide C2 when collapsed on desktop
+          showList: true, // Always show C2, width changes handle collapsed state
           showDetail: true
         }
     }
