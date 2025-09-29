@@ -3,6 +3,7 @@
 import { ReactNode, useRef, useEffect, KeyboardEvent } from 'react'
 import { FileText, BookOpen, ChevronLeft, ChevronRight, Inbox } from 'lucide-react'
 import { useFoldersList, useCreateFolder, useRenameFolder, useDeleteFolder } from '@/hooks/useFolders'
+import { formatVersion } from '@/lib/version'
 import type { AppSelection } from './types'
 
 interface FoldersPanelProps {
@@ -509,7 +510,7 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
       {/* Footer */}
       <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary">
         <div className="flex items-center justify-center text-xs text-text-secondary">
-          <span className="text-xs text-text-secondary font-mono">v0.5.8</span>
+          <span className="text-xs text-text-secondary font-mono">{formatVersion()}</span>
         </div>
       </footer>
     </div>
