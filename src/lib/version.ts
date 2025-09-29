@@ -2,10 +2,11 @@
  * Version utilities
  * Provides access to the current app version
  * Version is auto-updated by the version script on each commit
+ * Critical fix: C2 toggle now always visible - v0.5.17
  */
 
 // This version is automatically updated by scripts/auto-version.js
-export const APP_VERSION = '0.5.16'
+export const APP_VERSION = '0.5.17'
 export const APP_NAME = 'textnotepad'
 
 /**
