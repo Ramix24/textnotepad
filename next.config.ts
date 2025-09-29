@@ -14,6 +14,10 @@ const nextConfig: NextConfig = {
 
     return config
   },
+  // Force fresh builds to resolve deployment issues
+  generateBuildId: async () => {
+    return `build-${Date.now()}`
+  },
 };
 
 export default nextConfig;
