@@ -1,1 +1,2 @@
+npm run version:auto
 pnpm exec lint-staged

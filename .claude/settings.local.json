@@ -46,7 +46,9 @@
       "WebFetch(domain:textnotepad.vercel.app)",
       "Bash(timeout:*)",
       "Bash(start http://localhost:3005)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(copy:*)",
+      "Bash(start http://localhost:3000)"
     ],
     "deny": [],
     "ask": [],

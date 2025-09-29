@@ -6,6 +6,7 @@ import { Container } from "@/components/ui/container"
 import { MotionDiv, animations } from "@/components/ui/motion"
 import { Logo } from "@/components/ui/logo"
 import { useAuthSession } from "@/hooks/useAuthSession"
+import { formatVersion } from "@/lib/version"
 
 export function Header() {
   const { user } = useAuthSession()
@@ -21,7 +22,12 @@ export function Header() {
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center space-x-2">
               <Logo size={32} />
-              <span className="text-xl font-semibold text-text-primary">TextNotepad.com</span>
+              <div className="flex items-center space-x-2">
+                <span className="text-xl font-semibold text-text-primary">TextNotepad.com</span>
+                <span className="text-sm text-text-secondary bg-bg-secondary px-2 py-0.5 rounded-md font-mono">
+                  {formatVersion()}
+                </span>
+              </div>
             </Link>
 
             <nav className="hidden md:flex items-center space-x-8">
