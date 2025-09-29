@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode, useEffect, useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useFilesList, useEmptyTrash } from '@/hooks/useFiles'
 import { useFileOperations } from './useFileOperations'
 import { FileItem } from './FileItem'
@@ -15,6 +16,8 @@ interface ContextListProps {
   selection: AppSelection
   onSelectionChange: (selection: Partial<AppSelection>) => void
   onMobileAdvance?: () => void // For mobile navigation to pane 3
+  isCollapsed?: boolean
+  onToggleCollapsed?: () => void
 }
 
 export function ContextList({ 
@@ -22,7 +25,9 @@ export function ContextList({
   className = '',
   selection,
   onSelectionChange,
-  onMobileAdvance
+  onMobileAdvance,
+  isCollapsed = false,
+  onToggleCollapsed
 }: ContextListProps) {
   
   return (
@@ -36,6 +41,8 @@ export function ContextList({
           selection={selection}
           onSelectionChange={onSelectionChange}
           onMobileAdvance={onMobileAdvance}
+          isCollapsed={isCollapsed}
+          onToggleCollapsed={onToggleCollapsed}
         />
       )}
     </div>
@@ -46,9 +53,11 @@ interface DefaultContextContentProps {
   selection: AppSelection
   onSelectionChange: (selection: Partial<AppSelection>) => void
   onMobileAdvance?: () => void
+  isCollapsed?: boolean
+  onToggleCollapsed?: () => void
 }
 
-function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }: DefaultContextContentProps) {
+function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance, isCollapsed = false, onToggleCollapsed }: DefaultContextContentProps) {
   const { data: files = [], isLoading } = useFilesList()
   
   // Edge case: Invalid folder detection and recovery is now handled by FoldersPanel with real data
@@ -145,6 +154,8 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
         onFileSelect={handleFileSelect}
         fileOps={fileOps}
         selection={selection}
+        isCollapsed={isCollapsed}
+        onToggleCollapsed={onToggleCollapsed}
       />
     )
   }
@@ -164,6 +175,8 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
         onFileSelect={handleFileSelect}
         fileOps={fileOps}
         selection={selection}
+        isCollapsed={isCollapsed}
+        onToggleCollapsed={onToggleCollapsed}
       />
     )
   }
@@ -179,6 +192,8 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance }
         onFileSelect={handleFileSelect}
         fileOps={fileOps}
         selection={selection}
+        isCollapsed={isCollapsed}
+        onToggleCollapsed={onToggleCollapsed}
       />
     )
   }
@@ -233,7 +248,9 @@ function NotesView({
   selectedFileId, 
   onFileSelect, 
   fileOps,
-  selection: _selection
+  selection: _selection,
+  isCollapsed = false,
+  onToggleCollapsed
 }: {
   files: UserFile[]
   isLoading: boolean
@@ -241,6 +258,8 @@ function NotesView({
   onFileSelect: (file: UserFile) => void
   fileOps: ReturnType<typeof useFileOperations>
   selection: AppSelection
+  isCollapsed?: boolean
+  onToggleCollapsed?: () => void
 }) {
   const [sortBy, setSortBy] = useState<SortOption>(getDefaultSort())
   
@@ -252,18 +271,35 @@ function NotesView({
     <div className="flex flex-col h-full">
       <header className="flex-shrink-0 p-4 border-b border-border-dark bg-bg-secondary">
         <div className="flex items-center justify-between">
-          <button
-            onClick={() => fileOps.handleCreateFile()}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-accent-blue text-white rounded-md hover:opacity-90 transition-colors"
-            title="Create new note in current folder"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            <span className="hidden sm:inline">Note</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => fileOps.handleCreateFile()}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-accent-blue text-white rounded-md hover:opacity-90 transition-colors"
+              title="Create new note in current folder"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              {!isCollapsed && <span className="hidden sm:inline">Note</span>}
+            </button>
+            
+            {/* Collapse Toggle Button */}
+            {onToggleCollapsed && (
+              <button
+                onClick={onToggleCollapsed}
+                className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-bg-active rounded transition-colors"
+                title={isCollapsed ? "Expand notes list" : "Collapse notes list for focus mode"}
+              >
+                {isCollapsed ? (
+                  <ChevronRight className="w-4 h-4" />
+                ) : (
+                  <ChevronLeft className="w-4 h-4" />
+                )}
+              </button>
+            )}
+          </div>
           
-          {files.length > 0 && (
+          {!isCollapsed && files.length > 0 && (
             <SortDropdown 
               value={sortBy} 
               onChange={setSortBy}
@@ -273,51 +309,85 @@ function NotesView({
       </header>
       
       <div className="flex-1 overflow-auto">
-        {isLoading ? (
-          <div className="p-6 text-center">
-            <div className="text-sm text-text-secondary">Loading notes...</div>
-          </div>
-        ) : sortedFiles.length === 0 ? (
-          <NotesEmptyState />
-        ) : (
-          <div role="listbox" className="p-2 space-y-1">
-            {sortedFiles.map((file) => (
-              <FileItem
+        {isCollapsed ? (
+          // Collapsed view - show minimal indicators
+          <div className="p-2 space-y-1">
+            {sortedFiles.slice(0, 10).map((file) => (
+              <button
                 key={file.id}
-                file={file}
-                isSelected={selectedFileId === file.id}
-                isRenaming={fileOps.renamingFileId === file.id}
-                renameValue={fileOps.renameValue}
-                onSelect={onFileSelect}
-                onStartRename={fileOps.handleStartRename}
-                onRenameCommit={fileOps.handleRenameCommit}
-                onRenameCancel={fileOps.handleRenameCancel}
-                onRenameValueChange={fileOps.setRenameValue}
-                onDelete={(file) => fileOps.handleDelete(file, selectedFileId ?? undefined, files)}
-                compact={false}
-              />
+                onClick={() => onFileSelect(file)}
+                className={`w-full h-8 rounded flex items-center justify-center text-xs transition-colors ${
+                  selectedFileId === file.id
+                    ? 'bg-accent-blue text-white'
+                    : 'bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-text-primary'
+                }`}
+                title={file.name}
+              >
+                📄
+              </button>
             ))}
+            {sortedFiles.length > 10 && (
+              <div className="text-xs text-text-secondary text-center py-2">
+                +{sortedFiles.length - 10} more
+              </div>
+            )}
           </div>
+        ) : (
+          // Expanded view - show full content
+          <>
+            {isLoading ? (
+              <div className="p-6 text-center">
+                <div className="text-sm text-text-secondary">Loading notes...</div>
+              </div>
+            ) : sortedFiles.length === 0 ? (
+              <NotesEmptyState />
+            ) : (
+              <div role="listbox" className="p-2 space-y-1">
+                {sortedFiles.map((file) => (
+                  <FileItem
+                    key={file.id}
+                    file={file}
+                    isSelected={selectedFileId === file.id}
+                    isRenaming={fileOps.renamingFileId === file.id}
+                    renameValue={fileOps.renameValue}
+                    onSelect={onFileSelect}
+                    onStartRename={fileOps.handleStartRename}
+                    onRenameCommit={fileOps.handleRenameCommit}
+                    onRenameCancel={fileOps.handleRenameCancel}
+                    onRenameValueChange={fileOps.setRenameValue}
+                    onDelete={(file) => fileOps.handleDelete(file, selectedFileId ?? undefined, files)}
+                    compact={false}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 
       {/* Footer */}
       <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary">
-        <div className="flex items-center justify-between text-xs text-text-secondary">
-          <div className="flex items-center gap-2">
-            <span>{files.length} notes</span>
-            {files.length > 0 && (
-              <>
-                <span>·</span>
-                <span>Updated {new Date().toLocaleDateString()}</span>
-              </>
-            )}
+        {isCollapsed ? (
+          <div className="text-center text-xs text-text-secondary">
+            <div>{files.length}</div>
           </div>
-          <div className="flex items-center gap-1">
-            <kbd className="px-1 py-0.5 text-[10px] bg-bg-active text-text-secondary rounded border border-border-dark">⌘N</kbd>
-            <span>new</span>
+        ) : (
+          <div className="flex items-center justify-between text-xs text-text-secondary">
+            <div className="flex items-center gap-2">
+              <span>{files.length} notes</span>
+              {files.length > 0 && (
+                <>
+                  <span>·</span>
+                  <span>Updated {new Date().toLocaleDateString()}</span>
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              <kbd className="px-1 py-0.5 text-[10px] bg-bg-active text-text-secondary rounded border border-border-dark">⌘N</kbd>
+              <span>new</span>
+            </div>
           </div>
-        </div>
+        )}
       </footer>
     </div>
   )

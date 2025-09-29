@@ -12,7 +12,7 @@ import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Logo } from '@/components/ui/logo'
-import { BookOpen, FileText, HelpCircle, Search, ChevronLeft, ChevronRight } from 'lucide-react'
+import { BookOpen, FileText, HelpCircle, Search } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface AppShell3Props {
@@ -276,21 +276,6 @@ export function AppShell3({
               <Logo size={28} />
               <span className="text-lg font-medium">TextNotepad.com</span>
             </button>
-            
-            {/* C2 Toggle Button - only show on desktop when C2 is visible */}
-            {layout.breakpoint === 'desktop' && (
-              <button
-                onClick={layout.actions.toggleCol2Collapsed}
-                className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-bg-active rounded transition-colors"
-                title={layout.state.isCol2Collapsed ? "Show notes list" : "Hide notes list for focus mode"}
-              >
-                {layout.state.isCol2Collapsed ? (
-                  <ChevronRight className="w-4 h-4" />
-                ) : (
-                  <ChevronLeft className="w-4 h-4" />
-                )}
-              </button>
-            )}
           </div>
 
           {/* Center section - Note title and save status when editing */}
@@ -415,6 +400,8 @@ export function AppShell3({
               selection={layout.selection}
               onSelectionChange={layout.setSelection}
               onMobileAdvance={() => (layout.isMobile || layout.isTablet) && layout.setActivePane(3)}
+              isCollapsed={layout.state.isCol2Collapsed}
+              onToggleCollapsed={layout.actions.toggleCol2Collapsed}
             >
               {listContent}
             </ContextList>
