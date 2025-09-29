@@ -141,11 +141,6 @@ export function AppShell3({
     }
   }, [supabase])
 
-  // Get current file info for header
-  const currentFileInfo = layout.selection.mode === 'notes' && layout.selection.fileId ? {
-    fileId: layout.selection.fileId,
-    // We'll need to get file details from a hook or prop
-  } : null
 
 
   // Global keyboard navigation
@@ -278,22 +273,8 @@ export function AppShell3({
             </button>
           </div>
 
-          {/* Center section - Note title and save status when editing */}
-          <div className="flex-1 flex items-center justify-center max-w-md mx-4">
-            {currentFileInfo && (
-              <div className="flex items-center gap-3">
-                <input
-                  className="bg-transparent outline-none text-base font-medium text-center text-text-primary placeholder:text-text-secondary"
-                  defaultValue="Note Title" // TODO: Get from file data
-                  placeholder="Untitled"
-                />
-                <div className="flex items-center gap-2 text-xs text-text-secondary">
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                  <span>Saved</span>
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Center section - Keep empty for clean header */}
+          <div className="flex-1"></div>
 
           {/* Right section */}
           <div className="flex items-center gap-4">
