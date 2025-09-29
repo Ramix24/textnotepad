@@ -96,27 +96,45 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   const { isSaving, hasPendingChanges, markDirty, forceSave } = useAutosave({
     file,
     onSaved: (updatedFile) => {
-      // Prevent any content updates during active typing to avoid cursor jumping
+      // Store cursor position before any potential re-render
+      const cursorPos = textareaRef.current?.selectionStart || 0
+      const cursorEnd = textareaRef.current?.selectionEnd || 0
+      
+      // Always update the file data but preserve content during active typing
       if (!isActivelyTypingRef.current) {
-        // Only update when user is not typing - this prevents cursor disruption
         onFileUpdate?.(updatedFile)
       } else {
-        // During typing, only update metadata but preserve current content
+        // During typing, update metadata but keep current editor content
         onFileUpdate?.({
           ...updatedFile,
-          content: content // Keep current editor content
+          content: content // Preserve current editor content to prevent cursor jump
         })
       }
       
-      // Simplified cursor restoration - no complex requestAnimationFrame
-      // The cursor should stay in place naturally if we don't update content during typing
+      // Restore cursor position after any potential DOM updates
+      requestAnimationFrame(() => {
+        if (textareaRef.current && document.activeElement === textareaRef.current) {
+          textareaRef.current.setSelectionRange(cursorPos, cursorEnd)
+        }
+      })
     },
     onConflict: (conflictingFile) => {
       // Only update content if user is not actively typing
       if (!isActivelyTypingRef.current) {
+        // Store cursor position before content change
+        const cursorPos = textareaRef.current?.selectionStart || 0
+        const cursorEnd = textareaRef.current?.selectionEnd || 0
+        
         setContent(conflictingFile.content)
         toast.warning('File was updated elsewhere', {
           description: 'Your content has been refreshed with the latest version.'
+        })
+        
+        // Restore cursor position after content update
+        requestAnimationFrame(() => {
+          if (textareaRef.current && document.activeElement === textareaRef.current) {
+            textareaRef.current.setSelectionRange(cursorPos, cursorEnd)
+          }
         })
       } else {
         // Defer the conflict resolution until user stops typing
