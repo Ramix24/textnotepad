@@ -141,6 +141,8 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance, 
         selectedFileId={selection.fileId}
         onFileSelect={handleFileSelect}
         fileOps={fileOps}
+        isCollapsed={isCollapsed}
+        onToggleCollapsed={onToggleCollapsed}
       />
     )
   }
@@ -424,13 +426,17 @@ function TrashView({
   isLoading, 
   selectedFileId, 
   onFileSelect, 
-  fileOps
+  fileOps,
+  isCollapsed = false,
+  onToggleCollapsed
 }: {
   files: UserFile[]
   isLoading: boolean
   selectedFileId?: string | null
   onFileSelect: (file: UserFile) => void
   fileOps: ReturnType<typeof useFileOperations>
+  isCollapsed?: boolean
+  onToggleCollapsed?: () => void
 }) {
   const [sortBy, setSortBy] = useState<SortOption>(getDefaultSort())
   const emptyTrash = useEmptyTrash()
@@ -469,62 +475,125 @@ function TrashView({
 
   return (
     <div className="flex flex-col h-full">
-      <header className="flex-shrink-0 p-4 border-b border-border-dark bg-bg-secondary">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={handleEmptyTrash}
-            disabled={files.length === 0 || emptyTrash.isPending}
-            className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            title="Permanently delete all files in trash"
-          >
-            {emptyTrash.isPending ? 'Emptying...' : 'Empty Trash'}
-          </button>
-          
-          {files.length > 0 && (
-            <SortDropdown 
-              value={sortBy} 
-              onChange={setSortBy}
-            />
-          )}
-        </div>
+      <header className="flex-shrink-0 border-b border-border-dark bg-bg-secondary">
+        {isCollapsed ? (
+          // Collapsed header - minimal with just toggle button
+          <div className="flex items-center justify-center p-2">
+            {onToggleCollapsed && (
+              <button
+                onClick={onToggleCollapsed}
+                className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-bg-active rounded transition-colors"
+                title="Expand trash list"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        ) : (
+          // Expanded header - full controls
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleEmptyTrash}
+                disabled={files.length === 0 || emptyTrash.isPending}
+                className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title="Permanently delete all files in trash"
+              >
+                {emptyTrash.isPending ? 'Emptying...' : 'Empty Trash'}
+              </button>
+              
+              {/* Collapse Toggle Button */}
+              {onToggleCollapsed && (
+                <button
+                  onClick={onToggleCollapsed}
+                  className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-bg-active rounded transition-colors"
+                  title="Collapse trash list for focus mode"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            
+            {files.length > 0 && (
+              <SortDropdown 
+                value={sortBy} 
+                onChange={setSortBy}
+              />
+            )}
+          </div>
+        )}
       </header>
       
       <div className="flex-1 overflow-auto">
-        {isLoading ? (
-          <div className="p-6 text-center">
-            <div className="text-sm text-text-secondary">Loading deleted items...</div>
-          </div>
-        ) : sortedFiles.length === 0 ? (
-          <TrashEmptyState />
-        ) : (
-          <div role="listbox" className="p-2 space-y-1">
-            {sortedFiles.map((file) => (
-              <TrashFileItem
+        {isCollapsed ? (
+          // Collapsed view - show minimal indicators
+          <div className="p-2 space-y-1">
+            {sortedFiles.slice(0, 10).map((file) => (
+              <button
                 key={file.id}
-                file={file}
-                isSelected={selectedFileId === file.id}
-                onSelect={onFileSelect}
-                onRestore={() => handleRestoreFile(file)}
-                onPermanentDelete={() => handlePermanentDelete(file)}
-              />
+                onClick={() => onFileSelect(file)}
+                className={`w-full h-8 rounded flex items-center justify-center text-xs transition-colors ${
+                  selectedFileId === file.id
+                    ? 'bg-accent-blue text-white'
+                    : 'bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-text-primary'
+                }`}
+                title={file.name}
+              >
+                🗑️
+              </button>
             ))}
+            {sortedFiles.length > 10 && (
+              <div className="text-xs text-text-secondary text-center py-2">
+                +{sortedFiles.length - 10} more
+              </div>
+            )}
           </div>
+        ) : (
+          // Expanded view - show full content
+          <>
+            {isLoading ? (
+              <div className="p-6 text-center">
+                <div className="text-sm text-text-secondary">Loading deleted items...</div>
+              </div>
+            ) : sortedFiles.length === 0 ? (
+              <TrashEmptyState />
+            ) : (
+              <div role="listbox" className="p-2 space-y-1">
+                {sortedFiles.map((file) => (
+                  <TrashFileItem
+                    key={file.id}
+                    file={file}
+                    isSelected={selectedFileId === file.id}
+                    onSelect={onFileSelect}
+                    onRestore={() => handleRestoreFile(file)}
+                    onPermanentDelete={() => handlePermanentDelete(file)}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 
       {/* Footer */}
       <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary">
-        <div className="flex items-center justify-between text-xs text-text-secondary">
-          <div className="flex items-center gap-2">
-            <span>{files.length} deleted items</span>
-            {files.length > 0 && (
-              <>
-                <span>·</span>
-                <span>Select an item to preview or restore</span>
-              </>
-            )}
+        {isCollapsed ? (
+          <div className="text-center text-xs text-text-secondary">
+            <div>{files.length}</div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center justify-between text-xs text-text-secondary">
+            <div className="flex items-center gap-2">
+              <span>{files.length} deleted items</span>
+              {files.length > 0 && (
+                <>
+                  <span>·</span>
+                  <span>Select an item to preview or restore</span>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </footer>
     </div>
   )
