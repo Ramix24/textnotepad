@@ -66,10 +66,10 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         clearTimeout(typingTimeoutRef.current)
       }
       
-      // Set timeout to mark typing as stopped after 3 seconds (longer to match debounce)
+      // Set timeout to mark typing as stopped after 2 seconds (longer than autosave debounce)
       typingTimeoutRef.current = setTimeout(() => {
         isActivelyTypingRef.current = false
-      }, 3500)
+      }, 2000)
       
       // Trigger autosave
       markDirty(newContent)
@@ -96,9 +96,10 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   const { isSaving, hasPendingChanges, markDirty, forceSave } = useAutosave({
     file,
     onSaved: (updatedFile) => {
-      // Store cursor position before any potential re-render
+      // ALWAYS store cursor position before any updates
       const cursorPos = textareaRef.current?.selectionStart || 0
       const cursorEnd = textareaRef.current?.selectionEnd || 0
+      const wasTextareaFocused = document.activeElement === textareaRef.current
       
       // Always update the file data but preserve content during active typing
       if (!isActivelyTypingRef.current) {
@@ -111,9 +112,10 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         })
       }
       
-      // Restore cursor position after any potential DOM updates
+      // ALWAYS restore cursor position after DOM updates, regardless of typing state
       requestAnimationFrame(() => {
-        if (textareaRef.current && document.activeElement === textareaRef.current) {
+        if (textareaRef.current && wasTextareaFocused) {
+          textareaRef.current.focus()
           textareaRef.current.setSelectionRange(cursorPos, cursorEnd)
         }
       })
