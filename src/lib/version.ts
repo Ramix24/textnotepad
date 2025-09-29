@@ -2,11 +2,11 @@
  * Version utilities  
  * Provides access to the current app version
  * Version is auto-updated by the version script on each commit
- * CRITICAL: Complete C2 collapse fix for ALL modes - v0.5.21
+ * FINAL FIX: C2 stays visible when collapsed - no more disappearing - v0.5.23
  */
 
 // This version is automatically updated by scripts/auto-version.js
-export const APP_VERSION = '0.5.22'
+export const APP_VERSION = '0.5.23'
 export const APP_NAME = 'textnotepad'
 
 /**
