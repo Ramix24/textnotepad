@@ -270,42 +270,54 @@ function NotesView({
   return (
     <div className="flex flex-col h-full">
       <header className="flex-shrink-0 p-4 border-b border-border-dark bg-bg-secondary">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => fileOps.handleCreateFile()}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-accent-blue text-white rounded-md hover:opacity-90 transition-colors"
-              title="Create new note in current folder"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              {!isCollapsed && <span className="hidden sm:inline">Note</span>}
-            </button>
-            
-            {/* Collapse Toggle Button */}
+        {isCollapsed ? (
+          // Collapsed header - minimal with just toggle button
+          <div className="flex items-center justify-center">
             {onToggleCollapsed && (
               <button
                 onClick={onToggleCollapsed}
                 className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-bg-active rounded transition-colors"
-                title={isCollapsed ? "Expand notes list" : "Collapse notes list for focus mode"}
+                title="Expand notes list"
               >
-                {isCollapsed ? (
-                  <ChevronRight className="w-4 h-4" />
-                ) : (
-                  <ChevronLeft className="w-4 h-4" />
-                )}
+                <ChevronRight className="w-4 h-4" />
               </button>
             )}
           </div>
-          
-          {!isCollapsed && files.length > 0 && (
-            <SortDropdown 
-              value={sortBy} 
-              onChange={setSortBy}
-            />
-          )}
-        </div>
+        ) : (
+          // Expanded header - full controls
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => fileOps.handleCreateFile()}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-accent-blue text-white rounded-md hover:opacity-90 transition-colors"
+                title="Create new note in current folder"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                <span className="hidden sm:inline">Note</span>
+              </button>
+              
+              {/* Collapse Toggle Button */}
+              {onToggleCollapsed && (
+                <button
+                  onClick={onToggleCollapsed}
+                  className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-bg-active rounded transition-colors"
+                  title="Collapse notes list for focus mode"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            
+            {files.length > 0 && (
+              <SortDropdown 
+                value={sortBy} 
+                onChange={setSortBy}
+              />
+            )}
+          </div>
+        )}
       </header>
       
       <div className="flex-1 overflow-auto">
