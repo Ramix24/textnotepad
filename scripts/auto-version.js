@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 
 const packageJsonPath = path.join(__dirname, '..', 'package.json');
+const versionTsPath = path.join(__dirname, '..', 'src', 'lib', 'version.ts');
 
 try {
   // Read current package.json
@@ -28,6 +29,14 @@ try {
   // Update package.json
   packageJson.version = newVersion;
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
+  
+  // Update version.ts file
+  const versionTsContent = fs.readFileSync(versionTsPath, 'utf8');
+  const updatedVersionTs = versionTsContent.replace(
+    /export const APP_VERSION = '[^']+'/,
+    `export const APP_VERSION = '${newVersion}'`
+  );
+  fs.writeFileSync(versionTsPath, updatedVersionTs);
   
   console.log(`Version incremented: ${currentVersion} → ${newVersion}`);
   

@@ -1,12 +1,12 @@
 /**
  * Version utilities
- * Provides access to the current app version from package.json
+ * Provides access to the current app version
+ * Version is auto-updated by the version script on each commit
  */
 
-import packageJson from '../../package.json'
-
-export const APP_VERSION = packageJson.version
-export const APP_NAME = packageJson.name
+// This version is automatically updated by scripts/auto-version.js
+export const APP_VERSION = '0.5.4'
+export const APP_NAME = 'textnotepad'
 
 /**
  * Get the current application version
