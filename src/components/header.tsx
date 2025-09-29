@@ -6,7 +6,6 @@ import { Container } from "@/components/ui/container"
 import { MotionDiv, animations } from "@/components/ui/motion"
 import { Logo } from "@/components/ui/logo"
 import { useAuthSession } from "@/hooks/useAuthSession"
-import { formatVersion } from "@/lib/version"
 
 export function Header() {
   const { user } = useAuthSession()
@@ -25,7 +24,7 @@ export function Header() {
               <div className="flex items-center space-x-3">
                 <span className="text-xl font-semibold text-text-primary">TextNotepad.com</span>
                 <span className="text-xs text-white bg-blue-600 px-2 py-1 rounded font-mono font-medium">
-                  {formatVersion()}
+                  v0.5.8
                 </span>
               </div>
             </Link>
