@@ -1,12 +1,12 @@
 /**
- * Version utilities
+ * Version utilities  
  * Provides access to the current app version
  * Version is auto-updated by the version script on each commit
- * Critical fix: C2 toggle now always visible - v0.5.17
+ * URGENT FIX: C2 collapsed width increased to 64px - v0.5.19
  */
 
 // This version is automatically updated by scripts/auto-version.js
-export const APP_VERSION = '0.5.18'
+export const APP_VERSION = '0.5.19'
 export const APP_NAME = 'textnotepad'
 
 /**
