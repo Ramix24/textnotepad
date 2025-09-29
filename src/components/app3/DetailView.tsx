@@ -76,9 +76,6 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
       if (isLoading) {
         return (
           <div className="flex flex-col">
-            <header className="flex-shrink-0 h-12 flex items-center px-4 border-b border-border-dark bg-bg-secondary">
-              <div className="h-4 w-32 bg-border-dark rounded animate-pulse" />
-            </header>
             <div className="flex-1">
               <EditorSkeleton className="h-full" />
             </div>
@@ -94,17 +91,7 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
       // Show trash file content in read-only mode
       if (file) {
         return (
-          <div className="flex flex-col h-full">
-            <header className="flex-shrink-0 h-12 flex items-center justify-between px-4 border-b border-border-dark bg-bg-secondary">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">🗑️</span>
-                <h1 className="text-sm font-medium text-text-primary truncate">{file.name}</h1>
-                <span className="text-xs text-text-secondary bg-bg-active px-2 py-1 rounded">
-                  Deleted
-                </span>
-              </div>
-            </header>
-            
+          <div className="flex flex-col h-full">            
             <div className="flex-1 min-h-0">
               <Editor 
                 key={file.id} 
@@ -145,9 +132,6 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
   if (isLoading) {
     return (
       <div className="flex flex-col">
-        <header className="flex-shrink-0 h-12 flex items-center px-4 border-b border-border-dark bg-bg-secondary">
-          <div className="h-4 w-32 bg-border-dark rounded animate-pulse" />
-        </header>
         <div className="flex-1">
           <EditorSkeleton className="h-full" />
         </div>
@@ -163,11 +147,7 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
   // File loaded successfully
   if (file) {
     return (
-      <div className="flex flex-col h-full">
-        <header className="flex-shrink-0 h-12 flex items-center justify-between px-4 border-b border-border-dark bg-bg-secondary">
-          <h1 className="text-sm font-medium text-text-primary truncate">{file.name}</h1>
-        </header>
-        
+      <div className="flex flex-col h-full">        
         <div className="flex-1 min-h-0">
           <Editor 
             key={file.id} // Reset editor state when file changes

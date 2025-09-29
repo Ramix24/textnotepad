@@ -112,6 +112,10 @@ export function HelpInterface({ className = '' }: HelpInterfaceProps) {
               trigger="?" 
               description="Show this help page" 
             />
+            <ShortcutRow 
+              trigger="Ctrl+Shift+[" 
+              description="Toggle notes list (C2) for focus mode" 
+            />
           </div>
         </section>
 
@@ -184,6 +188,20 @@ export function HelpInterface({ className = '' }: HelpInterfaceProps) {
           </div>
         </section>
 
+        {/* Focus Mode */}
+        <section>
+          <h3 className="text-lg font-medium text-text-primary mb-4 flex items-center gap-2">
+            🎯 <span>Focus Modes</span>
+          </h3>
+          <div className="space-y-2 text-sm text-text-secondary">
+            <p>• <strong>Full Browse Mode:</strong> All panels visible (C1 folders + C2 notes list + C3 editor)</p>
+            <p>• <strong>Structured Focus:</strong> Collapse C1 for more writing space while keeping notes list</p>
+            <p>• <strong>Maximum Focus:</strong> Collapse both C1 and C2 for distraction-free writing</p>
+            <p>• Use the chevron buttons in the header or keyboard shortcuts to toggle panels</p>
+            <p>• Settings are automatically saved and restored between sessions</p>
+          </div>
+        </section>
+
         {/* Pro Tips */}
         <section>
           <h3 className="text-lg font-medium text-text-primary mb-4 flex items-center gap-2">
@@ -197,6 +215,7 @@ export function HelpInterface({ className = '' }: HelpInterfaceProps) {
             <p>• Line numbers can be toggled on desktop layouts</p>
             <p>• Click any note to switch from search mode to reading mode</p>
             <p>• Use the search icon in header for quick access to search interface</p>
+            <p>• Consolidated header shows note title and save status when editing</p>
           </div>
         </section>
       </div>

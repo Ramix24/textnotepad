@@ -8,6 +8,7 @@ export interface ColumnWidths {
   col1: number // Width for sections rail when expanded
   col1Collapsed: number // Width for sections rail when collapsed (icon-only)
   col2: number // Resizable width for context list
+  col2Collapsed: number // Width for context list when collapsed
   col2Min: number
   col2Max: number
   col3Min: number // Minimum width for detail view
@@ -19,6 +20,7 @@ export interface LayoutState {
   col2Width: number
   isResizing: boolean
   isCol1Collapsed: boolean // Whether C1 is collapsed to icon-only view
+  isCol2Collapsed: boolean // Whether C2 is collapsed for focus mode
 }
 
 export interface LayoutActions {
@@ -26,6 +28,7 @@ export interface LayoutActions {
   setCol2Width: (width: number) => void
   setIsResizing: (resizing: boolean) => void
   toggleCol1Collapsed: () => void
+  toggleCol2Collapsed: () => void
 }
 
 export type Mode = 'notes' | 'messages' | 'search' | 'help'

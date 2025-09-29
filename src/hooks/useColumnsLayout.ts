@@ -26,6 +26,7 @@ const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
   col1: 200, // Expanded folders panel width 
   col1Collapsed: 48, // Collapsed folders panel width (icon-only)
   col2: 360, // Default context list width  
+  col2Collapsed: 48, // Collapsed context list width
   col2Min: COL2_MIN,
   col2Max: COL2_MAX,
   col3Min: 480 // Minimum detail view width
@@ -42,7 +43,8 @@ const STORAGE_KEYS = {
   COL2_WIDTH: 'layout:c2w',
   ACTIVE_PANEL: 'layout:active-panel', 
   SELECTION: 'tnp:selection', // New key for folder-based selection
-  COL1_COLLAPSED: 'layout:c1-collapsed'
+  COL1_COLLAPSED: 'layout:c1-collapsed',
+  COL2_COLLAPSED: 'layout:c2-collapsed'
 }
 
 // Migration function to handle old selection format
@@ -113,6 +115,10 @@ export function useColumnsLayout(
   const [isCol1Collapsed, setIsCol1Collapsed] = useState(() =>
     getPreference(STORAGE_KEYS.COL1_COLLAPSED, false)
   )
+  
+  const [isCol2Collapsed, setIsCol2Collapsed] = useState(() =>
+    getPreference(STORAGE_KEYS.COL2_COLLAPSED, false)
+  )
 
   // Selection state with migration and URL sync
   const [selection, setSelectionState] = useState<AppSelection>(() => {
@@ -177,6 +183,15 @@ export function useColumnsLayout(
         setTimeout(() => getPreference(STORAGE_KEYS.COL1_COLLAPSED, newValue), 0)
         return newValue
       })
+    }, []),
+
+    toggleCol2Collapsed: useCallback(() => {
+      setIsCol2Collapsed(prev => {
+        const newValue = !prev
+        // Persist immediately
+        setTimeout(() => getPreference(STORAGE_KEYS.COL2_COLLAPSED, newValue), 0)
+        return newValue
+      })
     }, [])
   }
 
@@ -232,10 +247,11 @@ export function useColumnsLayout(
     activePanel,
     col2Width,
     isResizing,
-    isCol1Collapsed
+    isCol1Collapsed,
+    isCol2Collapsed
   }
 
-  // Derived visibility states based on breakpoint and activePanel
+  // Derived visibility states based on breakpoint, activePanel, and collapse states
   const { showSections, showList, showDetail } = useMemo(() => {
     switch (breakpoint) {
       case 'mobile':
@@ -254,11 +270,11 @@ export function useColumnsLayout(
       default:
         return {
           showSections: true,
-          showList: true,
+          showList: !isCol2Collapsed, // Hide C2 when collapsed on desktop
           showDetail: true
         }
     }
-  }, [breakpoint, activePanel])
+  }, [breakpoint, activePanel, isCol2Collapsed])
 
   // Derived flags
   const isMobile = breakpoint === 'mobile'

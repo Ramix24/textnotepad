@@ -12,7 +12,7 @@ import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Logo } from '@/components/ui/logo'
-import { BookOpen, FileText, HelpCircle, Search } from 'lucide-react'
+import { BookOpen, FileText, HelpCircle, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface AppShell3Props {
@@ -141,6 +141,12 @@ export function AppShell3({
     }
   }, [supabase])
 
+  // Get current file info for header
+  const currentFileInfo = layout.selection.mode === 'notes' && layout.selection.fileId ? {
+    fileId: layout.selection.fileId,
+    // We'll need to get file details from a hook or prop
+  } : null
+
 
   // Global keyboard navigation
   useKeyboardNav({
@@ -180,6 +186,10 @@ export function AppShell3({
             layout.setActivePane(3)
           }
         }
+      } else if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === '[') {
+        // Toggle C2 sidebar (notes list)
+        e.preventDefault()
+        layout.actions.toggleCol2Collapsed()
       }
     }
 
@@ -252,22 +262,55 @@ export function AppShell3({
       className={`fixed inset-0 flex flex-col overflow-hidden bg-bg-primary ${className}`}
       data-testid="app-shell-3"
     >
-      {/* Header */}
+      {/* Consolidated Header */}
       <header className="h-14 border-b border-border-dark bg-bg-secondary flex-shrink-0">
         <div className="flex items-center justify-between h-full px-6">
-          {/* Header click triggers search interface in C3 */}
-          <button 
-            onClick={() => layout.setSelection({ mode: 'search', folderId: null, fileId: null, searchQuery: '' })}
-            className="flex items-center space-x-2 text-text-primary hover:text-accent-blue transition-colors cursor-pointer"
-            title="Open search interface (shows all notes in C2, search in C3)"
-          >
-            <Logo size={28} />
-            <span className="text-lg font-medium">TextNotepad.com</span>
-          </button>
-          
-          {/* Spacer for center alignment */}
-          <div className="flex-1"></div>
+          {/* Left section */}
+          <div className="flex items-center gap-4">
+            {/* Logo */}
+            <button 
+              onClick={() => layout.setSelection({ mode: 'search', folderId: null, fileId: null, searchQuery: '' })}
+              className="flex items-center space-x-2 text-text-primary hover:text-accent-blue transition-colors cursor-pointer"
+              title="Open search interface (shows all notes in C2, search in C3)"
+            >
+              <Logo size={28} />
+              <span className="text-lg font-medium">TextNotepad.com</span>
+            </button>
+            
+            {/* C2 Toggle Button - only show on desktop when C2 is visible */}
+            {layout.breakpoint === 'desktop' && (
+              <button
+                onClick={layout.actions.toggleCol2Collapsed}
+                className="p-1.5 text-text-secondary hover:text-text-primary hover:bg-bg-active rounded transition-colors"
+                title={layout.state.isCol2Collapsed ? "Show notes list" : "Hide notes list for focus mode"}
+              >
+                {layout.state.isCol2Collapsed ? (
+                  <ChevronRight className="w-4 h-4" />
+                ) : (
+                  <ChevronLeft className="w-4 h-4" />
+                )}
+              </button>
+            )}
+          </div>
 
+          {/* Center section - Note title and save status when editing */}
+          <div className="flex-1 flex items-center justify-center max-w-md mx-4">
+            {currentFileInfo && (
+              <div className="flex items-center gap-3">
+                <input
+                  className="bg-transparent outline-none text-base font-medium text-center text-text-primary placeholder:text-text-secondary"
+                  defaultValue="Note Title" // TODO: Get from file data
+                  placeholder="Untitled"
+                />
+                <div className="flex items-center gap-2 text-xs text-text-secondary">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span>Saved</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right section */}
           <div className="flex items-center gap-4">
             {/* Search Button */}
             <button
@@ -359,9 +402,11 @@ export function AppShell3({
           <div 
             ref={listRef}
             tabIndex={-1}
-            className="flex-shrink-0 outline-none focus:ring-2 focus:ring-primary/50 focus:ring-inset"
+            className="flex-shrink-0 outline-none focus:ring-2 focus:ring-primary/50 focus:ring-inset transition-all duration-300 ease-in-out"
             style={{ 
-              width: layout.breakpoint === 'desktop' ? layout.state.col2Width : '100%' 
+              width: layout.breakpoint === 'desktop' 
+                ? (layout.state.isCol2Collapsed ? layout.columnWidths.col2Collapsed : layout.state.col2Width)
+                : '100%' 
             }}
             data-testid="list-column"
           >
@@ -376,8 +421,8 @@ export function AppShell3({
           </div>
         )}
 
-        {/* Resizer (desktop only) */}
-        {layout.breakpoint === 'desktop' && layout.showList && layout.showDetail && (
+        {/* Resizer (desktop only) - hide when C2 is collapsed */}
+        {layout.breakpoint === 'desktop' && layout.showList && layout.showDetail && !layout.state.isCol2Collapsed && (
           <div
             ref={resizerRef}
             role="separator"
