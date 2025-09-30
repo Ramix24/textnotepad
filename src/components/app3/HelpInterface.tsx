@@ -10,10 +10,10 @@ export function HelpInterface({ className = '' }: HelpInterfaceProps) {
       {/* Header */}
       <div className="flex-shrink-0 p-6 border-b border-border-dark bg-bg-secondary">
         <h1 className="text-xl font-semibold text-text-primary flex items-center gap-2">
-          ⌨️ Keyboard Shortcuts & Markdown Guide
+          ⌨️ Keyboard Shortcuts & Quick Actions Guide
         </h1>
         <p className="text-sm text-text-secondary mt-2">
-          Learn keyboard shortcuts, markdown syntax, and search features
+          Master keyboard shortcuts, Quick Actions (Ctrl+K), markdown syntax, and search features
         </p>
       </div>
 
@@ -90,6 +90,46 @@ export function HelpInterface({ className = '' }: HelpInterfaceProps) {
           </div>
         </section>
 
+        {/* Quick Actions (Command Palette) */}
+        <section>
+          <h3 className="text-lg font-medium text-text-primary mb-4 flex items-center gap-2">
+            ⚡ <span>Quick Actions (Command Palette)</span>
+          </h3>
+          <div className="grid gap-3">
+            <ShortcutRow 
+              trigger="Ctrl+K" 
+              description="Open Quick Actions palette (Cmd+K on Mac)" 
+            />
+            <ShortcutRow 
+              trigger="↑ ↓" 
+              description="Navigate between actions and items" 
+            />
+            <ShortcutRow 
+              trigger="Tab" 
+              description="Switch between sections (Actions → Notes → Folders)" 
+            />
+            <ShortcutRow 
+              trigger="Enter" 
+              description="Execute selected action or open item" 
+            />
+            <ShortcutRow 
+              trigger="Esc" 
+              description="Close command palette" 
+            />
+          </div>
+          <div className="mt-4 p-3 bg-bg-secondary rounded-lg">
+            <h4 className="text-sm font-medium text-text-primary mb-2">Available Actions:</h4>
+            <div className="space-y-1 text-sm text-text-secondary">
+              <p>• <strong>New Note:</strong> Create note in current folder</p>
+              <p>• <strong>New Folder:</strong> Create new notebook/folder</p>
+              <p>• <strong>Toggle Dark Mode:</strong> Switch light/dark theme</p>
+              <p>• <strong>Search Notes:</strong> Open search interface</p>
+              <p>• <strong>Copy Link:</strong> Copy link to current note</p>
+              <p>• Type to search notes, folders, and actions with fuzzy matching</p>
+            </div>
+          </div>
+        </section>
+
         {/* Navigation Shortcuts */}
         <section>
           <h3 className="text-lg font-medium text-text-primary mb-4 flex items-center gap-2">
@@ -99,10 +139,6 @@ export function HelpInterface({ className = '' }: HelpInterfaceProps) {
             <ShortcutRow 
               trigger="Ctrl+N" 
               description="Create new note" 
-            />
-            <ShortcutRow 
-              trigger="Ctrl+K" 
-              description="Open search interface" 
             />
             <ShortcutRow 
               trigger="Ctrl+/" 
@@ -208,14 +244,16 @@ export function HelpInterface({ className = '' }: HelpInterfaceProps) {
             💡 <span>Pro Tips</span>
           </h3>
           <div className="space-y-2 text-sm text-text-secondary">
+            <p>• <strong>Quick Actions (Ctrl+K):</strong> Fastest way to create notes, switch themes, and search</p>
             <p>• Auto-save triggers 1 second after you stop typing</p>
-            <p>• Copy a URL and use Ctrl+K for instant link creation</p>
+            <p>• Copy a URL and use Ctrl+K for instant link creation in editor</p>
             <p>• Empty list items automatically end the list when you press Enter</p>
             <p>• Text wrapping is always enabled for better mobile experience</p>
             <p>• Line numbers can be toggled on desktop layouts</p>
             <p>• Click any note to switch from search mode to reading mode</p>
-            <p>• Use the search icon in header for quick access to search interface</p>
+            <p>• Use Quick Actions or search icon in header for fast navigation</p>
             <p>• Consolidated header shows note title and save status when editing</p>
+            <p>• Quick Actions fuzzy search finds items even with partial typing</p>
           </div>
         </section>
       </div>
