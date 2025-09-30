@@ -151,6 +151,9 @@ export function CommandPalette({
           items: searchResults.folders,
           icon: FolderIcon
         })
+      } else if (state.argMode === 'text') {
+        // For text input, don't show any search results - just accept text input
+        // The user will type directly and press Enter
       }
       return secs
     }
@@ -218,9 +221,16 @@ export function CommandPalette({
 
   // Handle item selection
   const handleSelect = () => {
+    // Special handling for text input mode
+    if (state.step === 'input-arg' && state.argMode === 'text' && state.pendingAction && onExecuteWithArg) {
+      // Use the query (what user typed) as the argument
+      onExecuteWithArg(state.pendingAction, state.query)
+      onClose()
+      return
+    }
+
     const activeItem = getActiveItem()
     if (!activeItem) return
-
 
     if (state.step === 'input-arg' && state.pendingAction && onExecuteWithArg) {
       onExecuteWithArg(state.pendingAction, activeItem.item)

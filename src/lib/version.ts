@@ -6,7 +6,7 @@
  */
 
 // This version is automatically updated by scripts/auto-version.js
-export const APP_VERSION = '0.5.50'
+export const APP_VERSION = '0.5.51'
 export const APP_NAME = 'textnotepad'
 
 /**
