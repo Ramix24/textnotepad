@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { useCommandPalette } from './useCommandPalette'
 import { CommandPalette } from './CommandPalette'
 import { CommandContext, CommandAction, mockApi } from './actions'
-import { useFilesList, useCreateFile } from '@/hooks/useFiles'
+import { useFilesList, useCreateFile, useDeleteFile } from '@/hooks/useFiles'
 import { useFoldersList, useCreateFolder } from '@/hooks/useFolders'
 import { UserFile } from '@/types/user-files.types'
 import { UserFolder } from '@/types/folders.types'
@@ -48,6 +48,7 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
   const { data: folders = [] } = useFoldersList()
   const createFile = useCreateFile()
   const createFolderMutation = useCreateFolder()
+  const deleteFile = useDeleteFile()
   
   // Command palette state
   const commandPalette = useCommandPalette()
@@ -161,9 +162,29 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
         if (layout.isMobile || layout.isTablet) {
           layout.setActivePane(3)
         }
+      },
+      
+      deleteNote: async (noteId: string) => {
+        try {
+          await deleteFile.mutateAsync(noteId)
+          
+          // Navigate away from deleted note if it was currently selected
+          if (layout.selection.fileId === noteId) {
+            layout.setSelection({
+              mode: 'notes',
+              folderId: layout.selection.folderId,
+              fileId: null
+            })
+          }
+          
+          toast.success('Note deleted')
+        } catch {
+          toast.error('Failed to delete note')
+          throw new Error('Failed to delete note')
+        }
       }
     }
-  }), [layout, files, folders, createFile, createFolderMutation, setTheme])
+  }), [layout, files, folders, createFile, createFolderMutation, deleteFile, setTheme])
 
   // Actions are handled directly in the CommandPalette component
 

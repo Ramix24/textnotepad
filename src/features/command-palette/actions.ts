@@ -21,6 +21,7 @@ export type CommandContext = {
     openFolder: (id: string) => void
     copyNoteLink: (noteId: string) => void
     openSearch: (query?: string) => void
+    deleteNote: (noteId: string) => Promise<void>
   }
 }
 
@@ -99,6 +100,21 @@ export function registerDefaultActions(_ctx: CommandContext): CommandAction[] {
         const state = ctx.getState()
         if (state.currentNoteId) {
           ctx.api.copyNoteLink(state.currentNoteId)
+        } else {
+          throw new Error('No note is currently selected')
+        }
+      }
+    },
+    {
+      id: 'delete-current-note',
+      label: 'Delete Current Note',
+      description: 'Delete the currently selected note',
+      keywords: ['delete', 'remove', 'trash', 'current', 'note'],
+      icon: 'Trash2',
+      run: async (ctx: CommandContext) => {
+        const state = ctx.getState()
+        if (state.currentNoteId) {
+          await ctx.api.deleteNote(state.currentNoteId)
         } else {
           throw new Error('No note is currently selected')
         }
