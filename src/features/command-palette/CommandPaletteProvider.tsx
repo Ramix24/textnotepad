@@ -82,9 +82,7 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
       
       createFolder: async (name: string) => {
         try {
-          console.log('createFolder called with name:', name)
           const result = await createFolderMutation.mutateAsync({ name })
-          console.log('createFolder result:', result)
           
           // Navigate to the new folder
           layout.setSelection({
@@ -96,7 +94,6 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
           toast.success(`Folder "${name}" created`)
           return { id: result.id }
         } catch (error) {
-          console.error('createFolder error:', error)
           toast.error('Failed to create folder')
           throw error
         }
@@ -184,16 +181,12 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
   // Handle action selection
   const handleSelectAction = useCallback(async (action: CommandAction) => {
     try {
-      console.log('🎯 ACTION SELECTED:', action.id, action.label)
-      
       if ('needsArg' in action) {
-        console.log('🎯 ACTION NEEDS ARG:', action.needsArg)
         // Start argument input mode
         commandPalette.actions.startArgInput(action, action.needsArg)
         return
       }
 
-      console.log('🎯 EXECUTING ACTION IMMEDIATELY:', action.id)
       // Execute action immediately
       await action.run(commandContext)
       
@@ -201,8 +194,7 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
       commandPalette.actions.addRecentAction(action.id)
       commandPalette.actions.close()
       
-    } catch (error) {
-      console.error('🎯 ACTION EXECUTION ERROR:', error)
+    } catch {
       // Silently handle errors in production
       toast.error('Failed to execute action')
     }

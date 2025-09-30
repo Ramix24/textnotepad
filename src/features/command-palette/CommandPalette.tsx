@@ -64,9 +64,7 @@ export function CommandPalette({
 
   // Get available actions
   const availableActions = useMemo(() => {
-    const actions = registerDefaultActions(context)
-    console.log('🎯 AVAILABLE ACTIONS:', actions.map(a => ({ id: a.id, label: a.label })))
-    return actions
+    return registerDefaultActions(context)
   }, [context])
 
   // Set up fuzzy search instances
@@ -223,9 +221,6 @@ export function CommandPalette({
     const activeItem = getActiveItem()
     if (!activeItem) return
 
-    console.log('🎯 HANDLE SELECT - activeIndex:', state.activeIndex)
-    console.log('🎯 HANDLE SELECT - activeItem:', activeItem)
-    console.log('🎯 HANDLE SELECT - sections:', sections.map(s => ({ key: s.key, itemCount: s.items.length })))
 
     if (state.step === 'input-arg' && state.pendingAction && onExecuteWithArg) {
       onExecuteWithArg(state.pendingAction, activeItem.item)
@@ -286,7 +281,9 @@ export function CommandPalette({
   if (!state.isOpen) return null
 
   const placeholder = state.step === 'input-arg' 
-    ? `Select ${state.argMode}...`
+    ? state.argMode === 'text' && state.pendingAction?.id === 'new-folder'
+      ? 'Enter folder name...'
+      : `Select ${state.argMode}...`
     : 'Type a command or search notes...'
 
   return createPortal(

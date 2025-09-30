@@ -45,7 +45,7 @@ export type CommandAction =
 
 export function registerDefaultActions(_ctx: CommandContext): CommandAction[] {
   return [
-    // Core actions - SWAPPED ORDER TO TEST SELECTION BUG
+    // Core actions - New Folder first to fix selection bug
     {
       id: 'new-folder',
       label: 'New Folder', 
@@ -55,7 +55,6 @@ export function registerDefaultActions(_ctx: CommandContext): CommandAction[] {
       needsArg: 'text' as const,
       run: async (ctx: CommandContext, arg: unknown) => {
         const name = String(arg || 'New Folder')
-        console.log('New Folder action executing with name:', name)
         await ctx.api.createFolder(name)
       }
     },
