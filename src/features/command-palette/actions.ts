@@ -45,21 +45,10 @@ export type CommandAction =
 
 export function registerDefaultActions(_ctx: CommandContext): CommandAction[] {
   return [
-    // Core actions
-    {
-      id: 'new-note',
-      label: 'New Note',
-      description: 'Create a new note',
-      keywords: ['create', 'add', 'new', 'note'],
-      icon: 'FileText',
-      run: async (ctx: CommandContext) => {
-        const state = ctx.getState()
-        await ctx.api.createNote(state.currentFolderId)
-      }
-    },
+    // Core actions - SWAPPED ORDER TO TEST SELECTION BUG
     {
       id: 'new-folder',
-      label: 'New Folder',
+      label: 'New Folder', 
       description: 'Create a new folder',
       keywords: ['create', 'add', 'new', 'folder', 'notebook'],
       icon: 'FolderPlus',
@@ -68,6 +57,17 @@ export function registerDefaultActions(_ctx: CommandContext): CommandAction[] {
         const name = String(arg || 'New Folder')
         console.log('New Folder action executing with name:', name)
         await ctx.api.createFolder(name)
+      }
+    },
+    {
+      id: 'new-note',
+      label: 'New Note',
+      description: 'Create a new note', 
+      keywords: ['create', 'add', 'new', 'note'],
+      icon: 'FileText',
+      run: async (ctx: CommandContext) => {
+        const state = ctx.getState()
+        await ctx.api.createNote(state.currentFolderId)
       }
     },
     {
