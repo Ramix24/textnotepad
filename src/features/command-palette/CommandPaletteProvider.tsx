@@ -47,7 +47,7 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
   const { data: files = [] } = useFilesList()
   const { data: folders = [] } = useFoldersList()
   const createFile = useCreateFile()
-  const createFolder = useCreateFolder()
+  const createFolderMutation = useCreateFolder()
   
   // Command palette state
   const commandPalette = useCommandPalette()
@@ -81,7 +81,7 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
       
       createFolder: async (name: string) => {
         try {
-          const result = await createFolder.mutateAsync({ name })
+          const result = await createFolderMutation.mutateAsync({ name })
           
           // Navigate to the new folder
           layout.setSelection({
@@ -163,7 +163,7 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
         }
       }
     }
-  }), [layout, files, folders, createFile, createFolder, setTheme])
+  }), [layout, files, folders, createFile, createFolderMutation, setTheme])
 
   // Actions are handled directly in the CommandPalette component
 
