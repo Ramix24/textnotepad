@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { AppShell } from '@/components/AppShell'
-import { AppShell3 } from '@/components/app3'
+import { AppShell3Wrapper } from '@/components/app3/AppShell3Wrapper'
 import { isThreeCol } from '@/lib/flags'
 import { Editor } from '@/components/Editor'
 import { EditorSkeleton } from '@/components/EditorSkeleton'
@@ -137,7 +137,7 @@ export function AppView({ user: _user }: AppViewProps) {
   })
 
   // Determine which shell to use
-  const AppShellComponent = isThreeCol() ? AppShell3 : AppShell
+  const AppShellComponent = isThreeCol() ? AppShell3Wrapper : AppShell
 
   // Show loading or auth states
   if (authLoading) {
@@ -161,7 +161,7 @@ export function AppView({ user: _user }: AppViewProps) {
   return (
     <>
       {isThreeCol() ? (
-        <AppShell3 />
+        <AppShell3Wrapper />
       ) : (
         <AppShell
           sidebar={
