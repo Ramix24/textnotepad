@@ -81,7 +81,7 @@ export async function PUT(
       .single()
     
     if (error) {
-      console.error('PUT /api/folders/[id] error:', error)
+      // PUT /api/folders/[id] error
       return NextResponse.json(
         { ok: false, error: 'Failed to update folder' },
         { status: 500 }
@@ -89,8 +89,8 @@ export async function PUT(
     }
 
     return NextResponse.json({ ok: true, data: folder })
-  } catch (error) {
-    console.error('PUT /api/folders/[id] error:', error)
+  } catch {
+    // PUT /api/folders/[id] error
     
     return NextResponse.json(
       { ok: false, error: 'Failed to update folder' },
@@ -142,7 +142,7 @@ export async function DELETE(
       .eq('user_id', user.id)
     
     if (error) {
-      console.error('DELETE /api/folders/[id] error:', error)
+      // DELETE /api/folders/[id] error
       return NextResponse.json(
         { ok: false, error: 'Failed to delete folder' },
         { status: 500 }
@@ -150,8 +150,8 @@ export async function DELETE(
     }
 
     return NextResponse.json({ ok: true, data: { id: params.id } })
-  } catch (error) {
-    console.error('DELETE /api/folders/[id] error:', error)
+  } catch {
+    // DELETE /api/folders/[id] error
     
     return NextResponse.json(
       { ok: false, error: 'Failed to delete folder' },

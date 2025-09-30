@@ -34,8 +34,8 @@ export async function GET(request: NextRequest): Promise<NextResponse<ApiRespons
     const files = await listFilesForUser(supabase, includeDeleted)
     
     return NextResponse.json({ data: files })
-  } catch (error) {
-    console.error('GET /api/files error:', error)
+  } catch {
+    // GET /api/files error
     
     return NextResponse.json(
       { error: 'Failed to list files' },
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       { status: 201 }
     )
   } catch (error) {
-    console.error('POST /api/files error:', error)
+    // POST /api/files error
     
     // Handle specific error types
     if (error instanceof Error) {

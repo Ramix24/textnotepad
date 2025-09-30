@@ -42,7 +42,7 @@ export async function GET(
     
     return NextResponse.json({ data: file })
   } catch (error) {
-    console.error(`GET /api/files/${id} error:`, error)
+    // GET /api/files/[id] error
     
     if (error instanceof Error) {
       if (error.message.includes('not found') || error.message.includes('access denied')) {
@@ -113,7 +113,7 @@ export async function PATCH(
     
     return NextResponse.json({ data: file })
   } catch (error) {
-    console.error(`PATCH /api/files/${id} error:`, error)
+    // PATCH /api/files/[id] error
     
     if (error instanceof Error) {
       if (error.message.includes('not found') || error.message.includes('access denied')) {
@@ -171,7 +171,7 @@ export async function DELETE(
     // 204 No Content for successful deletion
     return new NextResponse(null, { status: 204 })
   } catch (error) {
-    console.error(`DELETE /api/files/${id} error:`, error)
+    // DELETE /api/files/[id] error
     
     if (error instanceof Error) {
       if (error.message.includes('not found') || error.message.includes('access denied')) {
@@ -235,7 +235,7 @@ export async function POST(
     }
     
   } catch (error) {
-    console.error(`POST /api/files/${id} error:`, error)
+    // POST /api/files/[id] error
     
     if (error instanceof Error) {
       if (error.message.includes('not found') || error.message.includes('access denied')) {
