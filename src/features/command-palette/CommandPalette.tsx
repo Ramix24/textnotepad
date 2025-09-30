@@ -64,7 +64,9 @@ export function CommandPalette({
 
   // Get available actions
   const availableActions = useMemo(() => {
-    return registerDefaultActions(context)
+    const actions = registerDefaultActions(context)
+    console.log('🎯 AVAILABLE ACTIONS:', actions.map(a => ({ id: a.id, label: a.label })))
+    return actions
   }, [context])
 
   // Set up fuzzy search instances
@@ -220,6 +222,10 @@ export function CommandPalette({
   const handleSelect = () => {
     const activeItem = getActiveItem()
     if (!activeItem) return
+
+    console.log('🎯 HANDLE SELECT - activeIndex:', state.activeIndex)
+    console.log('🎯 HANDLE SELECT - activeItem:', activeItem)
+    console.log('🎯 HANDLE SELECT - sections:', sections.map(s => ({ key: s.key, itemCount: s.items.length })))
 
     if (state.step === 'input-arg' && state.pendingAction && onExecuteWithArg) {
       onExecuteWithArg(state.pendingAction, activeItem.item)
