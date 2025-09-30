@@ -6,7 +6,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!supabaseUrl || !supabaseKey) {
-  console.warn('Supabase credentials not found - admin endpoints will be disabled')
+  // Supabase credentials not found - admin endpoints will be disabled
 }
 
 const supabase = supabaseUrl && supabaseKey 
@@ -19,7 +19,7 @@ function isAuthorized(request: NextRequest): boolean {
   const adminPassword = process.env.ADMIN_PASSWORD
   
   if (!adminPassword) {
-    console.warn('ADMIN_PASSWORD not set - admin endpoint disabled')
+    // ADMIN_PASSWORD not set - admin endpoint disabled
     return false
   }
   
@@ -97,8 +97,8 @@ export async function GET(request: NextRequest) {
       }
     })
 
-  } catch (error) {
-    console.error('Admin waitlist error:', error)
+  } catch {
+    // Admin waitlist error
     return NextResponse.json(
       { error: 'Failed to fetch waitlist data' },
       { status: 500 }
@@ -159,8 +159,8 @@ export async function POST(request: NextRequest) {
       }
     })
 
-  } catch (error) {
-    console.error('Admin export error:', error)
+  } catch {
+    // Admin export error
     return NextResponse.json(
       { error: 'Failed to export data' },
       { status: 500 }
