@@ -19,7 +19,6 @@ export type CommandContext = {
     toggleDarkMode: () => void
     openNote: (id: string) => void
     openFolder: (id: string) => void
-    copyNoteLink: (noteId: string) => void
     openSearch: (query?: string) => void
     deleteNote: (noteId: string) => Promise<void>
   }
@@ -67,6 +66,7 @@ export function registerDefaultActions(_ctx: CommandContext): CommandAction[] {
       needsArg: 'text' as const,
       run: async (ctx: CommandContext, arg: unknown) => {
         const name = String(arg || 'New Folder')
+        console.log('New Folder action executing with name:', name)
         await ctx.api.createFolder(name)
       }
     },
@@ -88,21 +88,6 @@ export function registerDefaultActions(_ctx: CommandContext): CommandAction[] {
       icon: 'Search',
       run: (ctx: CommandContext) => {
         ctx.api.openSearch()
-      }
-    },
-    {
-      id: 'copy-note-link',
-      label: 'Copy Link to Current Note',
-      description: 'Copy a shareable link to the clipboard',
-      keywords: ['copy', 'link', 'share', 'url'],
-      icon: 'Link',
-      run: (ctx: CommandContext) => {
-        const state = ctx.getState()
-        if (state.currentNoteId) {
-          ctx.api.copyNoteLink(state.currentNoteId)
-        } else {
-          throw new Error('No note is currently selected')
-        }
       }
     },
     {

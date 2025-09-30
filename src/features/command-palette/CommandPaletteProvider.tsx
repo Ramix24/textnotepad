@@ -82,7 +82,9 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
       
       createFolder: async (name: string) => {
         try {
+          console.log('createFolder called with name:', name)
           const result = await createFolderMutation.mutateAsync({ name })
+          console.log('createFolder result:', result)
           
           // Navigate to the new folder
           layout.setSelection({
@@ -94,6 +96,7 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
           toast.success(`Folder "${name}" created`)
           return { id: result.id }
         } catch (error) {
+          console.error('createFolder error:', error)
           toast.error('Failed to create folder')
           throw error
         }
@@ -137,16 +140,6 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
         // Focus list view on mobile/tablet
         if (layout.isMobile || layout.isTablet) {
           layout.setActivePane(2)
-        }
-      },
-      
-      copyNoteLink: async (noteId: string) => {
-        try {
-          const url = `${window.location.origin}/app?note=${noteId}`
-          await navigator.clipboard.writeText(url)
-          toast.success('Link copied to clipboard')
-        } catch {
-          toast.error('Failed to copy link to clipboard')
         }
       },
       
