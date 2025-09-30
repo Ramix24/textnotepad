@@ -80,16 +80,22 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
       },
       
       createFolder: async (name: string) => {
-        const result = await createFolder.mutateAsync({ name })
-        
-        // Navigate to the new folder
-        layout.setSelection({
-          mode: 'notes',
-          folderId: result.id,
-          fileId: null
-        })
-        
-        return { id: result.id }
+        try {
+          const result = await createFolder.mutateAsync({ name })
+          
+          // Navigate to the new folder
+          layout.setSelection({
+            mode: 'notes',
+            folderId: result.id,
+            fileId: null
+          })
+          
+          toast.success(`Folder "${name}" created`)
+          return { id: result.id }
+        } catch (error) {
+          toast.error('Failed to create folder')
+          throw error
+        }
       },
       
       moveNote: async (_noteId: string, _folderId: string) => {
@@ -100,8 +106,11 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
       exportNotePdf: mockApi.exportNotePdf, // Use real API when available
       
       toggleDarkMode: () => {
-        setTheme((currentTheme) => currentTheme === 'dark' ? 'light' : 'dark')
-        toast.success('Theme toggled')
+        // Get current theme from document to determine toggle direction
+        const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
+        setTheme(newTheme)
+        toast.success(`Switched to ${newTheme} mode`)
       },
       
       openNote: (id: string) => {
@@ -130,10 +139,14 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
         }
       },
       
-      copyNoteLink: (noteId: string) => {
-        const url = `${window.location.origin}/app?note=${noteId}`
-        navigator.clipboard.writeText(url)
-        toast.success('Link copied to clipboard')
+      copyNoteLink: async (noteId: string) => {
+        try {
+          const url = `${window.location.origin}/app?note=${noteId}`
+          await navigator.clipboard.writeText(url)
+          toast.success('Link copied to clipboard')
+        } catch {
+          toast.error('Failed to copy link to clipboard')
+        }
       },
       
       openSearch: (query?: string) => {

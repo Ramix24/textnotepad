@@ -63,9 +63,9 @@ export function registerDefaultActions(_ctx: CommandContext): CommandAction[] {
       description: 'Create a new folder',
       keywords: ['create', 'add', 'new', 'folder', 'notebook'],
       icon: 'FolderPlus',
-      run: async (ctx: CommandContext) => {
-        // This would need a text input step
-        const name = `Folder ${new Date().toLocaleDateString()}`
+      needsArg: 'text' as const,
+      run: async (ctx: CommandContext, arg: unknown) => {
+        const name = String(arg || 'New Folder')
         await ctx.api.createFolder(name)
       }
     },
@@ -99,6 +99,8 @@ export function registerDefaultActions(_ctx: CommandContext): CommandAction[] {
         const state = ctx.getState()
         if (state.currentNoteId) {
           ctx.api.copyNoteLink(state.currentNoteId)
+        } else {
+          throw new Error('No note is currently selected')
         }
       }
     }
