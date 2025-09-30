@@ -24,7 +24,13 @@ const CommandPaletteContext = createContext<CommandPaletteContextType | null>(nu
 export function useCommandPaletteContext() {
   const context = useContext(CommandPaletteContext)
   if (!context) {
-    throw new Error('useCommandPaletteContext must be used within a CommandPaletteProvider')
+    // Return a fallback object during SSR or when provider is not available
+    return {
+      toggle: () => {},
+      open: () => {},
+      close: () => {},
+      isOpen: false
+    }
   }
   return context
 }
