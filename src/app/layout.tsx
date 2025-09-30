@@ -5,7 +5,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { QueryProvider } from '@/components/QueryProvider'
 import SupabaseProvider from '@/components/SupabaseProvider'
 import { Toaster } from '@/components/ui/sonner'
-import { CommandPaletteProvider } from '@/features/command-palette/CommandPaletteProvider'
+import { ClientProviders } from '@/components/ClientProviders'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -89,10 +89,10 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <CommandPaletteProvider>
+              <ClientProviders>
                 {children}
                 <Toaster />
-              </CommandPaletteProvider>
+              </ClientProviders>
             </ThemeProvider>
           </QueryProvider>
         </SupabaseProvider>
