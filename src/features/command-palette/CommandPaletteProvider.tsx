@@ -184,12 +184,16 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
   // Handle action selection
   const handleSelectAction = useCallback(async (action: CommandAction) => {
     try {
+      console.log('🎯 ACTION SELECTED:', action.id, action.label)
+      
       if ('needsArg' in action) {
+        console.log('🎯 ACTION NEEDS ARG:', action.needsArg)
         // Start argument input mode
         commandPalette.actions.startArgInput(action, action.needsArg)
         return
       }
 
+      console.log('🎯 EXECUTING ACTION IMMEDIATELY:', action.id)
       // Execute action immediately
       await action.run(commandContext)
       
@@ -197,7 +201,8 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
       commandPalette.actions.addRecentAction(action.id)
       commandPalette.actions.close()
       
-    } catch {
+    } catch (error) {
+      console.error('🎯 ACTION EXECUTION ERROR:', error)
       // Silently handle errors in production
       toast.error('Failed to execute action')
     }
