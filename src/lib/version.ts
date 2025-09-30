@@ -2,11 +2,11 @@
  * Version utilities  
  * Provides access to the current app version
  * Version is auto-updated by the version script on each commit
- * DEPLOY v0.5.47: Enhanced debugging for command palette action selection bug
+ * CRITICAL FIX v0.5.49: Test swapped action order to fix selection bug
  */
 
 // This version is automatically updated by scripts/auto-version.js
-export const APP_VERSION = '0.5.48'
+export const APP_VERSION = '0.5.49'
 export const APP_NAME = 'textnotepad'
 
 /**
