@@ -2,11 +2,11 @@
  * Version utilities  
  * Provides access to the current app version
  * Version is auto-updated by the version script on each commit
- * FORCE DEPLOY: Command palette action fixes - v0.5.40
+ * FORCE DEPLOY v0.5.42: Debug action selection bug - New Folder executes Search
  */
 
 // This version is automatically updated by scripts/auto-version.js
-export const APP_VERSION = '0.5.41'
+export const APP_VERSION = '0.5.42'
 export const APP_NAME = 'textnotepad'
 
 /**
