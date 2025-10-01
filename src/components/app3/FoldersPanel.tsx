@@ -506,8 +506,8 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
       </div>
 
       {/* Footer */}
-      <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary">
-        <div className="flex items-center justify-center text-xs text-text-secondary">
+      <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary min-h-[60px]">
+        <div className="flex items-center justify-center text-xs text-text-secondary h-full">
           <span className="text-xs text-text-secondary font-mono">{formatVersion()}</span>
         </div>
       </footer>

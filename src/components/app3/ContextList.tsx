@@ -380,13 +380,13 @@ function NotesView({
       </div>
 
       {/* Footer */}
-      <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary">
+      <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary min-h-[60px]">
         {isCollapsed ? (
-          <div className="text-center text-xs text-text-secondary">
+          <div className="text-center text-xs text-text-secondary h-full flex items-center justify-center">
             <div>{files.length}</div>
           </div>
         ) : (
-          <div className="flex items-center justify-between text-xs text-text-secondary">
+          <div className="flex items-center justify-between text-xs text-text-secondary h-full">
             <div className="flex items-center gap-2">
               <span>{files.length} notes</span>
               {files.length > 0 && (
@@ -576,13 +576,13 @@ function TrashView({
       </div>
 
       {/* Footer */}
-      <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary">
+      <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary min-h-[60px]">
         {isCollapsed ? (
-          <div className="text-center text-xs text-text-secondary">
+          <div className="text-center text-xs text-text-secondary h-full flex items-center justify-center">
             <div>{files.length}</div>
           </div>
         ) : (
-          <div className="flex items-center justify-between text-xs text-text-secondary">
+          <div className="flex items-center justify-between text-xs text-text-secondary h-full">
             <div className="flex items-center gap-2">
               <span>{files.length} deleted items</span>
               {files.length > 0 && (

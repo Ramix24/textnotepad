@@ -43,7 +43,7 @@ export function EditorHeader({
   const getSaveStatus = () => {
     if (saving) return 'Saving…'
     if (showTyping) return 'Typing...'
-    if (savedAt) return `Saved • ${savedAt}`
+    if (savedAt) return 'Saved'
     return 'Ready'
   }
 
