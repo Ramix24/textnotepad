@@ -158,7 +158,18 @@ export function AppShell3({
   // Global keyboard shortcuts  
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        // Focus search bar (Ctrl/Cmd+K)
+        e.preventDefault()
+        const searchInput = document.querySelector('input[placeholder="Search notes..."]') as HTMLInputElement
+        if (searchInput) {
+          searchInput.focus()
+          layout.setSelection({ mode: 'search', folderId: null, fileId: null })
+          if (layout.isMobile || layout.isTablet) {
+            layout.setActivePane(3)
+          }
+        }
+      } else if ((e.metaKey || e.ctrlKey) && e.key === '/') {
         e.preventDefault()
         layout.setSelection({ mode: 'help', folderId: null, fileId: null })
         if (layout.isMobile || layout.isTablet) {
@@ -266,12 +277,68 @@ export function AppShell3({
             </button>
           </div>
 
-          {/* Center section - Keep empty for clean header */}
-          <div className="flex-1"></div>
+          {/* Center section - Search Bar (Desktop/Tablet only) */}
+          <div className="hidden md:flex flex-1 max-w-md mx-8">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" />
+              <input
+                type="text"
+                value={layout.selection.searchQuery || ''}
+                onChange={(e) => {
+                  const query = e.target.value
+                  layout.setSelection({ 
+                    mode: 'search', 
+                    folderId: null, 
+                    fileId: null, 
+                    searchQuery: query 
+                  })
+                  if (layout.isMobile || layout.isTablet) {
+                    layout.setActivePane(3)
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    layout.setSelection({ 
+                      mode: 'notes', 
+                      folderId: null, 
+                      fileId: null, 
+                      searchQuery: '' 
+                    })
+                    e.currentTarget.blur()
+                  }
+                }}
+                placeholder="Search notes..."
+                className="w-full pl-10 pr-10 py-2 bg-bg-primary border border-border-dark rounded-lg text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-blue/50 focus:border-accent-blue transition-all duration-200 hover:border-border-light"
+              />
+              
+              {/* Clear button */}
+              {layout.selection.searchQuery && (
+                <button
+                  onClick={() => {
+                    layout.setSelection({ 
+                      mode: 'notes', 
+                      folderId: null, 
+                      fileId: null, 
+                      searchQuery: '' 
+                    })
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary hover:text-text-primary transition-colors"
+                  title="Clear search (Esc)"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile spacer */}
+          <div className="flex-1 md:hidden"></div>
 
           {/* Right section */}
           <div className="flex items-center gap-4">
-            {/* Search Button */}
+            {/* Mobile Search Button */}
             <button
               onClick={() => {
                 layout.setSelection({ mode: 'search', folderId: null, fileId: null, searchQuery: '' })
@@ -279,11 +346,10 @@ export function AppShell3({
                   layout.setActivePane(3)
                 }
               }}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-[color:var(--bg-active)]/40 rounded transition-colors"
+              className="md:hidden flex items-center gap-2 px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-[color:var(--bg-active)]/40 rounded transition-colors"
               title="Open search interface"
             >
               <Search className="w-4 h-4" />
-              <span className="hidden sm:inline">Search</span>
             </button>
             
             {/* Help Button */}
