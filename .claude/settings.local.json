@@ -48,7 +48,8 @@
       "Bash(start http://localhost:3005)",
       "Bash(git reset:*)",
       "Bash(copy:*)",
-      "Bash(start http://localhost:3000)"
+      "Bash(start http://localhost:3000)",
+      "Bash(npm run version:auto:*)"
     ],
     "deny": [],
     "ask": [],

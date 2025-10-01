@@ -226,8 +226,13 @@ export function CommandPalette({
 
   // Handle item selection
   const handleSelect = () => {
+    console.log('🎯 HANDLE SELECT - step:', state.step, 'query:', state.query)
+    console.log('🎯 HANDLE SELECT - sections length:', sections.length)
+    console.log('🎯 HANDLE SELECT - activeIndex:', state.activeIndex)
+    
     // Special handling for text input mode
     if (state.step === 'input-arg' && state.argMode === 'text' && state.pendingAction && onExecuteWithArg) {
+      console.log('🎯 HANDLE SELECT - text input mode, pendingAction:', state.pendingAction?.id)
       // Use the query (what user typed) as the argument
       onExecuteWithArg(state.pendingAction, state.query)
       onClose()
@@ -235,14 +240,20 @@ export function CommandPalette({
     }
 
     const activeItem = getActiveItem()
-    if (!activeItem) return
+    console.log('🎯 HANDLE SELECT - activeItem:', activeItem)
+    if (!activeItem) {
+      console.log('🎯 HANDLE SELECT - no active item, returning early')
+      return
+    }
 
     if (state.step === 'input-arg' && state.pendingAction && onExecuteWithArg) {
+      console.log('🎯 HANDLE SELECT - arg input mode, pendingAction:', state.pendingAction?.id)
       onExecuteWithArg(state.pendingAction, activeItem.item)
       onClose()
       return
     }
 
+    console.log('🎯 HANDLE SELECT - section:', activeItem.section, 'item:', activeItem.item)
     switch (activeItem.section) {
       case 'actions':
         onSelectAction(activeItem.item as CommandAction)
