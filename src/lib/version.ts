@@ -2,11 +2,11 @@
  * Version utilities  
  * Provides access to the current app version
  * Version is auto-updated by the version script on each commit
- * CRITICAL FIX v0.5.49: Test swapped action order to fix selection bug
+ * DEBUG v0.5.53: Trace action order bug - New Note creates folders
  */
 
 // This version is automatically updated by scripts/auto-version.js
-export const APP_VERSION = '0.5.52'
+export const APP_VERSION = '0.5.53'
 export const APP_NAME = 'textnotepad'
 
 /**
