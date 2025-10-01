@@ -284,6 +284,34 @@ export function CommandPalette({
     }
   }
 
+  // Direct click handler that bypasses activeIndex state
+  const handleDirectClick = (item: any, sectionKey: string, globalIndex: number) => {
+    console.log('🎯 DIRECT CLICK - item:', item, 'section:', sectionKey, 'globalIndex:', globalIndex)
+    
+    if (state.step === 'input-arg' && state.pendingAction && onExecuteWithArg) {
+      console.log('🎯 DIRECT CLICK - arg input mode, pendingAction:', state.pendingAction?.id)
+      onExecuteWithArg(state.pendingAction, item)
+      onClose()
+      return
+    }
+
+    console.log('🎯 DIRECT CLICK - executing action for section:', sectionKey)
+    switch (sectionKey) {
+      case 'actions':
+        onSelectAction(item as CommandAction)
+        break
+      case 'notes':
+      case 'search-notes':
+        onSelectNote(item as UserFile)
+        onClose()
+        break
+      case 'folders':
+        onSelectFolder(item as UserFolder)
+        onClose()
+        break
+    }
+  }
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -387,8 +415,9 @@ export function CommandPalette({
                               : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
                           }`}
                           onClick={() => {
+                            console.log('🎯 CLICK - item clicked:', item, 'section:', section.key, 'globalIndex:', globalIndex)
                             onSetActiveIndex(globalIndex)
-                            handleSelect()
+                            handleDirectClick(item, section.key, globalIndex)
                           }}
                         >
                           <div className="flex items-center gap-3">
