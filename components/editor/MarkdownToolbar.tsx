@@ -100,9 +100,57 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, clearForm
     })
   }
 
+  const handleUndo = () => {
+    const el = textareaRef.current
+    if (!el || disabled) return
+    
+    // Use browser's native undo functionality
+    if (document.execCommand) {
+      document.execCommand('undo', false)
+    } else {
+      // For modern browsers, dispatch keyboard event
+      el.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'z',
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true
+      }))
+    }
+    el.focus()
+  }
+
+  const handleRedo = () => {
+    const el = textareaRef.current
+    if (!el || disabled) return
+    
+    // Use browser's native redo functionality
+    if (document.execCommand) {
+      document.execCommand('redo', false)
+    } else {
+      // For modern browsers, dispatch keyboard event
+      el.dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'y',
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true
+      }))
+    }
+    el.focus()
+  }
+
 
   return (
     <div className="h-10 bg-bg-secondary border-b border-border-dark flex items-center gap-1 px-3 overflow-x-auto">
+      {/* Undo/Redo - always visible */}
+      <ToolbarButton onClick={handleUndo} disabled={disabled} title="Undo (Ctrl+Z)">
+        ↶
+      </ToolbarButton>
+      <ToolbarButton onClick={handleRedo} disabled={disabled} title="Redo (Ctrl+Y)">
+        ↷
+      </ToolbarButton>
+
+      <Separator />
+
       {/* Essential formatting - always visible */}
       <ToolbarButton onClick={() => surround('**')} disabled={disabled} title="Bold (Ctrl+B)">
         <strong>B</strong>
@@ -113,10 +161,6 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, clearForm
       <ToolbarButton onClick={() => surround('~~')} disabled={disabled} title="Strikethrough">
         <s>S</s>
       </ToolbarButton>
-      <ToolbarButton onClick={() => surround('`')} disabled={disabled} title="Code (Ctrl+`)">
-        Code
-      </ToolbarButton>
-
       <Separator />
 
       {/* Headings - hide H3 on mobile */}
@@ -126,7 +170,7 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, clearForm
       <ToolbarButton onClick={() => insertPrefix('## ')} disabled={disabled} title="Heading 2">
         H2
       </ToolbarButton>
-      <ToolbarButton onClick={() => insertPrefix('### ')} disabled={disabled} title="Heading 3" className="hidden sm:inline-flex">
+      <ToolbarButton onClick={() => insertPrefix('### ')} disabled={disabled} title="Heading 3">
         H3
       </ToolbarButton>
 
@@ -140,7 +184,7 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, clearForm
         1. List
       </ToolbarButton>
       <ToolbarButton onClick={insertChecklist} disabled={disabled} title="Checklist" className="hidden sm:inline-flex">
-        ☑ Todo
+        ☐ Todo
       </ToolbarButton>
 
       <Separator className="hidden sm:block" />
@@ -159,7 +203,7 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, clearForm
       <Separator className="hidden sm:block" />
 
       {/* Clear formatting button */}
-      <ToolbarButton onClick={clearFormatting} disabled={disabled} title="Clear Formatting (Ctrl+Shift+U)" className="text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20">
+      <ToolbarButton onClick={clearFormatting} disabled={disabled} title="Clear Formatting (Ctrl+Shift+U)">
         Clear
       </ToolbarButton>
     </div>

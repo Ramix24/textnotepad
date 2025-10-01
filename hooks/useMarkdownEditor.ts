@@ -378,11 +378,6 @@ export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEdit
         e.preventDefault()
         insertLink()
         break
-      case '`':
-        if (!e.shiftKey) {
-          surround('`')
-        }
-        break
       case 'p':
         if (e.shiftKey) {
           e.preventDefault()
