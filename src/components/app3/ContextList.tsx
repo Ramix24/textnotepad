@@ -381,27 +381,9 @@ function NotesView({
 
       {/* Footer */}
       <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary min-h-[60px]">
-        {isCollapsed ? (
-          <div className="text-center text-xs text-text-secondary h-full flex items-center justify-center">
-            <div>{files.length}</div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-between text-xs text-text-secondary h-full">
-            <div className="flex items-center gap-2">
-              <span>{files.length} notes</span>
-              {files.length > 0 && (
-                <>
-                  <span>·</span>
-                  <span>Updated {new Date().toLocaleDateString()}</span>
-                </>
-              )}
-            </div>
-            <div className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 text-[10px] bg-bg-active text-text-secondary rounded border border-border-dark">⌘N</kbd>
-              <span>new</span>
-            </div>
-          </div>
-        )}
+        <div className="text-center text-xs text-text-secondary h-full flex items-center justify-center">
+          <div>{files.length} notes</div>
+        </div>
       </footer>
     </div>
   )
@@ -577,23 +559,9 @@ function TrashView({
 
       {/* Footer */}
       <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary min-h-[60px]">
-        {isCollapsed ? (
-          <div className="text-center text-xs text-text-secondary h-full flex items-center justify-center">
-            <div>{files.length}</div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-between text-xs text-text-secondary h-full">
-            <div className="flex items-center gap-2">
-              <span>{files.length} deleted items</span>
-              {files.length > 0 && (
-                <>
-                  <span>·</span>
-                  <span>Select an item to preview or restore</span>
-                </>
-              )}
-            </div>
-          </div>
-        )}
+        <div className="text-center text-xs text-text-secondary h-full flex items-center justify-center">
+          <div>{files.length} deleted items</div>
+        </div>
       </footer>
     </div>
   )

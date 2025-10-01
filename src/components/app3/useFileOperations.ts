@@ -68,46 +68,44 @@ export function useFileOperations(options: UseFileOperationsOptions = {}) {
   }
 
   const handleDelete = async (file: UserFile, currentFileId?: string, allFiles: UserFile[] = []) => {
-    if (window.confirm(`Are you sure you want to delete "${file.name}"?`)) {
-      try {
-        await deleteFile.mutateAsync(file.id)
+    try {
+      await deleteFile.mutateAsync(file.id)
+      
+      // If we deleted the currently selected file, select the next logical file
+      if (currentFileId === file.id) {
+        const activeFiles = allFiles.filter(f => f.id !== file.id && !f.deleted_at)
         
-        // If we deleted the currently selected file, select the next logical file
-        if (currentFileId === file.id) {
-          const activeFiles = allFiles.filter(f => f.id !== file.id && !f.deleted_at)
+        if (activeFiles.length > 0) {
+          // Sort by updated_at (most recent first) to match list order
+          const sortedFiles = activeFiles.sort((a, b) => 
+            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+          )
           
-          if (activeFiles.length > 0) {
-            // Sort by updated_at (most recent first) to match list order
-            const sortedFiles = activeFiles.sort((a, b) => 
-              new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-            )
-            
-            // Find the current file index in the original sorted list
-            const originalSorted = allFiles
-              .filter(f => !f.deleted_at)
-              .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
-            
-            const currentIndex = originalSorted.findIndex(f => f.id === file.id)
-            
-            // Select the next file in the list, or the previous one if we're at the end
-            let nextFile = sortedFiles[Math.min(currentIndex, sortedFiles.length - 1)]
-            
-            // If that didn't work, just pick the first one
-            if (!nextFile) {
-              nextFile = sortedFiles[0]
-            }
-            
-            onFileSelect?.(nextFile.id)
-          } else {
-            // No files left, clear selection
-            onFileSelect?.('')
+          // Find the current file index in the original sorted list
+          const originalSorted = allFiles
+            .filter(f => !f.deleted_at)
+            .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+          
+          const currentIndex = originalSorted.findIndex(f => f.id === file.id)
+          
+          // Select the next file in the list, or the previous one if we're at the end
+          let nextFile = sortedFiles[Math.min(currentIndex, sortedFiles.length - 1)]
+          
+          // If that didn't work, just pick the first one
+          if (!nextFile) {
+            nextFile = sortedFiles[0]
           }
+          
+          onFileSelect?.(nextFile.id)
+        } else {
+          // No files left, clear selection
+          onFileSelect?.('')
         }
-        
-        onFileDeleted?.(file.id)
-      } catch {
-        // Error handling is done in the hook
       }
+      
+      onFileDeleted?.(file.id)
+    } catch {
+      // Error handling is done in the hook
     }
   }
 

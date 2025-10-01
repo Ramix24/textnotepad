@@ -12,6 +12,8 @@ import { useMarkdownEditor } from '../../hooks/useMarkdownEditor'
 import { EditorHeader } from '../../components/editor/EditorHeader'
 import { MarkdownToolbar } from '../../components/editor/MarkdownToolbar'
 import { MarkdownPreview } from '../../components/editor/MarkdownPreview'
+import { marked } from 'marked'
+import DOMPurify from 'isomorphic-dompurify'
 
 interface EditorProps {
   file: UserFile
@@ -170,6 +172,221 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     onFileUpdate?.({ ...file, name: newName })
   }, [readOnly, file, onFileUpdate])
 
+  // Handle print functionality
+  const handlePrint = useCallback(() => {
+    // Configure marked for consistent output
+    marked.setOptions({
+      breaks: true,
+      gfm: true,
+    })
+
+    // Convert markdown to HTML
+    const rawHtml = marked.parse(content)
+    const sanitizedHtml = DOMPurify.sanitize(rawHtml as string, {
+      USE_PROFILES: { html: true },
+      FORBID_TAGS: ['style', 'script', 'iframe', 'object', 'embed', 'form', 'input'],
+      FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'style'],
+      ALLOWED_ATTR: ['href', 'title', 'alt', 'class', 'id', 'target', 'rel', 'open'],
+      ADD_TAGS: ['details', 'summary'],
+    })
+
+    // Create print window with formatted content
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) {
+      toast.error('Unable to open print dialog', {
+        description: 'Please check your browser settings and try again.'
+      })
+      return
+    }
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>${file.name} - TextNotepad.com</title>
+          <style>
+            /* Reset and base styles */
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+              line-height: 1.6;
+              color: #374151;
+              max-width: 8.5in;
+              margin: 0 auto;
+              padding: 0.5in;
+              background: white;
+            }
+            
+            /* Header */
+            .print-header {
+              margin-bottom: 2rem;
+              padding-bottom: 1rem;
+              border-bottom: 2px solid #e5e7eb;
+            }
+            
+            .print-title {
+              font-size: 1.5rem;
+              font-weight: 600;
+              color: #111827;
+              margin-bottom: 0.5rem;
+            }
+            
+            .print-meta {
+              font-size: 0.875rem;
+              color: #6b7280;
+            }
+            
+            /* Content styles */
+            .print-content h1,
+            .print-content h2,
+            .print-content h3,
+            .print-content h4,
+            .print-content h5,
+            .print-content h6 {
+              margin-top: 1.5rem;
+              margin-bottom: 0.5rem;
+              font-weight: 600;
+              color: #111827;
+            }
+            
+            .print-content h1 { font-size: 1.875rem; }
+            .print-content h2 { font-size: 1.5rem; }
+            .print-content h3 { font-size: 1.25rem; }
+            .print-content h4 { font-size: 1.125rem; }
+            .print-content h5 { font-size: 1rem; }
+            .print-content h6 { font-size: 0.875rem; }
+            
+            .print-content p {
+              margin-bottom: 1rem;
+            }
+            
+            .print-content ul,
+            .print-content ol {
+              margin-bottom: 1rem;
+              padding-left: 1.5rem;
+            }
+            
+            .print-content li {
+              margin-bottom: 0.25rem;
+            }
+            
+            .print-content blockquote {
+              margin: 1rem 0;
+              padding-left: 1rem;
+              border-left: 4px solid #d1d5db;
+              color: #6b7280;
+              font-style: italic;
+            }
+            
+            .print-content code {
+              background-color: #f3f4f6;
+              padding: 0.125rem 0.25rem;
+              border-radius: 0.25rem;
+              font-family: 'Courier New', monospace;
+              font-size: 0.875rem;
+            }
+            
+            .print-content pre {
+              background-color: #f3f4f6;
+              padding: 1rem;
+              border-radius: 0.5rem;
+              margin: 1rem 0;
+              overflow-x: auto;
+            }
+            
+            .print-content pre code {
+              background: none;
+              padding: 0;
+            }
+            
+            .print-content table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 1rem 0;
+            }
+            
+            .print-content th,
+            .print-content td {
+              border: 1px solid #d1d5db;
+              padding: 0.5rem;
+              text-align: left;
+            }
+            
+            .print-content th {
+              background-color: #f9fafb;
+              font-weight: 600;
+            }
+            
+            .print-content a {
+              color: #2563eb;
+              text-decoration: underline;
+            }
+            
+            .print-content hr {
+              margin: 2rem 0;
+              border: none;
+              border-top: 1px solid #d1d5db;
+            }
+            
+            /* Print-specific styles */
+            @media print {
+              body {
+                margin: 0;
+                padding: 0.5in;
+              }
+              
+              .print-header {
+                margin-bottom: 1rem;
+              }
+              
+              /* Avoid page breaks inside elements */
+              h1, h2, h3, h4, h5, h6 {
+                page-break-after: avoid;
+              }
+              
+              p, li {
+                page-break-inside: avoid;
+              }
+              
+              /* Force page breaks before major sections */
+              h1 {
+                page-break-before: auto;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="print-header">
+            <h1 class="print-title">${file.name}</h1>
+            <div class="print-meta">
+              Printed on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}
+              <br>
+              From TextNotepad.com
+            </div>
+          </div>
+          <div class="print-content">
+            ${sanitizedHtml}
+          </div>
+        </body>
+      </html>
+    `)
+
+    printWindow.document.close()
+    
+    // Wait for content to load, then print
+    printWindow.onload = () => {
+      printWindow.print()
+      printWindow.close()
+    }
+  }, [content, file.name])
+
 
   // Combined keyboard shortcuts
   const handleKeyDown = useCallback(async (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -278,6 +495,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         readOnly={readOnly}
         showLineNumbers={showLineNumbers}
         onToggleLineNumbers={toggleLineNumbers}
+        onPrint={handlePrint}
       />
 
       {/* Main editor area */}
@@ -286,7 +504,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
           <MarkdownPreview content={content} className="h-full overflow-auto" />
         ) : showLineNumbers ? (
           <div className="relative h-full">
-            <div className="absolute left-0 top-0 w-12 h-full bg-bg-secondary border-r border-border-dark flex flex-col text-xs text-text-secondary font-mono overflow-hidden">
+            <div className="absolute left-0 top-0 w-12 h-full bg-bg-secondary border-r border-border-dark flex flex-col text-xs text-text-secondary font-mono overflow-hidden pt-4">
               {content.split('\n').map((_, index) => (
                 <div key={index + 1} className="px-2 leading-relaxed text-right min-h-[1.5rem] flex items-center justify-end">
                   {index + 1}

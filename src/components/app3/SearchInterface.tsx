@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Search, Calendar, Hash } from 'lucide-react'
+import { Search, Hash } from 'lucide-react'
 import { useFilesList } from '@/hooks/useFiles'
 import { UserFile } from '@/types/user-files.types'
 import type { AppSelection } from './types'
@@ -207,16 +207,6 @@ export function SearchInterface({
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs">
                         <Hash className="w-3 h-3" />
                         Tasks
-                      </span>
-                    )}
-                    {(() => {
-                      const weekAgo = new Date()
-                      weekAgo.setDate(weekAgo.getDate() - 7)
-                      return new Date(file.updated_at) > weekAgo
-                    })() && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-xs">
-                        <Calendar className="w-3 h-3" />
-                        Recent
                       </span>
                     )}
                   </div>

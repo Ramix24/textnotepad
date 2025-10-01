@@ -369,7 +369,6 @@ export function AppShell3({
               title="Settings (Ctrl+,)"
             >
               <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline">Settings</span>
             </button>
             
             {/* Help Button */}
@@ -384,7 +383,6 @@ export function AppShell3({
               title="Keyboard shortcuts (Ctrl+/ or ?)"
             >
               <HelpCircle className="w-4 h-4" />
-              <span className="hidden sm:inline">Help</span>
             </button>
             
             {/* User Authentication UI */}
@@ -392,11 +390,11 @@ export function AppShell3({
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-[color:var(--bg-active)]/40 rounded transition-colors"
+                title="Logout"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                Logout
               </button>
             )}
           </div>
