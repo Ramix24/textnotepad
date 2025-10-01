@@ -64,9 +64,11 @@ export function registerDefaultActions(_ctx: CommandContext): CommandAction[] {
       description: 'Create a new note', 
       keywords: ['create', 'add', 'new', 'note'],
       icon: 'FileText',
-      run: async (ctx: CommandContext) => {
+      needsArg: 'text' as const,
+      run: async (ctx: CommandContext, arg: unknown) => {
         const state = ctx.getState()
-        await ctx.api.createNote(state.currentFolderId)
+        const name = String(arg || 'New Note')
+        await ctx.api.createNote(state.currentFolderId, name)
       }
     },
     {

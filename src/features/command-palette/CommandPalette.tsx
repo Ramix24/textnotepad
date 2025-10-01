@@ -351,6 +351,8 @@ export function CommandPalette({
   const placeholder = state.step === 'input-arg' 
     ? state.argMode === 'text' && state.pendingAction?.id === 'new-folder'
       ? 'Enter folder name...'
+      : state.argMode === 'text' && state.pendingAction?.id === 'new-note'
+      ? 'Enter note name...'
       : `Select ${state.argMode}...`
     : 'Type a command or search notes...'
 
