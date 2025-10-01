@@ -6,7 +6,7 @@ interface HelpInterfaceProps {
 
 export function HelpInterface({ className = '' }: HelpInterfaceProps) {
   return (
-    <div className={`flex flex-col h-full bg-bg-primary ${className}`}>
+    <div className={`flex flex-col h-full bg-bg-secondary ${className}`}>
       {/* Header */}
       <div className="flex-shrink-0 p-6 border-b border-border-dark bg-bg-secondary">
         <h1 className="text-xl font-semibold text-text-primary flex items-center gap-2">

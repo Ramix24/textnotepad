@@ -119,7 +119,7 @@ export function SearchInterface({
   }
 
   return (
-    <div className={`flex flex-col h-full bg-bg-primary ${className}`}>
+    <div className={`flex flex-col h-full bg-bg-secondary ${className}`}>
       {/* Search Header */}
       <div className="flex-shrink-0 p-6 border-b border-border-dark bg-bg-secondary">
         <div className="space-y-4">

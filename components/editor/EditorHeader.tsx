@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 
 interface EditorHeaderProps {
   name: string
-  version?: number
   savedAt?: string
   saving?: boolean
   isDirty?: boolean
@@ -13,7 +12,6 @@ interface EditorHeaderProps {
 
 export function EditorHeader({
   name,
-  version,
   savedAt,
   saving,
   isDirty,
@@ -53,7 +51,6 @@ export function EditorHeader({
         placeholder="Untitled"
       />
       <div className="flex items-center gap-2 text-xs text-text-secondary">
-        {version && <span>v{version}</span>}
         
         {/* Save status indicator - simplified and less flashy */}
         <div className="flex items-center gap-2">

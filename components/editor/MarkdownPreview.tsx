@@ -24,7 +24,8 @@ export function MarkdownPreview({ content, className = '' }: MarkdownPreviewProp
       USE_PROFILES: { html: true },
       FORBID_TAGS: ['style', 'script', 'iframe', 'object', 'embed', 'form', 'input'],
       FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'style'],
-      ALLOWED_ATTR: ['href', 'title', 'alt', 'class', 'id', 'target', 'rel'],
+      ALLOWED_ATTR: ['href', 'title', 'alt', 'class', 'id', 'target', 'rel', 'open'],
+      ADD_TAGS: ['details', 'summary'],
     })
   }, [content])
 

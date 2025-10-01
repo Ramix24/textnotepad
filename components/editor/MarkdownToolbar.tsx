@@ -55,6 +55,50 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, disabled 
     })
   }
 
+  const insertChecklist = () => {
+    const el = textareaRef.current
+    if (!el || disabled) return
+
+    const { selectionStart: start, selectionEnd: end, value } = el
+    const before = value.slice(0, start)
+    const selected = value.slice(start, end)
+    const after = value.slice(end)
+
+    const lines = selected.split('\n')
+    const newSelected = lines.map(line => 
+      line.length ? `- [ ] ${line}` : line
+    ).join('\n')
+    const newContent = before + newSelected + after
+
+    setContent(newContent)
+
+    requestAnimationFrame(() => {
+      el.setSelectionRange(start, start + newSelected.length)
+      el.focus()
+    })
+  }
+
+  const insertCollapsible = () => {
+    const el = textareaRef.current
+    if (!el || disabled) return
+
+    const { selectionStart: start, selectionEnd: end, value } = el
+    const before = value.slice(0, start)
+    const selected = value.slice(start, end)
+    const after = value.slice(end)
+
+    const summary = selected || 'Click to expand'
+    const content = selected ? '\n\nContent here...' : '\n\nContent here...'
+    
+    const newContent = before + `<details>\n<summary>${summary}</summary>\n${content}\n</details>` + after
+
+    setContent(newContent)
+
+    requestAnimationFrame(() => {
+      el.focus()
+    })
+  }
+
   return (
     <div className="h-10 bg-bg-secondary border-b border-border-dark flex items-center gap-1 px-3 overflow-x-auto">
       {/* Essential formatting - always visible */}
@@ -63,6 +107,9 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, disabled 
       </ToolbarButton>
       <ToolbarButton onClick={() => surround('*')} disabled={disabled} title="Italic (Ctrl+I)">
         <em>I</em>
+      </ToolbarButton>
+      <ToolbarButton onClick={() => surround('~~')} disabled={disabled} title="Strikethrough">
+        <s>S</s>
       </ToolbarButton>
       <ToolbarButton onClick={() => surround('`')} disabled={disabled} title="Code (Ctrl+`)">
         Code
@@ -90,6 +137,9 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, disabled 
       <ToolbarButton onClick={() => insertPrefix('1. ')} disabled={disabled} title="Numbered List" className="hidden sm:inline-flex">
         1. List
       </ToolbarButton>
+      <ToolbarButton onClick={insertChecklist} disabled={disabled} title="Checklist" className="hidden sm:inline-flex">
+        ☑ Todo
+      </ToolbarButton>
 
       <Separator className="hidden sm:block" />
 
@@ -99,6 +149,9 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, disabled 
       </ToolbarButton>
       <ToolbarButton onClick={() => surround('> ')} disabled={disabled} title="Quote" className="hidden md:inline-flex">
         Quote
+      </ToolbarButton>
+      <ToolbarButton onClick={insertCollapsible} disabled={disabled} title="Collapsible Section" className="hidden lg:inline-flex">
+        ▼ Details
       </ToolbarButton>
     </div>
   )

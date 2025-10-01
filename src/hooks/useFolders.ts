@@ -254,9 +254,6 @@ export function useDeleteFolder() {
       // Invalidate files queries as they might be affected
       queryClient.invalidateQueries({ queryKey: ['files'] })
       
-      toast.success('Notebook deleted', {
-        description: 'The folder was deleted. Files have been moved to All Notes.',
-      })
     },
     onError: (error: any, folderId, context) => {
       // If the mutation fails, use the context to roll back

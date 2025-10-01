@@ -242,7 +242,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   }
 
   return (
-    <div className={cn('flex flex-col h-full bg-bg-primary relative', className)}>
+    <div className={cn('flex flex-col h-full bg-bg-secondary relative', className)}>
       {/* Logout Warning Overlay */}
       {!user && !authLoading && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -269,7 +269,6 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
       {/* Top Bar - File info and save status */}
       <EditorHeader
         name={file.name}
-        version={file.version}
         savedAt={formatTime(file.updated_at)}
         saving={isSaving}
         isDirty={isDirty}
@@ -301,8 +300,8 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
                 onSelect={handleSelectionChange}
                 onClick={handleSelectionChange}
                 className={cn(
-                  'w-full h-full bg-bg-primary text-text-primary',
-                  'font-mono text-sm leading-relaxed',
+                  'w-full h-full bg-bg-secondary text-text-primary',
+                  'text-sm leading-relaxed',
                   'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
                   'resize-none placeholder:text-text-secondary',
                   'whitespace-pre-wrap break-words', // Enable text wrapping
@@ -346,8 +345,8 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
               onSelect={handleSelectionChange}
               onClick={handleSelectionChange}
               className={cn(
-                'w-full h-full pl-16 pr-4 py-4 bg-bg-primary text-text-primary',
-                'font-mono text-sm leading-relaxed',
+                'w-full h-full pl-16 pr-4 py-4 bg-bg-secondary text-text-primary',
+                'text-sm leading-relaxed',
                 'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
                 'resize-none placeholder:text-text-secondary',
                 'whitespace-pre-wrap break-words', // Enable text wrapping
@@ -375,7 +374,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
             onSelect={handleSelectionChange}
             onClick={handleSelectionChange}
             className={cn(
-              'w-full h-full p-4 bg-bg-primary text-text-primary',
+              'w-full h-full p-4 bg-bg-secondary text-text-primary',
               'font-mono text-sm leading-relaxed',
               'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
               'resize-none placeholder:text-text-secondary',

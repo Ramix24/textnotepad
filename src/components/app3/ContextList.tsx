@@ -32,7 +32,7 @@ export function ContextList({
   
   return (
     <div 
-      className={`flex flex-col h-full bg-bg-primary border-r border-border-dark ${className}`}
+      className={`flex flex-col h-full bg-bg-secondary border-r border-border-dark ${className}`}
       role="main"
       aria-label="Context List"
     >
@@ -274,7 +274,7 @@ function NotesView({
       <header className="flex-shrink-0 border-b border-border-dark bg-bg-secondary">
         {isCollapsed ? (
           // Collapsed header - minimal with just toggle button
-          <div className="flex items-center justify-center p-2">
+          <div className="flex items-center justify-center px-4 py-3">
             {onToggleCollapsed && (
               <button
                 onClick={onToggleCollapsed}
@@ -287,7 +287,7 @@ function NotesView({
           </div>
         ) : (
           // Expanded header - full controls
-          <div className="flex items-center justify-between p-4">
+          <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
               <button
                 onClick={() => fileOps.handleCreateFile()}
@@ -478,7 +478,7 @@ function TrashView({
       <header className="flex-shrink-0 border-b border-border-dark bg-bg-secondary">
         {isCollapsed ? (
           // Collapsed header - minimal with just toggle button
-          <div className="flex items-center justify-center p-2">
+          <div className="flex items-center justify-center px-4 py-3">
             {onToggleCollapsed && (
               <button
                 onClick={onToggleCollapsed}
@@ -491,7 +491,7 @@ function TrashView({
           </div>
         ) : (
           // Expanded header - full controls
-          <div className="flex items-center justify-between p-4">
+          <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
               <button
                 onClick={handleEmptyTrash}

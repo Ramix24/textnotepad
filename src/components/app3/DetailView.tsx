@@ -29,7 +29,7 @@ export function DetailView({
 }: DetailViewProps) {
   return (
     <div 
-      className={`flex flex-col bg-bg-primary ${className}`}
+      className={`flex flex-col bg-bg-secondary ${className}`}
       role="main"
       aria-label="Detail View"
     >
