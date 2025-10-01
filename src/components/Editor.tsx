@@ -61,7 +61,8 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     toggleLineNumbers,
     textareaRef, 
     handleKeyDown: handleMarkdownKeyDown, 
-    insertLink 
+    insertLink,
+    clearFormatting
   } = useMarkdownEditor(protectedFileContent, {
     onChange: (newContent: string) => {
       // Skip changes if in read-only mode
@@ -359,6 +360,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
             textareaRef={textareaRef}
             setContent={setContent}
             insertLink={insertLink}
+            clearFormatting={clearFormatting}
             disabled={!user}
           />
           

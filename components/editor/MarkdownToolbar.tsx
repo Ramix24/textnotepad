@@ -5,10 +5,11 @@ interface MarkdownToolbarProps {
   textareaRef: RefObject<HTMLTextAreaElement | null>
   setContent: (content: string) => void
   insertLink: () => void
+  clearFormatting: () => void
   disabled?: boolean
 }
 
-export function MarkdownToolbar({ textareaRef, setContent, insertLink, disabled }: MarkdownToolbarProps) {
+export function MarkdownToolbar({ textareaRef, setContent, insertLink, clearFormatting, disabled }: MarkdownToolbarProps) {
   const surround = (markerLeft: string, markerRight = markerLeft) => {
     const el = textareaRef.current
     if (!el || disabled) return
@@ -99,6 +100,7 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, disabled 
     })
   }
 
+
   return (
     <div className="h-10 bg-bg-secondary border-b border-border-dark flex items-center gap-1 px-3 overflow-x-auto">
       {/* Essential formatting - always visible */}
@@ -152,6 +154,13 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, disabled 
       </ToolbarButton>
       <ToolbarButton onClick={insertCollapsible} disabled={disabled} title="Collapsible Section" className="hidden lg:inline-flex">
         ▼ Details
+      </ToolbarButton>
+
+      <Separator className="hidden sm:block" />
+
+      {/* Clear formatting button */}
+      <ToolbarButton onClick={clearFormatting} disabled={disabled} title="Clear Formatting (Ctrl+Shift+U)" className="text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20">
+        Clear
       </ToolbarButton>
     </div>
   )

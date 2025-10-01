@@ -63,6 +63,60 @@ export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEdit
     })
   }, [updateContent])
 
+  const clearFormatting = useCallback(() => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const { selectionStart: start, selectionEnd: end, value } = textarea
+    
+    if (start === end) {
+      // No selection - clear formatting for entire document
+      const clearText = value
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Bold
+        .replace(/\*(.*?)\*/g, '$1') // Italic
+        .replace(/~~(.*?)~~/g, '$1') // Strikethrough
+        .replace(/`([^`]*)`/g, '$1') // Inline code
+        .replace(/^#{1,6}\s+/gm, '') // Headings
+        .replace(/^>\s*/gm, '') // Quotes
+        .replace(/^[-*]\s+/gm, '') // Bullet lists
+        .replace(/^\d+\.\s+/gm, '') // Numbered lists
+        .replace(/^-\s+\[[ x]\]\s+/gm, '') // Checklists
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // Links
+        .replace(/<details>[\s\S]*?<\/details>/g, '') // Collapsible sections
+      
+      updateContent(clearText)
+      
+      requestAnimationFrame(() => {
+        textarea.focus()
+      })
+    } else {
+      // Selection exists - clear formatting only for selected text
+      const before = value.slice(0, start)
+      const selected = value.slice(start, end)
+      const after = value.slice(end)
+      
+      const clearSelected = selected
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Bold
+        .replace(/\*(.*?)\*/g, '$1') // Italic
+        .replace(/~~(.*?)~~/g, '$1') // Strikethrough
+        .replace(/`([^`]*)`/g, '$1') // Inline code
+        .replace(/^#{1,6}\s+/gm, '') // Headings
+        .replace(/^>\s*/gm, '') // Quotes
+        .replace(/^[-*]\s+/gm, '') // Bullet lists
+        .replace(/^\d+\.\s+/gm, '') // Numbered lists
+        .replace(/^-\s+\[[ x]\]\s+/gm, '') // Checklists
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // Links
+      
+      const newContent = before + clearSelected + after
+      updateContent(newContent)
+      
+      requestAnimationFrame(() => {
+        textarea.setSelectionRange(start, start + clearSelected.length)
+        textarea.focus()
+      })
+    }
+  }, [updateContent])
+
   // Keyboard shortcuts handler
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     const textarea = e.currentTarget
@@ -335,8 +389,14 @@ export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEdit
           togglePreview()
         }
         break
+      case 'u':
+        if (e.shiftKey) {
+          e.preventDefault()
+          clearFormatting()
+        }
+        break
     }
-  }, [updateContent, togglePreview, insertLink])
+  }, [updateContent, togglePreview, insertLink, clearFormatting])
 
   // Sync initial content when it changes externally
   useEffect(() => {
@@ -354,6 +414,7 @@ export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEdit
     toggleLineNumbers,
     textareaRef,
     handleKeyDown,
-    insertLink
+    insertLink,
+    clearFormatting
   }
 }
