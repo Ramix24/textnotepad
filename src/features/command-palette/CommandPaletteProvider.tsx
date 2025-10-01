@@ -62,8 +62,8 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
         folders,
         files
       }
-      console.log('🎯 CONTEXT getState - layout.selection:', layout.selection)
-      console.log('🎯 CONTEXT getState - returning state:', state)
+      console.log('🎯 CONTEXT getState - layout.selection:', JSON.stringify(layout.selection))
+      console.log('🎯 CONTEXT getState - returning state:', JSON.stringify(state))
       return state
     },
     api: {
