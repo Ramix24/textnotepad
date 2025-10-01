@@ -10,9 +10,8 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { FoldersPanel } from './FoldersPanel'
 import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
-import { ThemeToggle } from '@/components/theme-toggle'
 import { Logo } from '@/components/ui/logo'
-import { BookOpen, FileText, HelpCircle, Search } from 'lucide-react'
+import { BookOpen, FileText, HelpCircle, Search, Settings } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface AppShell3Props {
@@ -168,6 +167,12 @@ export function AppShell3({
           if (layout.isMobile || layout.isTablet) {
             layout.setActivePane(3)
           }
+        }
+      } else if ((e.metaKey || e.ctrlKey) && e.key === ',') {
+        e.preventDefault()
+        layout.setSelection({ mode: 'settings', folderId: null, fileId: null })
+        if (layout.isMobile || layout.isTablet) {
+          layout.setActivePane(3)
         }
       } else if ((e.metaKey || e.ctrlKey) && e.key === '/') {
         e.preventDefault()
@@ -352,6 +357,21 @@ export function AppShell3({
               <Search className="w-4 h-4" />
             </button>
             
+            {/* Settings Button */}
+            <button
+              onClick={() => {
+                layout.setSelection({ mode: 'settings', folderId: null, fileId: null })
+                if (layout.isMobile || layout.isTablet) {
+                  layout.setActivePane(3)
+                }
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-[color:var(--bg-active)]/40 rounded transition-colors"
+              title="Settings (Ctrl+,)"
+            >
+              <Settings className="w-4 h-4" />
+              <span className="hidden sm:inline">Settings</span>
+            </button>
+            
             {/* Help Button */}
             <button
               onClick={() => {
@@ -366,9 +386,6 @@ export function AppShell3({
               <HelpCircle className="w-4 h-4" />
               <span className="hidden sm:inline">Help</span>
             </button>
-            
-            {/* Theme Toggle */}
-            <ThemeToggle />
             
             {/* User Authentication UI */}
             {user && (

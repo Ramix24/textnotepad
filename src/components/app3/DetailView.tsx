@@ -6,6 +6,7 @@ import { Editor } from '@/components/Editor'
 import { EditorSkeleton } from '@/components/EditorSkeleton'
 import { SearchInterface } from './SearchInterface'
 import { HelpInterface } from './HelpInterface'
+import { SettingsInterface } from './SettingsInterface'
 import type { AppSelection } from './types'
 
 interface DetailViewProps {
@@ -36,6 +37,13 @@ export function DetailView({
       {children || (
         selection.mode === 'search' ? (
           <SearchInterface 
+            selection={selection}
+            onSelectionChange={onSelectionChange!}
+            onMobileAdvance={onMobileAdvance}
+            className="h-full"
+          />
+        ) : selection.mode === 'settings' ? (
+          <SettingsInterface 
             selection={selection}
             onSelectionChange={onSelectionChange!}
             onMobileAdvance={onMobileAdvance}
@@ -167,7 +175,7 @@ function DefaultDetailContent({ selection, onFileUpdate, onDirtyChange }: Defaul
   return <DetailViewEmpty mode="notes" />
 }
 
-function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' | 'search' | 'help' | 'inbox' }) {
+function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' | 'search' | 'help' | 'inbox' | 'settings' }) {
   const getEmptyContent = () => {
     switch (mode) {
       case 'inbox':
@@ -210,6 +218,13 @@ function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' | 'sea
           icon: '⌨️',
           title: 'Help & Shortcuts',
           description: 'Learn keyboard shortcuts, markdown syntax, and search features.',
+          showActions: false
+        }
+      case 'settings':
+        return {
+          icon: '⚙️',
+          title: 'Settings',
+          description: 'Manage your preferences and account settings.',
           showActions: false
         }
     }

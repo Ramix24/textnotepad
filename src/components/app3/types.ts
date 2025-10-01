@@ -31,7 +31,7 @@ export interface LayoutActions {
   toggleCol2Collapsed: () => void
 }
 
-export type Mode = 'notes' | 'messages' | 'search' | 'help'
+export type Mode = 'notes' | 'messages' | 'search' | 'help' | 'settings'
 
 // Legacy type for compatibility - remove when SectionsRail is fully replaced
 export type Section = 'folders' | 'notes' | 'messages' | 'trash'
