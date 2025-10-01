@@ -12,9 +12,8 @@ import { ContextList } from './ContextList'
 import { DetailView } from './DetailView'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Logo } from '@/components/ui/logo'
-import { BookOpen, FileText, HelpCircle, Search, Command } from 'lucide-react'
+import { BookOpen, FileText, HelpCircle, Search } from 'lucide-react'
 import { toast } from 'sonner'
-import { useCommandPaletteContext } from '@/features/command-palette/CommandPaletteProvider'
 
 interface AppShell3Props {
   sectionsContent?: ReactNode
@@ -35,7 +34,6 @@ export function AppShell3({
   const containerRef = useRef<HTMLDivElement>(null)
   const { supabase } = useSupabase()
   const { user } = useAuthSession()
-  const commandPalette = useCommandPaletteContext()
   
   // Refs for focusing columns
   const sectionsRef = useRef<HTMLDivElement>(null)
@@ -273,16 +271,6 @@ export function AppShell3({
 
           {/* Right section */}
           <div className="flex items-center gap-4">
-            {/* Command Palette Button */}
-            <button
-              onClick={commandPalette.toggle}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-[color:var(--bg-active)]/40 rounded transition-colors"
-              title="Quick Actions (Ctrl+K)"
-            >
-              <Command className="w-4 h-4" />
-              <span className="hidden sm:inline">Quick Actions</span>
-            </button>
-            
             {/* Search Button */}
             <button
               onClick={() => {

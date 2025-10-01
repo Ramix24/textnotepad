@@ -58,7 +58,6 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance, 
   
   const handleInboxSelect = () => {
     // INBOX is a special folder for uncategorized notes
-    console.log('🔍 DEBUG: INBOX button clicked, setting selection to:', { mode: 'notes', folderId: 'inbox', fileId: null })
     onSelectionChange({ mode: 'notes', folderId: 'inbox', fileId: null })
     onMobileAdvance?.() // Auto-advance to pane 2 on mobile
   }
@@ -184,7 +183,6 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
       const folderExists = folders.some(f => f.id === selection.folderId)
       if (!folderExists) {
         // Invalid folder selection, falling back to All Notes
-        console.log('🔍 DEBUG: Invalid folder detected, falling back to All Notes. folderId:', selection.folderId)
         onFolderSelect(null)
         return
       }
