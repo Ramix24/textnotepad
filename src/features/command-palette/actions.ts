@@ -68,6 +68,8 @@ export function registerDefaultActions(_ctx: CommandContext): CommandAction[] {
       run: async (ctx: CommandContext, arg: unknown) => {
         const state = ctx.getState()
         const name = String(arg || 'New Note')
+        console.log('🎯 NEW NOTE ACTION - currentFolderId:', state.currentFolderId)
+        console.log('🎯 NEW NOTE ACTION - creating note in folder:', state.currentFolderId)
         await ctx.api.createNote(state.currentFolderId, name)
       }
     },

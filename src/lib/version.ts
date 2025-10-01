@@ -2,11 +2,11 @@
  * Version utilities  
  * Provides access to the current app version
  * Version is auto-updated by the version script on each commit
- * UX v0.5.64: New Note now asks for name like New Folder for consistency
+ * DEBUG v0.5.66: Add folder selection debugging for New Note action
  */
 
 // This version is automatically updated by scripts/auto-version.js
-export const APP_VERSION = '0.5.65'
+export const APP_VERSION = '0.5.67'
 export const APP_NAME = 'textnotepad'
 
 /**

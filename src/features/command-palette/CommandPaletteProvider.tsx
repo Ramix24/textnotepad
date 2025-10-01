@@ -55,12 +55,17 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
 
   // Build command context
   const commandContext: CommandContext = useMemo(() => ({
-    getState: () => ({
-      currentNoteId: layout.selection.fileId || undefined,
-      currentFolderId: layout.selection.folderId || undefined,
-      folders,
-      files
-    }),
+    getState: () => {
+      const state = {
+        currentNoteId: layout.selection.fileId || undefined,
+        currentFolderId: layout.selection.folderId || undefined,
+        folders,
+        files
+      }
+      console.log('🎯 CONTEXT getState - layout.selection:', layout.selection)
+      console.log('🎯 CONTEXT getState - returning state:', state)
+      return state
+    },
     api: {
       searchNotes: mockApi.searchNotes, // Use real API when available
       
