@@ -2,7 +2,6 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useCountersWorker, type CountResult } from '@/hooks/useCountersWorker'
 import { useAutosave } from '@/hooks/useAutosave'
@@ -50,7 +49,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     if (document.activeElement !== textareaRef.current) {
       setProtectedFileContent(file.content)
     }
-  }, [file.content])
+  }, [file.content]) // textareaRef is a ref and doesn't need to be in deps
   
   // Markdown editor hook with keyboard shortcuts
   const { 
@@ -273,58 +272,16 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         saving={isSaving}
         isDirty={isDirty}
         onNameChange={handleNameChange}
+        viewMode={viewMode}
+        onViewModeChange={setMode}
+        readOnly={readOnly}
+        showLineNumbers={showLineNumbers}
+        onToggleLineNumbers={toggleLineNumbers}
       />
 
       {/* Main editor area */}
       <div className="flex-1 overflow-auto">
-        {viewMode === 'split' ? (
-          <div className="flex h-full">
-            {/* Editor pane */}
-            <div className="flex-1 border-r border-border-dark relative">
-              {showLineNumbers && (
-                <div className="absolute left-0 top-0 w-12 h-full bg-bg-secondary border-r border-border-dark flex flex-col text-xs text-text-secondary font-mono overflow-hidden z-10">
-                  {content.split('\n').map((_, index) => (
-                    <div key={index + 1} className="px-2 leading-relaxed text-right min-h-[1.5rem] flex items-center justify-end">
-                      {index + 1}
-                    </div>
-                  ))}
-                </div>
-              )}
-              <textarea
-                ref={textareaRef}
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onBlur={handleBlur}
-                onFocus={() => { wasFocusedRef.current = true }}
-                onSelect={handleSelectionChange}
-                onClick={handleSelectionChange}
-                className={cn(
-                  'w-full h-full bg-bg-secondary text-text-primary',
-                  'text-sm leading-relaxed',
-                  'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
-                  'resize-none placeholder:text-text-secondary',
-                  'whitespace-pre-wrap break-words', // Enable text wrapping
-                  showLineNumbers ? 'pl-16 pr-4 py-4' : 'p-4',
-                  !user && 'opacity-50 cursor-not-allowed',
-                  readOnly && 'opacity-75 cursor-default bg-bg-secondary'
-                )}
-                placeholder={!user ? "Please sign in to edit your notes..." : readOnly ? "This file is read-only..." : "Start writing in Markdown..."}
-                disabled={!user}
-                readOnly={readOnly}
-                aria-label={readOnly ? "Markdown editor (read-only)" : "Markdown editor"}
-                spellCheck={true}
-                autoComplete="off"
-                data-testid="editor-textarea"
-                wrap="soft"
-              />
-            </div>
-            {/* Preview pane */}
-            <div className="flex-1">
-              <MarkdownPreview content={content} className="h-full overflow-auto" />
-            </div>
-          </div>
-        ) : viewMode === 'preview' ? (
+        {viewMode === 'preview' ? (
           <MarkdownPreview content={content} className="h-full overflow-auto" />
         ) : showLineNumbers ? (
           <div className="relative h-full">
@@ -405,62 +362,11 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
             disabled={!user}
           />
           
-          {/* View Mode Toggle + Line Numbers + Shortcuts */}
-          <div className="h-10 border-t border-border-dark flex items-center justify-between px-3">
-            <div className="flex items-center gap-1">
-              <Button
-                variant={viewMode === 'edit' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setMode('edit')}
-                disabled={readOnly}
-                className="text-xs h-7"
-              >
-                Edit
-              </Button>
-              
-              {/* Preview and Split modes - Desktop only */}
-              <Button
-                variant={viewMode === 'preview' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setMode('preview')}
-                disabled={readOnly}
-                className="text-xs h-7 hidden md:inline-flex"
-              >
-                Preview
-              </Button>
-              <Button
-                variant={viewMode === 'split' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setMode('split')}
-                disabled={readOnly}
-                className="text-xs h-7 hidden lg:inline-flex"
-              >
-                Split
-              </Button>
-              
-              <div className="w-px h-5 bg-border-dark mx-2" />
-              
-              <Button
-                variant={showLineNumbers ? 'default' : 'ghost'}
-                size="sm"
-                onClick={toggleLineNumbers}
-                disabled={readOnly}
-                className="text-xs h-7 hidden sm:inline-flex"
-                title="Toggle line numbers"
-              >
-                #123
-              </Button>
-            </div>
-            
-            <div className="text-xs text-text-secondary hidden lg:block">
-              Shortcuts: Ctrl+B (bold), Ctrl+I (italic), Ctrl+K (link), Tab (indent), Enter (continue lists)
-            </div>
-          </div>
         </div>
       )}
 
       {/* Status bar */}
-      <div className="flex items-center justify-between px-4 py-2 border-t bg-muted/30 text-sm text-muted-foreground">
+      <div className="flex items-center justify-between px-4 py-3 border-t bg-muted/30 text-sm text-muted-foreground">
         <div 
           id="editor-stats"
           className="flex items-center space-x-4"

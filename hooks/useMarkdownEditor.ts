@@ -5,7 +5,7 @@ interface UseMarkdownEditorOptions {
   onChange?: (value: string) => void
 }
 
-export type ViewMode = 'edit' | 'preview' | 'split'
+export type ViewMode = 'edit' | 'preview'
 
 export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEditorOptions) {
   const [content, setContent] = useState(initialContent)
@@ -23,17 +23,6 @@ export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEdit
   }, [])
 
   const setMode = useCallback((mode: ViewMode) => {
-    // Force edit mode on mobile/tablet
-    if (typeof window !== 'undefined') {
-      const isMobile = window.innerWidth < 768 // md breakpoint
-      const isTablet = window.innerWidth < 1024 // lg breakpoint
-      
-      if (isMobile || (isTablet && mode === 'split')) {
-        setViewMode('edit')
-        return
-      }
-    }
-    
     setViewMode(mode)
   }, [])
 
@@ -359,7 +348,6 @@ export function useMarkdownEditor(initialContent = '', options?: UseMarkdownEdit
     setContent: updateContent,
     viewMode,
     isPreview: viewMode === 'preview',
-    isSplit: viewMode === 'split',
     togglePreview,
     setMode,
     showLineNumbers,
