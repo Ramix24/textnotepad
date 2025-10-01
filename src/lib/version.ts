@@ -2,11 +2,11 @@
  * Version utilities  
  * Provides access to the current app version
  * Version is auto-updated by the version script on each commit
- * FIX v0.5.58: Smart default - typing with no matches creates note with that name
+ * DEBUG v0.5.60: Enhanced API debugging - trace createNote vs createFolder calls
  */
 
 // This version is automatically updated by scripts/auto-version.js
-export const APP_VERSION = '0.5.59'
+export const APP_VERSION = '0.5.61'
 export const APP_NAME = 'textnotepad'
 
 /**

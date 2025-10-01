@@ -242,11 +242,13 @@ export function CommandPalette({
     // SMART DEFAULT: If user typed a query but no search results, create a note with that name
     if (state.step === 'search' && state.query.trim() && sections.length === 0) {
       console.log('🎯 HANDLE SELECT - smart default: creating note with name:', state.query)
+      console.log('🎯 SMART DEFAULT - calling context.api.createNote with args:', undefined, state.query)
       // Directly call the createNote API with the user's typed name
-      context.api.createNote(undefined, state.query).then(() => {
+      context.api.createNote(undefined, state.query).then((result) => {
+        console.log('🎯 SMART DEFAULT - createNote success:', result)
         onClose()
-      }).catch(() => {
-        console.error('Failed to create note with smart default')
+      }).catch((error) => {
+        console.error('🎯 SMART DEFAULT - createNote failed:', error)
       })
       return
     }

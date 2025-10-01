@@ -65,10 +65,16 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
       searchNotes: mockApi.searchNotes, // Use real API when available
       
       createNote: async (folderId?: string, name?: string) => {
+        console.log('🎯 API createNote called with folderId:', folderId, 'name:', name)
+        const finalName = name || `Note ${new Date().toLocaleDateString()}`
+        console.log('🎯 API createNote final name:', finalName)
+        
         const result = await createFile.mutateAsync({
-          name: name || `Note ${new Date().toLocaleDateString()}`,
+          name: finalName,
           folder_id: folderId || null
         })
+        
+        console.log('🎯 API createNote result:', result)
         
         // Navigate to the new note
         layout.setSelection({
@@ -81,8 +87,10 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
       },
       
       createFolder: async (name: string) => {
+        console.log('🎯 API createFolder called with name:', name)
         try {
           const result = await createFolderMutation.mutateAsync({ name })
+          console.log('🎯 API createFolder result:', result)
           
           // Navigate to the new folder
           layout.setSelection({
@@ -94,6 +102,7 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
           toast.success(`Folder "${name}" created`)
           return { id: result.id }
         } catch (error) {
+          console.error('🎯 API createFolder error:', error)
           toast.error('Failed to create folder')
           throw error
         }
