@@ -2,11 +2,11 @@
  * Version utilities  
  * Provides access to the current app version
  * Version is auto-updated by the version script on each commit
- * DEBUG v0.5.55: Enhanced selection debugging - trace handleSelect flow
+ * DEBUG v0.5.56: Enhanced selection debugging - trace handleSelect flow - FORCE DEPLOY
  */
 
 // This version is automatically updated by scripts/auto-version.js
-export const APP_VERSION = '0.5.55'
+export const APP_VERSION = '0.5.57'
 export const APP_NAME = 'textnotepad'
 
 /**
