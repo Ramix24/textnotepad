@@ -118,8 +118,10 @@ export function CommandPalette({
   // Search and filter results
   const searchResults: SearchResults = useMemo(() => {
     if (!state.query.trim()) {
+      const actions = availableActions.slice(0, 8)
+      console.log('🎯 NO QUERY - actions order:', actions.map(a => ({ id: a.id, label: a.label })))
       return {
-        actions: availableActions.slice(0, 8), // Show all actions when no query
+        actions, // Show all actions when no query
         notes: files.slice(0, 10), // Show recent notes
         folders: folders.slice(0, 10), // Show all folders
         searchNotes: []
@@ -129,6 +131,9 @@ export function CommandPalette({
     const actionResults = actionsFuse.search(state.query).map(result => result.item)
     const noteResults = notesFuse.search(state.query).map(result => result.item)
     const folderResults = foldersFuse.search(state.query).map(result => result.item)
+    
+    console.log('🎯 SEARCH QUERY:', state.query)
+    console.log('🎯 SEARCH RESULTS - actions order:', actionResults.map(a => ({ id: a.id, label: a.label })))
 
     return {
       actions: actionResults,
