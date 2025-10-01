@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Search, Filter, FileText, Calendar, Hash } from 'lucide-react'
+import { Search, Calendar, Hash } from 'lucide-react'
 import { useFilesList } from '@/hooks/useFiles'
 import { UserFile } from '@/types/user-files.types'
 import type { AppSelection } from './types'
@@ -13,7 +13,6 @@ interface SearchInterfaceProps {
   onMobileAdvance?: () => void
 }
 
-type SearchFilter = 'all' | 'notes' | 'tasks' | 'recent'
 
 export function SearchInterface({ 
   className = '', 
@@ -21,27 +20,23 @@ export function SearchInterface({
   onSelectionChange,
   onMobileAdvance
 }: SearchInterfaceProps) {
-  const [activeFilter, setActiveFilter] = useState<SearchFilter>('all')
-  const [showFilters, setShowFilters] = useState(false)
   const [selectedResultIndex, setSelectedResultIndex] = useState(0)
   const { data: allFiles = [] } = useFilesList()
 
   // Use searchQuery from selection (controlled by header)
   const searchQuery = selection.searchQuery || ''
 
-  // Clear filters and reset selection when entering search mode
+  // Reset selection when entering search mode
   useEffect(() => {
     if (selection.mode === 'search') {
-      setActiveFilter('all')
-      setShowFilters(false)
       setSelectedResultIndex(0)
     }
   }, [selection.mode])
 
-  // Reset selected index when search query or filters change
+  // Reset selected index when search query changes
   useEffect(() => {
     setSelectedResultIndex(0)
-  }, [searchQuery, activeFilter])
+  }, [searchQuery])
 
   // File selection handler
   const handleFileSelect = useCallback((file: UserFile) => {
@@ -53,7 +48,7 @@ export function SearchInterface({
     onMobileAdvance?.()
   }, [onSelectionChange, onMobileAdvance])
 
-  // Filter and search files
+  // Filter and search files (simplified - no filters)
   const filteredFiles = useMemo(() => {
     // Only show results when there's an actual search query
     if (!searchQuery.trim()) {
@@ -65,29 +60,11 @@ export function SearchInterface({
     
     // Apply search query
     const query = searchQuery.toLowerCase()
-    const searchResults = activeFiles.filter(file => 
+    return activeFiles.filter(file => 
       file.name.toLowerCase().includes(query) ||
       file.content.toLowerCase().includes(query)
     )
-
-    // Apply filters
-    switch (activeFilter) {
-      case 'tasks':
-        return searchResults.filter(file => 
-          file.content.includes('- [ ]') || file.content.includes('- [x]')
-        )
-      case 'recent':
-        const weekAgo = new Date()
-        weekAgo.setDate(weekAgo.getDate() - 7)
-        return searchResults.filter(file => 
-          new Date(file.updated_at) > weekAgo
-        )
-      case 'notes':
-      case 'all':
-      default:
-        return searchResults
-    }
-  }, [allFiles, searchQuery, activeFilter])
+  }, [allFiles, searchQuery])
 
   // Scroll selected item into view
   useEffect(() => {
@@ -163,55 +140,15 @@ export function SearchInterface({
 
   return (
     <div className={`flex flex-col h-full bg-bg-secondary ${className}`}>
-      {/* Search Header - Simplified without input */}
+      {/* Search Header - Simplified */}
       <div className="flex-shrink-0 p-6 border-b border-border-dark bg-bg-secondary">
-        <div className="space-y-4">
-          {/* Results Count and Filters Toggle */}
-          <div className="flex items-center justify-between">
-            <div className="text-lg font-medium text-text-primary">
-              Search Results
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors ${
-                  showFilters ? 'bg-accent-blue text-white' : 'text-text-secondary hover:text-text-primary hover:bg-bg-active'
-                }`}
-              >
-                <Filter className="w-4 h-4" />
-                Filters
-              </button>
-              
-              <div className="text-sm text-text-secondary">
-                {filteredFiles.length} {filteredFiles.length === 1 ? 'result' : 'results'}
-              </div>
-            </div>
+        <div className="flex items-center justify-between">
+          <div className="text-lg font-medium text-text-primary">
+            Search Results
           </div>
-
-          {/* Filter Options */}
-          {showFilters && (
-            <div className="flex flex-wrap gap-2">
-              {[
-                { id: 'all', label: 'All Notes', icon: FileText },
-                { id: 'tasks', label: 'With Tasks', icon: Hash },
-                { id: 'recent', label: 'Recent', icon: Calendar },
-              ].map((filter) => (
-                <button
-                  key={filter.id}
-                  onClick={() => setActiveFilter(filter.id as SearchFilter)}
-                  className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-md transition-colors ${
-                    activeFilter === filter.id
-                      ? 'bg-accent-blue text-white'
-                      : 'bg-bg-primary text-text-secondary hover:text-text-primary hover:bg-bg-active border border-border-dark'
-                  }`}
-                >
-                  <filter.icon className="w-3 h-3" />
-                  {filter.label}
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="text-sm text-text-secondary">
+            {filteredFiles.length} {filteredFiles.length === 1 ? 'result' : 'results'}
+          </div>
         </div>
       </div>
 
@@ -228,7 +165,7 @@ export function SearchInterface({
             <p className="text-text-secondary max-w-md leading-relaxed">
               {searchQuery.trim() 
                 ? `No notes found matching "${searchQuery}". Try different keywords or check your spelling.`
-                : 'Type in the search box in the header to find notes by title or content. Use filters to narrow down results.'
+                : 'Type in the search box in the header to find notes by title or content.'
               }
             </p>
           </div>
@@ -297,7 +234,6 @@ export function SearchInterface({
             <p><strong>Search tips:</strong></p>
             <p>• Use the search bar in the header to find notes</p>
             <p>• Search by note title or content</p>
-            <p>• Use filters to narrow down results</p>
             <p>• Use ↑/↓ arrow keys to navigate results</p>
             <p>• Press Enter to open selected note</p>
             <p>• Click any result to open the note</p>
