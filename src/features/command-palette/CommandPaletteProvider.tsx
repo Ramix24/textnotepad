@@ -64,9 +64,9 @@ export function CommandPaletteProvider({ children }: CommandPaletteProviderProps
     api: {
       searchNotes: mockApi.searchNotes, // Use real API when available
       
-      createNote: async (folderId?: string) => {
+      createNote: async (folderId?: string, name?: string) => {
         const result = await createFile.mutateAsync({
-          name: `Note ${new Date().toLocaleDateString()}`,
+          name: name || `Note ${new Date().toLocaleDateString()}`,
           folder_id: folderId || null
         })
         

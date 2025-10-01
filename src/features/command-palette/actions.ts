@@ -12,7 +12,7 @@ export type CommandContext = {
   }
   api: {
     searchNotes: (query: string) => Promise<{ id: string; title: string; snippet?: string }[]>
-    createNote: (folderId?: string) => Promise<{ id: string }>
+    createNote: (folderId?: string, name?: string) => Promise<{ id: string }>
     createFolder: (name: string) => Promise<{ id: string }>
     moveNote: (noteId: string, folderId: string) => Promise<void>
     exportNotePdf: (noteId: string) => Promise<Blob>
