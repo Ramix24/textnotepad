@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Search, Filter, FileText, Calendar, Hash } from 'lucide-react'
 import { useFilesList } from '@/hooks/useFiles'
 import { UserFile } from '@/types/user-files.types'
@@ -23,18 +23,35 @@ export function SearchInterface({
 }: SearchInterfaceProps) {
   const [activeFilter, setActiveFilter] = useState<SearchFilter>('all')
   const [showFilters, setShowFilters] = useState(false)
+  const [selectedResultIndex, setSelectedResultIndex] = useState(0)
   const { data: allFiles = [] } = useFilesList()
 
   // Use searchQuery from selection (controlled by header)
   const searchQuery = selection.searchQuery || ''
 
-  // Clear filters when entering search mode
+  // Clear filters and reset selection when entering search mode
   useEffect(() => {
     if (selection.mode === 'search') {
       setActiveFilter('all')
       setShowFilters(false)
+      setSelectedResultIndex(0)
     }
   }, [selection.mode])
+
+  // Reset selected index when search query or filters change
+  useEffect(() => {
+    setSelectedResultIndex(0)
+  }, [searchQuery, activeFilter])
+
+  // File selection handler
+  const handleFileSelect = useCallback((file: UserFile) => {
+    onSelectionChange({
+      mode: 'notes',
+      fileId: file.id,
+      folderId: null
+    })
+    onMobileAdvance?.()
+  }, [onSelectionChange, onMobileAdvance])
 
   // Filter and search files
   const filteredFiles = useMemo(() => {
@@ -72,14 +89,57 @@ export function SearchInterface({
     }
   }, [allFiles, searchQuery, activeFilter])
 
-  const handleFileSelect = (file: UserFile) => {
-    onSelectionChange({
-      mode: 'notes',
-      fileId: file.id,
-      folderId: null
-    })
-    onMobileAdvance?.()
-  }
+  // Scroll selected item into view
+  useEffect(() => {
+    if (filteredFiles.length > 0 && selectedResultIndex >= 0) {
+      const selectedElement = document.querySelector(`[data-result-index="${selectedResultIndex}"]`)
+      if (selectedElement) {
+        selectedElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest'
+        })
+      }
+    }
+  }, [selectedResultIndex, filteredFiles.length])
+
+  // Keyboard navigation for search results
+  useEffect(() => {
+    if (selection.mode !== 'search' || !searchQuery.trim()) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle if focus is not in an input field (except our search input)
+      const activeElement = document.activeElement
+      const isInSearchInput = activeElement?.getAttribute?.('placeholder') === 'Search notes...'
+      const isInOtherInput = activeElement?.tagName === 'INPUT' || activeElement?.tagName === 'TEXTAREA'
+      
+      if (isInOtherInput && !isInSearchInput) return
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault()
+          setSelectedResultIndex(prev => 
+            Math.min(prev + 1, filteredFiles.length - 1)
+          )
+          break
+        case 'ArrowUp':
+          e.preventDefault()
+          setSelectedResultIndex(prev => Math.max(prev - 1, 0))
+          break
+        case 'Enter':
+          e.preventDefault()
+          if (filteredFiles[selectedResultIndex]) {
+            handleFileSelect(filteredFiles[selectedResultIndex])
+          }
+          break
+        case 'Escape':
+          // Let the header search handle escape to clear search
+          break
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [selection.mode, searchQuery, selectedResultIndex, filteredFiles, handleFileSelect])
 
   const highlightMatch = (text: string, query: string) => {
     if (!query.trim()) return text
@@ -174,48 +234,58 @@ export function SearchInterface({
           </div>
         ) : (
           <div className="p-4 space-y-3">
-            {filteredFiles.map((file) => (
-              <div
-                key={file.id}
-                onClick={() => handleFileSelect(file)}
-                className="group p-4 rounded-lg border border-border-dark bg-bg-primary hover:bg-bg-secondary hover:border-border-light cursor-pointer transition-all"
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-medium text-text-primary group-hover:text-accent-blue transition-colors">
-                    {highlightMatch(file.name, searchQuery)}
-                  </h3>
-                  <div className="flex items-center gap-2 text-xs text-text-secondary">
-                    <span>{file.word_count} words</span>
-                    <span>•</span>
-                    <span>{new Date(file.updated_at).toLocaleDateString()}</span>
+            {filteredFiles.map((file, index) => {
+              const isSelected = index === selectedResultIndex
+              return (
+                <div
+                  key={file.id}
+                  data-result-index={index}
+                  onClick={() => handleFileSelect(file)}
+                  className={`group p-4 rounded-lg border cursor-pointer transition-all ${
+                    isSelected 
+                      ? 'border-accent-blue bg-accent-blue/10 ring-2 ring-accent-blue/20' 
+                      : 'border-border-dark bg-bg-primary hover:bg-bg-secondary hover:border-border-light'
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className={`font-medium transition-colors ${
+                      isSelected ? 'text-accent-blue' : 'text-text-primary group-hover:text-accent-blue'
+                    }`}>
+                      {highlightMatch(file.name, searchQuery)}
+                    </h3>
+                    <div className="flex items-center gap-2 text-xs text-text-secondary">
+                      <span>{file.word_count} words</span>
+                      <span>•</span>
+                      <span>{new Date(file.updated_at).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                
+                  <p className="text-sm text-text-secondary leading-relaxed line-clamp-3">
+                    {highlightMatch(getFilePreview(file.content), searchQuery)}
+                  </p>
+
+                  {/* File tags/indicators */}
+                  <div className="flex items-center gap-2 mt-3">
+                    {file.content.includes('- [ ]') && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs">
+                        <Hash className="w-3 h-3" />
+                        Tasks
+                      </span>
+                    )}
+                    {(() => {
+                      const weekAgo = new Date()
+                      weekAgo.setDate(weekAgo.getDate() - 7)
+                      return new Date(file.updated_at) > weekAgo
+                    })() && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-xs">
+                        <Calendar className="w-3 h-3" />
+                        Recent
+                      </span>
+                    )}
                   </div>
                 </div>
-                
-                <p className="text-sm text-text-secondary leading-relaxed line-clamp-3">
-                  {highlightMatch(getFilePreview(file.content), searchQuery)}
-                </p>
-
-                {/* File tags/indicators */}
-                <div className="flex items-center gap-2 mt-3">
-                  {file.content.includes('- [ ]') && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-xs">
-                      <Hash className="w-3 h-3" />
-                      Tasks
-                    </span>
-                  )}
-                  {(() => {
-                    const weekAgo = new Date()
-                    weekAgo.setDate(weekAgo.getDate() - 7)
-                    return new Date(file.updated_at) > weekAgo
-                  })() && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-xs">
-                      <Calendar className="w-3 h-3" />
-                      Recent
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
@@ -228,6 +298,8 @@ export function SearchInterface({
             <p>• Use the search bar in the header to find notes</p>
             <p>• Search by note title or content</p>
             <p>• Use filters to narrow down results</p>
+            <p>• Use ↑/↓ arrow keys to navigate results</p>
+            <p>• Press Enter to open selected note</p>
             <p>• Click any result to open the note</p>
           </div>
         </div>
