@@ -9,10 +9,6 @@ import { ChevronDown, ChevronUp } from "lucide-react"
 
 const shortFaqs = [
   {
-    question: "What is Promo 2025?",
-    answer: "If you create an account by Dec 31, 2025, you can activate the 1-year plan for free. Your free period runs until Dec 31, 2026."
-  },
-  {
     question: "Will I be charged automatically later?",
     answer: "Yes — only after your free period ends. The 1-year plan renews on Jan 1, 2027 for 29 USD / year. You can cancel anytime before renewal."
   },
@@ -48,7 +44,7 @@ export function FAQShort() {
             Quick FAQ
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Common questions about Promo 2025 and TextNotepad.com&apos;s privacy.
+            Common questions about TextNotepad.com&apos;s privacy and features.
           </p>
         </MotionDiv>
 
