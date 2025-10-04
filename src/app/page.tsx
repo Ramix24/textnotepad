@@ -13,7 +13,7 @@ const jsonLd = {
       "@id": "https://textnotepad.com/#website",
       "url": "https://textnotepad.com/",
       "name": "TextNotepad",
-      "description": "Privacy-first note taking with end-to-end encryption. Join our beta waitlist for early access.",
+      "description": "Encrypted notes with end-to-end encryption. No tracking, ever. Privacy is freedom.",
       "potentialAction": [
         {
           "@type": "SearchAction",

@@ -18,9 +18,9 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'TextNotepad - Privacy is freedom. Encrypted notes with no tracking.',
-  description: 'Privacy is freedom. Secure, encrypted notes with no tracking.',
-  keywords: ['privacy', 'encrypted notes', 'no tracking', 'secure notes', 'end-to-end encryption', 'zero surveillance', 'private notes'],
+  title: 'TextNotepad - Encrypted Notes. No tracking, ever.',
+  description: 'Encrypted notes with end-to-end encryption. No tracking, ever. Privacy is freedom.',
+  keywords: ['encrypted notes', 'privacy', 'no tracking', 'secure notes', 'end-to-end encryption', 'zero surveillance', 'private notes'],
   authors: [{ name: 'TextNotepad Team' }],
   creator: 'TextNotepad',
   publisher: 'TextNotepad',
@@ -39,8 +39,8 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://textnotepad.com',
-    title: 'TextNotepad - Privacy is freedom',
-    description: 'Privacy is freedom. Encrypted notes with no tracking, ever.',
+    title: 'TextNotepad - Encrypted Notes',
+    description: 'Encrypted notes with end-to-end encryption. No tracking, ever. Privacy is freedom.',
     siteName: 'TextNotepad',
     images: [
       {
@@ -53,8 +53,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TextNotepad - Privacy is freedom',
-    description: 'Privacy is freedom. Encrypted notes with no tracking, ever.',
+    title: 'TextNotepad - Encrypted Notes',
+    description: 'Encrypted notes with end-to-end encryption. No tracking, ever. Privacy is freedom.',
     images: ['/og-image.png'],
     creator: '@textnotepad',
   },
