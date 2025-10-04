@@ -1,9 +1,7 @@
 "use client"
 
-import Link from "next/link"
 import { Container } from "@/components/ui/container"
 import { Section } from "@/components/ui/section"
-import { Button } from "@/components/ui/button"
 import { MotionDiv, animations } from "@/components/ui/motion"
 import { Shield, Lock, Globe, Check } from "lucide-react"
 
@@ -12,8 +10,7 @@ const securityFeatures = [
   "Zero-knowledge architecture - we never see your plaintext",
   "Regular third-party security audits",
   "GDPR compliant with EU data centers",
-  "No tracking, no analytics, no data mining",
-  "No auto-charge during 2025 — renewals start only after your free period ends"
+  "No tracking, no analytics, no data mining"
 ]
 
 export function PrivacySecurity() {
@@ -51,12 +48,6 @@ export function PrivacySecurity() {
             </ul>
 
             <div className="flex flex-col sm:flex-row gap-4 items-start">
-              <Button asChild className="bg-text-primary text-bg-primary hover:bg-text-primary/90">
-                <Link href="/security">
-                  Read Security Whitepaper
-                </Link>
-              </Button>
-              
               <div className="flex flex-wrap gap-3 items-center">
                 <div className="flex items-center space-x-2 bg-green-50 px-3 py-2 rounded-lg border border-green-200">
                   <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
