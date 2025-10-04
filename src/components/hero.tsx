@@ -36,13 +36,15 @@ export function Hero() {
                   <Link href="/app">Open Editor</Link>
                 </Button>
               ) : (
-                <Button size="lg" asChild className="bg-accent-blue text-white hover:opacity-90 focus:ring-accent-blue/60">
-                  <Link href="#waitlist">Join Waitlist</Link>
-                </Button>
+                <>
+                  <Button size="lg" asChild className="bg-accent-blue text-white hover:opacity-90 focus:ring-accent-blue/60">
+                    <Link href="#waitlist">Join Waitlist</Link>
+                  </Button>
+                  <Button size="lg" asChild className="bg-accent-blue text-white hover:opacity-90 focus:ring-accent-blue/60">
+                    <Link href="/auth">Sign in as Beta tester</Link>
+                  </Button>
+                </>
               )}
-              <Button size="lg" variant="outline" asChild className="bg-transparent border-accent-blue text-accent-blue hover:bg-[color:var(--bg-active)]/40">
-                <Link href="/auth">Sign in as Beta tester</Link>
-              </Button>
             </div>
             
             <div className="space-y-4">

@@ -57,14 +57,9 @@ export function Header() {
                   <Link href="/app">Open Editor</Link>
                 </Button>
               ) : (
-                <>
-                  <Button variant="ghost" size="sm" asChild className="text-text-secondary hover:text-text-primary hover:bg-[color:var(--bg-active)]/40">
-                    <Link href="/auth">Sign In</Link>
-                  </Button>
-                  <Button size="sm" asChild className="bg-tn-accent text-white hover:bg-gray-800">
-                    <Link href="/auth">Join Beta</Link>
-                  </Button>
-                </>
+                <Button size="sm" asChild className="bg-tn-accent text-white hover:bg-gray-800">
+                  <Link href="/auth">Sign In</Link>
+                </Button>
               )}
             </div>
           </div>
