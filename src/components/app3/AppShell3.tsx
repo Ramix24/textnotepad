@@ -278,7 +278,7 @@ export function AppShell3({
               title="Open search interface (shows all notes in C2, search in C3)"
             >
               <Logo size={28} />
-              <span className="text-lg font-medium">TextNotepad.com</span>
+              <span className="text-lg font-medium">TextNotepad</span>
             </button>
           </div>
 
