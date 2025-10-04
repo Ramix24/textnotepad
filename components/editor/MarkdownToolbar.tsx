@@ -65,9 +65,22 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, clearForm
     const selected = value.slice(start, end)
     const after = value.slice(end)
 
+    // If no selection, create a new checklist item
+    if (selected === '') {
+      const newContent = before + '- [ ] ' + after
+      setContent(newContent)
+      requestAnimationFrame(() => {
+        const newPos = start + 6 // Position after "- [ ] "
+        el.setSelectionRange(newPos, newPos)
+        el.focus()
+      })
+      return
+    }
+
+    // If there's a selection, convert each line to a checklist item
     const lines = selected.split('\n')
     const newSelected = lines.map(line => 
-      line.length ? `- [ ] ${line}` : line
+      line.length ? `- [ ] ${line}` : '- [ ] '
     ).join('\n')
     const newContent = before + newSelected + after
 
