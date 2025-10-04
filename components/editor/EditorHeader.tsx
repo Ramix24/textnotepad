@@ -43,7 +43,7 @@ export function EditorHeader({
   }, [isDirty, saving])
   
   const getSaveStatus = () => {
-    if (saving) return 'Saving…'
+    if (saving) return 'Saving'
     if (showTyping) return 'Typing'
     if (savedAt) return 'Saved'
     return 'Ready'
@@ -52,6 +52,7 @@ export function EditorHeader({
   const getSaveStatusColor = () => {
     if (saving) return 'text-accent-blue'
     if (showTyping) return 'text-amber-600 dark:text-amber-400'
+    if (savedAt) return 'text-green-600 dark:text-green-400'
     return 'text-accent-blue'
   }
 
@@ -135,6 +136,7 @@ export function EditorHeader({
           <div className={`w-2 h-2 rounded-full transition-all duration-500 ${
             saving ? 'bg-accent-blue' : 
             showTyping ? 'bg-amber-500' : 
+            savedAt ? 'bg-green-500' :
             'bg-accent-blue'
           }`}></div>
           
