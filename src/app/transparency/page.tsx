@@ -123,7 +123,7 @@ export default function TransparencyPage() {
                       View Privacy Policy →
                     </a>
                     <a 
-                      href="mailto:privacy@textnotepad.com" 
+                      href="mailto:info@textnotepad.com" 
                       className="text-tn-accent hover:text-gray-700 font-medium underline"
                     >
                       Contact Privacy Team →

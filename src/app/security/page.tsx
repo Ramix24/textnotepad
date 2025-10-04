@@ -193,7 +193,7 @@ export default function SecurityPage() {
             <h2>Security Contact</h2>
             <p>
               If you discover a security vulnerability, please email us at{' '}
-              <a href="mailto:security@textnotepad.com">security@textnotepad.com</a>. 
+              <a href="mailto:info@textnotepad.com">info@textnotepad.com</a>. 
               We offer rewards for valid security reports through our bug bounty program.
             </p>
           </div>

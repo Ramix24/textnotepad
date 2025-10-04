@@ -84,7 +84,7 @@ export default function PrivacyPage() {
 
           <h2>Contact Us</h2>
           <p>
-            For privacy-related questions: <a href="mailto:privacy@textnotepad.com">privacy@textnotepad.com</a>
+            For privacy-related questions: <a href="mailto:info@textnotepad.com">info@textnotepad.com</a>
           </p>
           
           <p className="text-sm text-muted-foreground mt-8">

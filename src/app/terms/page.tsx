@@ -91,7 +91,7 @@ export default function TermsPage() {
 
           <h2>Contact</h2>
           <p>
-            Questions about these terms: <a href="mailto:legal@textnotepad.com">legal@textnotepad.com</a>
+            Questions about these terms: <a href="mailto:info@textnotepad.com">info@textnotepad.com</a>
           </p>
           
           <p className="text-sm text-muted-foreground mt-8">
