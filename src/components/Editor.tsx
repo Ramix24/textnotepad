@@ -37,6 +37,7 @@ interface EditorProps {
 export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly = false }: EditorProps) {
   // Local state management
   const [stats, setStats] = useState<CountResult | null>(null)
+  const [scrollTop, setScrollTop] = useState(0)
   
   // Refs for managing focus and keyboard shortcuts
   const wasFocusedRef = useRef(false)
@@ -503,13 +504,20 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         {viewMode === 'preview' ? (
           <MarkdownPreview content={content} className="h-full overflow-auto" />
         ) : showLineNumbers ? (
-          <div className="relative h-full">
-            <div className="absolute left-0 top-0 w-12 h-full bg-bg-secondary border-r border-border-dark flex flex-col text-xs text-text-secondary font-mono overflow-hidden pt-4">
-              {content.split('\n').map((_, index) => (
-                <div key={index + 1} className="px-2 leading-relaxed text-right min-h-[1.5rem] flex items-center justify-end">
-                  {index + 1}
-                </div>
-              ))}
+          <div className="relative h-full flex">
+            <div className="w-12 bg-bg-secondary border-r border-border-dark flex-shrink-0 overflow-hidden">
+              <div 
+                className="text-xs text-text-secondary font-mono pt-4 pb-4"
+                style={{
+                  transform: `translateY(-${scrollTop}px)`
+                }}
+              >
+                {content.split('\n').map((_, index) => (
+                  <div key={index + 1} className="px-2 text-right text-sm leading-relaxed h-[1.375rem] flex items-center justify-end shrink-0">
+                    {index + 1}
+                  </div>
+                ))}
+              </div>
             </div>
             <textarea
               ref={textareaRef}
@@ -520,8 +528,11 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
               onFocus={() => { wasFocusedRef.current = true }}
               onSelect={handleSelectionChange}
               onClick={handleSelectionChange}
+              onScroll={(e) => {
+                setScrollTop(e.currentTarget.scrollTop)
+              }}
               className={cn(
-                'w-full h-full pl-16 pr-4 py-4 bg-bg-secondary text-text-primary',
+                'flex-1 h-full px-4 py-4 bg-bg-secondary text-text-primary',
                 'text-sm leading-relaxed',
                 'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
                 'resize-none placeholder:text-text-secondary',

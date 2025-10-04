@@ -214,7 +214,7 @@ export function AppShell3({
 
     return (
       <div 
-        className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-bg-secondary/95 backdrop-blur-sm border-t border-border-dark flex safe-area-pb"
+        className="lg:hidden fixed bottom-0 left-0 right-0 h-12 bg-bg-secondary/95 backdrop-blur-sm border-t border-border-dark flex safe-area-pb"
         data-testid="mobile-tab-bar"
       >
         {tabs.map((tab) => {
@@ -224,7 +224,7 @@ export function AppShell3({
               key={tab.key}
               onClick={tab.action}
               className={`
-                flex-1 flex flex-col items-center justify-center gap-1 text-xs font-medium transition-all duration-200 relative
+                flex-1 flex flex-col items-center justify-center gap-0.5 text-xs font-medium transition-all duration-200 relative
                 ${isActive 
                   ? 'text-blue-500 dark:text-blue-400' 
                   : 'text-text-secondary hover:text-text-primary active:scale-95'
@@ -238,7 +238,7 @@ export function AppShell3({
               
               {/* Icon */}
               <div className={`
-                w-8 h-8 rounded-lg flex items-center justify-center transition-colors
+                w-6 h-6 rounded-lg flex items-center justify-center transition-colors
                 ${isActive 
                   ? 'bg-bg-active text-accent-blue' 
                   : 'bg-transparent text-text-secondary group-hover:bg-[color:var(--bg-active)]/40'

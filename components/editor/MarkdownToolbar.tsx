@@ -186,6 +186,9 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, clearForm
       <ToolbarButton onClick={insertChecklist} disabled={disabled} title="Checklist">
         ☐ Todo
       </ToolbarButton>
+      <ToolbarButton onClick={insertCollapsible} disabled={disabled} title="Collapsible Section">
+        ▼ Details
+      </ToolbarButton>
 
       <Separator className="hidden sm:block" />
 
@@ -195,9 +198,6 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, clearForm
       </ToolbarButton>
       <ToolbarButton onClick={() => surround('> ')} disabled={disabled} title="Quote" className="hidden md:inline-flex">
         Quote
-      </ToolbarButton>
-      <ToolbarButton onClick={insertCollapsible} disabled={disabled} title="Collapsible Section" className="hidden md:inline-flex">
-        ▼ Details
       </ToolbarButton>
 
       <Separator className="hidden sm:block" />

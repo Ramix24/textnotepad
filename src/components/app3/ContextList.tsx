@@ -380,7 +380,7 @@ function NotesView({
       </div>
 
       {/* Footer */}
-      <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary min-h-[60px]">
+      <footer className="flex-shrink-0 p-2 border-t border-border-dark bg-bg-secondary min-h-[40px]">
         <div className="text-center text-xs text-text-secondary h-full flex items-center justify-center">
           <div>{files.length} notes</div>
         </div>
@@ -558,7 +558,7 @@ function TrashView({
       </div>
 
       {/* Footer */}
-      <footer className="flex-shrink-0 p-3 border-t border-border-dark bg-bg-secondary min-h-[60px]">
+      <footer className="flex-shrink-0 p-2 border-t border-border-dark bg-bg-secondary min-h-[40px]">
         <div className="text-center text-xs text-text-secondary h-full flex items-center justify-center">
           <div>{files.length} deleted items</div>
         </div>
