@@ -92,6 +92,7 @@ function DefaultContextContent({ selection, onSelectionChange, onMobileAdvance, 
     onFileCreated: (newFile) => {
       onSelectionChange({
         ...selection,
+        mode: 'notes', // Ensure we're in notes mode to show the editor
         fileId: newFile.id
       })
       onMobileAdvance?.()

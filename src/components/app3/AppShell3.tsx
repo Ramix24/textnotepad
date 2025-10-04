@@ -114,6 +114,7 @@ export function AppShell3({
       if (layout.isMobile || layout.isTablet) {
         layout.setActivePane(3)
       }
+      // Always focus the detail area to ensure editor is focused
       setTimeout(() => detailRef.current?.focus(), 100)
     } catch {
       // Error handling is done in the hook
