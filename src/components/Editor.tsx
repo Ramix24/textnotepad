@@ -552,7 +552,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
               }}
               className={cn(
                 'flex-1 h-full px-4 py-4 bg-bg-secondary text-text-primary',
-                'text-base leading-relaxed',
+                'text-sm leading-relaxed',
                 'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
                 'resize-none placeholder:text-text-secondary',
                 'whitespace-pre-wrap break-words', // Enable text wrapping
@@ -581,7 +581,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
             onClick={handleSelectionChange}
             className={cn(
               'w-full h-full p-4 bg-bg-secondary text-text-primary',
-              'font-mono text-base leading-relaxed',
+              'font-mono text-sm leading-relaxed',
               'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
               'resize-none placeholder:text-text-secondary',
               'whitespace-pre-wrap break-words', // Enable text wrapping

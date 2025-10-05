@@ -39,7 +39,7 @@ export function MarkdownPreview({ content, className = '' }: MarkdownPreviewProp
 
   return (
     <div
-      className={`prose prose-gray dark:prose-invert max-w-none px-6 py-4 ${className}`}
+      className={`prose prose-sm prose-gray dark:prose-invert max-w-none px-6 py-4 ${className}`}
       dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
     />
   )
