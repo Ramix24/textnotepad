@@ -388,6 +388,24 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     }
   }, [content, file.name])
 
+  // Handle email functionality
+  const handleEmail = useCallback(() => {
+    const subject = encodeURIComponent(`Note: ${file.name}`)
+    const body = encodeURIComponent(
+      `Hi,\n\nI'm sharing this note with you:\n\n---\n\n${content}\n\n---\n\nSent from TextNotepad.com`
+    )
+    const mailtoUrl = `mailto:?subject=${subject}&body=${body}`
+    
+    // Try to open the email client
+    try {
+      window.location.href = mailtoUrl
+    } catch {
+      toast.error('Unable to open email client', {
+        description: 'Please check your browser settings and try again.'
+      })
+    }
+  }, [content, file.name])
+
 
   // Combined keyboard shortcuts
   const handleKeyDown = useCallback(async (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -496,6 +514,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         readOnly={readOnly}
         showLineNumbers={showLineNumbers}
         onToggleLineNumbers={toggleLineNumbers}
+        onEmail={handleEmail}
         onPrint={handlePrint}
       />
 
