@@ -50,7 +50,13 @@
       "Bash(copy:*)",
       "Bash(start http://localhost:3000)",
       "Bash(npm run version:auto:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(true)",
+      "Bash(start http://localhost:3001)",
+      "Bash(start http://localhost:3002)",
+      "Bash(start http://localhost:3004/auth)",
+      "Bash(start https://textnotepad.com)",
+      "WebFetch(domain:textnotepad.com)"
     ],
     "deny": [],
     "ask": [],
