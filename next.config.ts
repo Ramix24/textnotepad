@@ -18,22 +18,6 @@ const nextConfig: NextConfig = {
   generateBuildId: async () => {
     return `build-${Date.now()}`
   },
-  // Redirect www to non-www
-  async redirects() {
-    return [
-      {
-        source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'www.textnotepad.com',
-          },
-        ],
-        destination: 'https://textnotepad.com/:path*',
-        permanent: true,
-      },
-    ]
-  },
   // Security headers
   async headers() {
     return [
