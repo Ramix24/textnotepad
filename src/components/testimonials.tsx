@@ -15,8 +15,7 @@ const productionFeatures = [
   "Advanced collaboration tools",
   "Enhanced security features",
   "Priority customer support",
-  "Export & backup options",
-  "Custom domains & branding"
+  "Export & backup options"
 ]
 
 export function Testimonials() {

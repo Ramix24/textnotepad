@@ -25,10 +25,10 @@ export function Footer() {
                   <span className="text-xl font-semibold text-text-primary">TextNotepad.com</span>
                 </div>
                 <p className="text-muted-foreground text-sm max-w-xs">
-                  Privacy is freedom.
+                  Encrypted Notes.
                 </p>
                 <p className="text-muted-foreground text-sm max-w-xs">
-                  Encrypted notes. No tracking, ever.
+                  No tracking, ever. Privacy is Freedom.
                 </p>
               </div>
 

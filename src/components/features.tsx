@@ -47,9 +47,6 @@ export function Features() {
           <h2 className="text-3xl lg:text-4xl font-bold text-text-primary">
             Why TextNotepad?
           </h2>
-          <p className="text-xl text-text-secondary max-w-3xl mx-auto">
-            Because your notes deserve freedom.
-          </p>
           <p className="text-lg text-text-secondary max-w-4xl mx-auto mt-4">
             TextNotepad is a private space for your thoughts, ideas, and plans. Unlike other note apps, we don&apos;t track you, sell your data, or show ads. Your notes belong to you — encrypted, secure, and always under your control.
           </p>

@@ -53,11 +53,11 @@ export function Header() {
 
             <div className="flex items-center space-x-4">
               {user ? (
-                <Button size="sm" asChild className="bg-tn-accent text-white hover:bg-gray-800">
+                <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-gray-800 font-semibold px-6">
                   <Link href="/app">Open Editor</Link>
                 </Button>
               ) : (
-                <Button size="sm" asChild className="bg-tn-accent text-white hover:bg-gray-800">
+                <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-gray-800 font-semibold px-6">
                   <Link href="/auth">Sign In</Link>
                 </Button>
               )}
