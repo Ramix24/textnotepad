@@ -21,7 +21,7 @@ export function Header() {
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center space-x-2">
               <Logo size={32} />
-              <span className="text-xl font-semibold text-text-primary">TextNotepad.com</span>
+              <span className="text-xl font-semibold text-text-primary">TextNotepad</span>
             </Link>
 
             <nav className="hidden md:flex items-center space-x-8">
@@ -58,7 +58,7 @@ export function Header() {
                 </Button>
               ) : (
                 <Button size="lg" asChild className="bg-accent-blue text-white hover:opacity-90 focus:ring-accent-blue/60 font-semibold px-6">
-                  <Link href="/auth">Sign in as Beta tester</Link>
+                  <Link href="/auth">Sign in</Link>
                 </Button>
               )}
             </div>

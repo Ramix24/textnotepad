@@ -85,11 +85,11 @@ export function PrivacySecurity() {
 
 function SecurityDiagram() {
   return (
-    <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 border border-gray-200">
+    <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
       <div className="space-y-6">
         <div className="text-center space-y-2">
-          <h3 className="text-lg font-semibold text-text-primary">Zero-Knowledge Architecture</h3>
-          <p className="text-sm text-text-secondary">Your data journey</p>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Zero-Knowledge Architecture</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Your data journey</p>
         </div>
         
         <div className="flex flex-col space-y-4">
@@ -99,14 +99,14 @@ function SecurityDiagram() {
                 <Lock className="h-5 w-5 text-tn-accent" />
               </div>
               <div>
-                <div className="font-medium text-sm text-text-primary">Your Device</div>
-                <div className="text-xs text-text-secondary">Encryption happens here</div>
+                <div className="font-medium text-sm text-gray-900 dark:text-gray-100">Your Device</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Encryption happens here</div>
               </div>
             </div>
-            <div className="text-green-600 text-xs font-medium">Encrypted</div>
+            <div className="text-green-600 dark:text-green-400 text-xs font-medium">Encrypted</div>
           </div>
           
-          <div className="border-l-2 border-dashed border-gray-300 ml-5 h-8" />
+          <div className="border-l-2 border-dashed border-gray-300 dark:border-gray-600 ml-5 h-8" />
           
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -114,26 +114,26 @@ function SecurityDiagram() {
                 <Globe className="h-5 w-5 text-tn-accent" />
               </div>
               <div>
-                <div className="font-medium text-sm text-text-primary">EU Servers</div>
-                <div className="text-xs text-text-secondary">Still encrypted</div>
+                <div className="font-medium text-sm text-gray-900 dark:text-gray-100">EU Servers</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Still encrypted</div>
               </div>
             </div>
-            <div className="text-green-600 text-xs font-medium">Encrypted</div>
+            <div className="text-green-600 dark:text-green-400 text-xs font-medium">Encrypted</div>
           </div>
           
-          <div className="border-l-2 border-dashed border-gray-300 ml-5 h-8" />
+          <div className="border-l-2 border-dashed border-gray-300 dark:border-gray-600 ml-5 h-8" />
           
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
-                <Shield className="h-5 w-5 text-red-600" />
+              <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <Shield className="h-5 w-5 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <div className="font-medium text-sm text-text-primary">TextNotepad.com Team</div>
-                <div className="text-xs text-text-secondary">Cannot decrypt</div>
+                <div className="font-medium text-sm text-gray-900 dark:text-gray-100">TextNotepad.com Team</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Cannot decrypt</div>
               </div>
             </div>
-            <div className="text-red-600 text-xs font-medium">No Access</div>
+            <div className="text-red-600 dark:text-red-400 text-xs font-medium">No Access</div>
           </div>
         </div>
       </div>
