@@ -409,19 +409,17 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
   // Handle save locally functionality
   const handleSaveLocally = useCallback(() => {
     try {
-      const blob = new Blob([content], { type: 'text/markdown' })
+      const blob = new Blob([content], { type: 'text/plain' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `${file.name || 'untitled'}.md`
+      a.download = `${file.name || 'untitled'}.txt`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
       
-      toast.success('File saved locally', {
-        description: 'Your note has been downloaded to your device.'
-      })
+      // No toast notification - silent download
     } catch {
       toast.error('Failed to save locally', {
         description: 'Unable to download the file. Please try again.'

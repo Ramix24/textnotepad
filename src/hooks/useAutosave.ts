@@ -84,6 +84,7 @@ export function useAutosave({
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
   const pendingContentRef = useRef<string | null>(null)
   const currentVersionRef = useRef(file.version)
+  const authFailureCountRef = useRef(0)
 
   // Update version ref when file changes
   React.useEffect(() => {
@@ -115,6 +116,9 @@ export function useAutosave({
         queryKey: ['files', 'list']
       })
       
+      // Reset auth failure count on successful save
+      authFailureCountRef.current = 0
+      
       // Notify success
       onSaved?.(updatedFile)
     },
@@ -130,20 +134,25 @@ export function useAutosave({
           description: 'Your document was modified elsewhere and has been refreshed with the latest version.',
         })
       } else if (error.message.includes('User not authenticated') || error.message.includes('JWT')) {
-        // Authentication error - user session expired
-        // Check if page is being unloaded (user navigating away/logging out)
-        const isPageUnloading = window.location.pathname === '/'
+        // Authentication error - increment failure count
+        authFailureCountRef.current += 1
         
-        if (!isPageUnloading) {
-          toast.error('Session expired', {
-            description: 'Your session has expired. Please sign in again to continue.',
-            action: {
-              label: 'Sign In',
-              onClick: () => {
-                window.location.href = '/auth'
+        // Only show session expired after multiple consecutive failures to avoid false positives
+        if (authFailureCountRef.current >= 2) {
+          const isInApp = window.location.pathname.startsWith('/app')
+          const isVisible = document.visibilityState === 'visible'
+          
+          if (isInApp && isVisible) {
+            toast.error('Session expired', {
+              description: 'Your session has expired. Please sign in again to continue.',
+              action: {
+                label: 'Sign In',
+                onClick: () => {
+                  window.location.href = '/auth'
+                }
               }
-            }
-          })
+            })
+          }
         }
       } else {
         // Generic save error
