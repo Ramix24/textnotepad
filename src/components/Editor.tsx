@@ -71,6 +71,9 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
       // Skip changes if in read-only mode
       if (readOnly) return
       
+      // Update protected content to keep it in sync with editor changes
+      setProtectedFileContent(newContent)
+      
       // Mark user as actively typing
       isActivelyTypingRef.current = true
       
