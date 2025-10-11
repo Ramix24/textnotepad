@@ -140,9 +140,12 @@ export function useCreateFile() {
   
   return useMutation({
     mutationFn: createFile,
-    onSuccess: () => {
+    onSuccess: (newFile) => {
       // Invalidate and refetch files list
       queryClient.invalidateQueries({ queryKey: filesKeys.lists() })
+      
+      // Set the new file in the individual file cache for immediate access
+      queryClient.setQueryData(filesKeys.detail(newFile.id), newFile)
       
       // File created - no toast needed, user sees result in UI
     },
