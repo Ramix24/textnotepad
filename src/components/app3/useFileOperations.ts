@@ -25,7 +25,7 @@ export function useFileOperations(options: UseFileOperationsOptions = {}) {
     try {
       const newFile = await createFile.mutateAsync({
         name: name || `Note ${new Date().toLocaleDateString()}`,
-        folder_id: currentFolderId
+        folder_id: currentFolderId === 'inbox' ? null : currentFolderId
       })
       onFileCreated?.(newFile)
       onFileSelect?.(newFile.id)

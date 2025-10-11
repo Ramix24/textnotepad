@@ -101,7 +101,7 @@ export function AppShell3({
     try {
       const newFile = await createFile.mutateAsync({
         name: `Note ${new Date().toLocaleDateString()}`,
-        folder_id: layout.selection.mode === 'notes' ? layout.selection.folderId : null
+        folder_id: layout.selection.mode === 'notes' && layout.selection.folderId !== 'inbox' ? layout.selection.folderId : null
       })
       
       layout.setSelection({
