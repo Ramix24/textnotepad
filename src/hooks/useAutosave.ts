@@ -131,15 +131,20 @@ export function useAutosave({
         })
       } else if (error.message.includes('User not authenticated') || error.message.includes('JWT')) {
         // Authentication error - user session expired
-        toast.error('Session expired', {
-          description: 'Your session has expired. Please sign in again to continue.',
-          action: {
-            label: 'Sign In',
-            onClick: () => {
-              window.location.href = '/auth'
+        // Check if page is being unloaded (user navigating away/logging out)
+        const isPageUnloading = window.location.pathname === '/'
+        
+        if (!isPageUnloading) {
+          toast.error('Session expired', {
+            description: 'Your session has expired. Please sign in again to continue.',
+            action: {
+              label: 'Sign In',
+              onClick: () => {
+                window.location.href = '/auth'
+              }
             }
-          }
-        })
+          })
+        }
       } else {
         // Generic save error
         toast.error('Failed to save changes', {

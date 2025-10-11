@@ -16,6 +16,7 @@ interface EditorHeaderProps {
   onToggleLineNumbers?: () => void
   onPrint?: () => void
   onEmail?: () => void
+  onSaveLocally?: () => void
 }
 
 export function EditorHeader({
@@ -31,6 +32,7 @@ export function EditorHeader({
   onToggleLineNumbers,
   onPrint,
   onEmail,
+  onSaveLocally,
 }: EditorHeaderProps) {
   const [showTyping, setShowTyping] = useState(false)
   
@@ -123,6 +125,22 @@ export function EditorHeader({
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </Button>
+        )}
+        
+        {/* Save Locally Button */}
+        {onSaveLocally && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onSaveLocally}
+            disabled={readOnly}
+            className="text-xs h-7 transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-active"
+            title="Save locally"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </Button>
         )}

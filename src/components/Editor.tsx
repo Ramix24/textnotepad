@@ -406,6 +406,28 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     }
   }, [content, file.name])
 
+  // Handle save locally functionality
+  const handleSaveLocally = useCallback(() => {
+    try {
+      const blob = new Blob([content], { type: 'text/markdown' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${file.name || 'untitled'}.md`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      
+      toast.success('File saved locally', {
+        description: 'Your note has been downloaded to your device.'
+      })
+    } catch {
+      toast.error('Failed to save locally', {
+        description: 'Unable to download the file. Please try again.'
+      })
+    }
+  }, [content, file.name])
 
   // Combined keyboard shortcuts
   const handleKeyDown = useCallback(async (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -515,6 +537,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         showLineNumbers={showLineNumbers}
         onToggleLineNumbers={toggleLineNumbers}
         onEmail={handleEmail}
+        onSaveLocally={handleSaveLocally}
         onPrint={handlePrint}
       />
 
@@ -581,7 +604,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
             onClick={handleSelectionChange}
             className={cn(
               'w-full h-full p-4 bg-bg-secondary text-text-primary',
-              'font-mono text-sm leading-relaxed',
+              'text-sm leading-relaxed',
               'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
               'resize-none placeholder:text-text-secondary',
               'whitespace-pre-wrap break-words', // Enable text wrapping
