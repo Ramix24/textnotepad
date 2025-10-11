@@ -33,8 +33,8 @@ const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
 }
 
 const DEFAULT_SELECTION: AppSelection = {
-  mode: 'search',
-  folderId: null,
+  mode: 'notes',
+  folderId: 'inbox',
   fileId: null,
   searchQuery: ''
 }
@@ -51,11 +51,11 @@ const STORAGE_KEYS = {
 function migrateSelection(stored: unknown): AppSelection {
   if (!stored) return DEFAULT_SELECTION
   
-  // Force all users to start with search homepage for better organization
+  // Force all users to start with inbox folder for better organization
   if (stored && typeof stored === 'object' && 'mode' in stored) {
     return { 
-      mode: 'search', 
-      folderId: null, 
+      mode: 'notes', 
+      folderId: 'inbox', 
       fileId: null, 
       searchQuery: '' 
     }
@@ -63,8 +63,8 @@ function migrateSelection(stored: unknown): AppSelection {
   
   // Migrate from old format
   if (stored && typeof stored === 'object' && 'section' in stored) {
-    // Force start with search homepage for all migrated users
-    return { mode: 'search', folderId: null, fileId: null, searchQuery: '' }
+    // Force start with inbox folder for all migrated users
+    return { mode: 'notes', folderId: 'inbox', fileId: null, searchQuery: '' }
   }
   
   return DEFAULT_SELECTION

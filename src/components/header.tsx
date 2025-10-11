@@ -58,7 +58,7 @@ export function Header() {
                 </Button>
               ) : (
                 <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-gray-800 font-semibold px-6">
-                  <Link href="/auth">Sign In</Link>
+                  <Link href="/auth">Sign in as Beta tester</Link>
                 </Button>
               )}
             </div>
