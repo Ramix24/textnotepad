@@ -38,9 +38,21 @@ export function MarkdownPreview({ content, className = '' }: MarkdownPreviewProp
   }
 
   return (
-    <div
-      className={`prose prose-sm prose-gray dark:prose-invert max-w-none px-6 py-4 ${className}`}
-      dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
-    />
+    <>
+      <style jsx>{`
+        /* Fix task list items - remove list bullets for checkbox items */
+        .prose :where(li):has(input[type="checkbox"]):not(:where([class~="not-prose"] *)) {
+          list-style: none;
+          padding-left: 0;
+        }
+        .prose :where(li input[type="checkbox"]):not(:where([class~="not-prose"] *)) {
+          margin-right: 0.5rem;
+        }
+      `}</style>
+      <div
+        className={`prose prose-sm prose-gray dark:prose-invert max-w-none px-6 py-4 ${className}`}
+        dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+      />
+    </>
   )
 }

@@ -278,7 +278,7 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
         <div className="space-y-1">
           <button
             onClick={onInboxSelect}
-            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded-lg text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
             title={isCollapsed ? "INBOX" : undefined}
           >
             <Inbox className="h-4 w-4 text-text-secondary" />
@@ -286,7 +286,7 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
           </button>
           <button
             onClick={onAllNotesSelect}
-            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded-lg text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
             title={isCollapsed ? "All Notes" : undefined}
           >
             <FileText className="h-4 w-4 text-text-secondary" />
@@ -304,7 +304,7 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
           {/* INBOX button */}
           <button
             onClick={onInboxSelect}
-            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded-lg text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
             title={isCollapsed ? "INBOX" : undefined}
           >
             <Inbox className="h-4 w-4 text-text-secondary" />
@@ -314,7 +314,7 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
           {/* All Notes button */}
           <button
             onClick={onAllNotesSelect}
-            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded-lg text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
             title={isCollapsed ? "All Notes" : undefined}
           >
             <FileText className="h-4 w-4 text-text-secondary" />
@@ -341,7 +341,7 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
           {/* INBOX button - always available */}
           <button
             onClick={onInboxSelect}
-            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded-lg text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
             title={isCollapsed ? "INBOX" : undefined}
           >
             <Inbox className="h-4 w-4 text-text-secondary" />
@@ -351,7 +351,7 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
           {/* All Notes button - always available */}
           <button
             onClick={onAllNotesSelect}
-            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
+            className={`w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded-lg text-left transition-colors text-sm bg-bg-primary text-text-primary hover:bg-bg-active`}
             title={isCollapsed ? "All Notes" : undefined}
           >
             <FileText className="h-4 w-4 text-text-secondary" />
@@ -388,7 +388,7 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
           onClick={onInboxSelect}
           tabIndex={-1}
           className={`
-            w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
+            w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded-lg text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
             ${selection.folderId === 'inbox'
               ? 'bg-accent-blue text-white'
               : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
@@ -407,7 +407,7 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
           onClick={onAllNotesSelect}
           tabIndex={-1}
           className={`
-            w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
+            w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2'} rounded-lg text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
             ${selection.folderId === null && (selection.mode === 'notes' || selection.mode === 'search')
               ? 'bg-accent-blue text-white'
               : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'
@@ -434,7 +434,7 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
               onClick={() => onFolderSelect(folder.id)}
               tabIndex={-1}
               className={`
-                w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2 pr-16'} rounded text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
+                w-full flex items-center ${isCollapsed ? 'justify-center p-2' : 'gap-3 p-2 pr-16'} rounded-lg text-left transition-colors text-sm focus:outline-none focus:ring-1 focus:ring-blue-400
                 ${selection.folderId === folder.id
                   ? 'bg-accent-blue text-white'
                   : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-gray-100 hover:bg-blue-50 dark:hover:bg-gray-700'

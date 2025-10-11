@@ -547,13 +547,14 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
           <div className="relative h-full flex">
             <div className="w-12 bg-bg-secondary border-r border-border-dark flex-shrink-0 overflow-hidden">
               <div 
-                className="text-xs text-text-secondary font-mono pt-4 pb-4"
+                className="text-sm text-text-secondary font-mono py-4"
                 style={{
-                  transform: `translateY(-${scrollTop}px)`
+                  transform: `translateY(-${scrollTop}px)`,
+                  lineHeight: '1.625' // Match textarea leading-relaxed exactly
                 }}
               >
                 {content.split('\n').map((_, index) => (
-                  <div key={index + 1} className="px-2 text-right text-sm leading-relaxed h-[1.375rem] flex items-center justify-end shrink-0">
+                  <div key={index + 1} className="px-2 text-right text-sm leading-relaxed flex items-center justify-end">
                     {index + 1}
                   </div>
                 ))}

@@ -87,7 +87,7 @@ export function FileItem({
       aria-selected={isSelected}
       onClick={() => onSelect(file)}
       className={cn(
-        "group relative flex items-center justify-between p-3 rounded cursor-pointer transition-colors",
+        "group relative flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors",
         isSelected
           ? "bg-accent-blue text-white"
           : "text-text-primary hover:text-accent-blue hover:bg-[color:var(--bg-active)]/40",
