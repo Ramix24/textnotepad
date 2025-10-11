@@ -23,7 +23,7 @@ const COL2_MIN = 260
 const COL2_MAX = 560
 
 const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
-  col1: 200, // Expanded folders panel width 
+  col1: 360, // Expanded folders panel width (same as C2 for longer folder names)
   col1Collapsed: 48, // Collapsed folders panel width (icon-only)
   col2: 360, // Default context list width  
   col2Collapsed: 64, // Collapsed context list width (need space for toggle button)
