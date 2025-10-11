@@ -616,7 +616,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
       )}
 
       {/* Status bar */}
-      <div className="flex items-center justify-between px-4 py-3 border-t bg-muted/30 text-sm text-muted-foreground">
+      <div className="flex items-center justify-between px-4 py-2 border-t bg-muted/30 text-sm text-muted-foreground min-h-[40px]">
         <div 
           id="editor-stats"
           className="flex items-center space-x-4"

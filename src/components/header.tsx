@@ -57,7 +57,7 @@ export function Header() {
                   <Link href="/app">Open Editor</Link>
                 </Button>
               ) : (
-                <Button size="lg" asChild className="bg-tn-accent text-white hover:bg-gray-800 font-semibold px-6">
+                <Button size="lg" asChild className="bg-accent-blue text-white hover:opacity-90 focus:ring-accent-blue/60 font-semibold px-6">
                   <Link href="/auth">Sign in as Beta tester</Link>
                 </Button>
               )}
