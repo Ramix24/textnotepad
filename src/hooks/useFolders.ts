@@ -188,10 +188,8 @@ export function useRenameFolder() {
       // Return a context object with the snapshotted value
       return { previousNotebooks }
     },
-    onSuccess: (updatedNotebook) => {
-      toast.success('Notebook renamed', {
-        description: `Notebook renamed to "${updatedNotebook.name}".`,
-      })
+    onSuccess: (_updatedNotebook) => {
+      // Notification removed to reduce UI noise
     },
     onError: (error: any, variables, context) => {
       // If the mutation fails, use the context to roll back
