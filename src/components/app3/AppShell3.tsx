@@ -390,7 +390,7 @@ export function AppShell3({
             {user && (
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-text-primary hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors border border-border-dark hover:border-red-300"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors border border-red-300 hover:border-red-400"
                 title="Logout"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
