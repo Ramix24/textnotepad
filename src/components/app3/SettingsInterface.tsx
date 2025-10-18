@@ -1,8 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { User, Palette, Edit, Shield, Settings as SettingsIcon, Sun, Moon, Monitor } from 'lucide-react'
+import { User, Palette, Edit, Shield, Settings as SettingsIcon, Sun, Moon, Monitor, Download, Loader2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import { useSupabase } from '@/components/SupabaseProvider'
+import { listFilesForUser } from '@/lib/userFiles.repo'
+import { exportAllNotes } from '@/lib/exportNotes'
+import { toast } from 'sonner'
 import type { AppSelection } from './types'
 
 interface SettingsInterfaceProps {
@@ -282,6 +286,40 @@ function SecuritySettings() {
 }
 
 function AdvancedSettings() {
+  const { supabase } = useSupabase()
+  const [isExporting, setIsExporting] = useState(false)
+
+  const handleExportNotes = async () => {
+    try {
+      setIsExporting(true)
+      
+      // Fetch all user files
+      const files = await listFilesForUser(supabase, false) // Don't include deleted files
+      
+      if (files.length === 0) {
+        toast.error('No notes to export', {
+          description: 'Create some notes first before exporting.'
+        })
+        return
+      }
+      
+      // Export as ZIP
+      await exportAllNotes(files, { format: 'txt' })
+      
+      toast.success('Notes exported successfully', {
+        description: `Downloaded ${files.length} notes as ZIP file`
+      })
+      
+    } catch (error) {
+      console.error('Export failed:', error)
+      toast.error('Export failed', {
+        description: error instanceof Error ? error.message : 'Unable to export notes. Please try again.'
+      })
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -289,8 +327,40 @@ function AdvancedSettings() {
         <p className="text-text-secondary mb-6">Developer and power user options</p>
       </div>
       
-      <div className="p-4 bg-bg-primary rounded-lg border border-border-dark">
-        <p className="text-text-secondary">Advanced settings coming soon...</p>
+      {/* Export Section */}
+      <div className="p-6 bg-bg-primary rounded-lg border border-border-dark">
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-medium text-text-primary mb-2">Export Notes</h3>
+            <p className="text-sm text-text-secondary mb-4">
+              Download all your notes as a ZIP file. Each note will be saved as a separate text file.
+            </p>
+          </div>
+          
+          <button
+            onClick={handleExportNotes}
+            disabled={isExporting}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-accent-blue text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {isExporting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Download className="w-4 h-4" />
+            )}
+            {isExporting ? 'Exporting...' : 'Export All Notes'}
+          </button>
+          
+          <div className="text-xs text-text-secondary mt-2">
+            • Exports all notes except deleted ones<br />
+            • Files are saved as .txt format<br />
+            • Includes export metadata
+          </div>
+        </div>
+      </div>
+      
+      {/* Future Advanced Settings */}
+      <div className="p-4 bg-bg-primary rounded-lg border border-border-dark opacity-50">
+        <p className="text-text-secondary">Additional advanced settings coming soon...</p>
       </div>
     </div>
   )
