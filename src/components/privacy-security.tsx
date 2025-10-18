@@ -89,9 +89,9 @@ function SecurityDiagram() {
       <div className="space-y-6">
         {/* Header with improved visual hierarchy */}
         <div className="text-center space-y-3 pb-4 border-b border-blue-100 dark:border-blue-800">
-          <div className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 px-4 py-2 rounded-full">
-            <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Zero-Knowledge Architecture</span>
+          <div className="flex items-center space-x-2 bg-blue-50 dark:bg-blue-900/30 px-3 py-2 rounded-lg border border-blue-200 dark:border-blue-800 mx-auto w-fit">
+            <Lock className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+            <span className="text-xs font-medium text-blue-700 dark:text-blue-300">Zero-Knowledge</span>
           </div>
           <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">How Your Data Stays Private</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">Even we can&apos;t read your notes</p>
