@@ -55,6 +55,7 @@ interface DefaultFoldersContentProps {
 
 function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance, isCollapsed = false, onToggleCollapsed }: DefaultFoldersContentProps) {
   const createFolder = useCreateFolder()
+  const [newFolderId, setNewFolderId] = useState<string | null>(null)
   
   const handleInboxSelect = () => {
     // INBOX is a special folder for uncategorized notes
@@ -75,7 +76,15 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance, 
   
 
   const handleCreateFolder = () => {
-    createFolder.mutate({ name: 'New Folder' })
+    const tempName = 'New Folder'
+    createFolder.mutate({ 
+      name: tempName 
+    }, {
+      onSuccess: (newFolder) => {
+        // Auto-start editing the new folder
+        setNewFolderId(newFolder.id)
+      }
+    })
   }
 
 
@@ -134,6 +143,8 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance, 
             onMobileAdvance?.()
           }}
           isCollapsed={isCollapsed}
+          newFolderId={newFolderId}
+          onEditComplete={() => setNewFolderId(null)}
         />
       </div>
     </div>
@@ -147,9 +158,11 @@ interface FoldersListProps {
   onTrashSelect: () => void
   onAllNotesSelect: () => void
   isCollapsed?: boolean
+  newFolderId?: string | null
+  onEditComplete?: () => void
 }
 
-function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, onAllNotesSelect, isCollapsed = false }: FoldersListProps) {
+function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, onAllNotesSelect, isCollapsed = false, newFolderId, onEditComplete }: FoldersListProps) {
   const { data: folders = [], isLoading, error } = useFoldersList()
   const renameFolder = useRenameFolder()
   const deleteFolder = useDeleteFolder()
@@ -176,11 +189,13 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
     }
     setEditingFolderId(null)
     setEditingName('')
+    onEditComplete?.()
   }
 
   const handleCancelRename = () => {
     setEditingFolderId(null)
     setEditingName('')
+    onEditComplete?.()
   }
 
   const handleEditKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -207,6 +222,16 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
       editInputRef.current.select()
     }
   }, [editingFolderId])
+
+  // Auto-start editing new folders
+  useEffect(() => {
+    if (newFolderId && folders.some(f => f.id === newFolderId)) {
+      const folder = folders.find(f => f.id === newFolderId)
+      if (folder) {
+        handleRenameFolder(newFolderId, folder.name)
+      }
+    }
+  }, [newFolderId, folders])
 
   // Edge case: Validate current selection against available folders
   useEffect(() => {
