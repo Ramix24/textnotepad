@@ -61,6 +61,7 @@ export function EditorHeader({
         value={name}
         onChange={(e) => onNameChange(e.target.value)}
         placeholder="Untitled"
+        readOnly={readOnly}
       />
       <div className="flex items-center gap-3">
         {/* Edit/Preview Toggle */}

@@ -4,7 +4,7 @@ import * as React from 'react'
 import { ReactNode, useCallback, useRef } from 'react'
 import { useColumnsLayout } from '@/hooks/useColumnsLayout'
 import { useKeyboardNav } from '@/hooks/useKeyboardNav'
-import { useCreateFile } from '@/hooks/useFiles'
+import { useCreateFile, useRenameFile } from '@/hooks/useFiles'
 import { useSupabase } from '@/components/SupabaseProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { FoldersPanel } from './FoldersPanel'
@@ -29,6 +29,7 @@ export function AppShell3({
 }: AppShell3Props) {
   const layout = useColumnsLayout()
   const createFile = useCreateFile()
+  const renameFile = useRenameFile()
   const resizerRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const { supabase } = useSupabase()
@@ -493,8 +494,13 @@ export function AppShell3({
             <DetailView 
               className="h-full"
               selection={layout.selection}
-              onFileUpdate={(_updatedFile) => {
-                // Could invalidate queries or update cache here
+              onFileUpdate={(updatedFile) => {
+                // Handle file name changes by always calling rename
+                // The hook will handle optimistic updates and prevent unnecessary requests
+                renameFile.mutate({
+                  id: updatedFile.id,
+                  name: updatedFile.name
+                })
               }}
               onDirtyChange={(_fileId, _isDirty) => {
                 // Could track dirty state here
