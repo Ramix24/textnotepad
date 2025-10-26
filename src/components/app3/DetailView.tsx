@@ -7,6 +7,7 @@ import { EditorSkeleton } from '@/components/EditorSkeleton'
 import { SearchInterface } from './SearchInterface'
 import { HelpInterface } from './HelpInterface'
 import { SettingsInterface } from './SettingsInterface'
+import { Logo } from '@/components/ui/logo'
 import type { AppSelection } from './types'
 
 interface DetailViewProps {
@@ -234,10 +235,8 @@ function DetailViewEmpty({ mode }: { mode: 'notes' | 'messages' | 'trash' | 'sea
 
   return (
     <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-border-dark to-bg-secondary mb-6 flex items-center justify-center border border-border-dark">
-        <div className="w-8 h-8 rounded-lg bg-bg-secondary flex items-center justify-center">
-          <span className="text-lg">{content.icon}</span>
-        </div>
+      <div className="mb-6">
+        <Logo size={64} className="mx-auto" />
       </div>
       
       <h3 className="text-lg font-medium text-text-primary mb-2">{content.title}</h3>
