@@ -118,10 +118,8 @@ export function useCreateFolder() {
       // Return a context object with the snapshotted value
       return { previousNotebooks }
     },
-    onSuccess: (newNotebook) => {
-      toast.success('Notebook created', {
-        description: `"${newNotebook.name}" was created successfully.`,
-      })
+    onSuccess: (_newNotebook) => {
+      // Folder created - no toast needed, user sees result in UI
     },
     onError: (error: any, request, context) => {
       // If the mutation fails, use the context to roll back
