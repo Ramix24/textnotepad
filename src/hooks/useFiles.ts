@@ -182,6 +182,16 @@ export function useRenameFile() {
               : file
           )
         })
+        
+        // Also update the individual file cache
+        const updatedFile = previousFiles.find(f => f.id === id)
+        if (updatedFile) {
+          queryClient.setQueryData(filesKeys.detail(id), {
+            ...updatedFile,
+            name,
+            updated_at: new Date().toISOString()
+          })
+        }
       }
       
       // Return a context object with the snapshotted value
@@ -197,9 +207,10 @@ export function useRenameFile() {
         description: error.message,
       })
     },
-    onSettled: () => {
+    onSettled: (data, error, variables) => {
       // Always refetch after error or success
       queryClient.invalidateQueries({ queryKey: filesKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: filesKeys.detail(variables.id) })
     },
     onSuccess: () => {
       // File renamed - no toast needed, user sees result in UI

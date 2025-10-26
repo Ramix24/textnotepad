@@ -199,6 +199,9 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
   }
 
   const handleEditKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    // Stop propagation to prevent parent listbox from handling key events
+    e.stopPropagation()
+    
     if (e.key === 'Enter') {
       e.preventDefault()
       handleSaveRename()

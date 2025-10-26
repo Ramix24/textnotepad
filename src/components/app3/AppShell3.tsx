@@ -4,7 +4,7 @@ import * as React from 'react'
 import { ReactNode, useCallback, useRef } from 'react'
 import { useColumnsLayout } from '@/hooks/useColumnsLayout'
 import { useKeyboardNav } from '@/hooks/useKeyboardNav'
-import { useCreateFile, useRenameFile } from '@/hooks/useFiles'
+import { useCreateFile, useRenameFile as useRenameFileHook } from '@/hooks/useFiles'
 import { useSupabase } from '@/components/SupabaseProvider'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { FoldersPanel } from './FoldersPanel'
@@ -29,7 +29,7 @@ export function AppShell3({
 }: AppShell3Props) {
   const layout = useColumnsLayout()
   const createFile = useCreateFile()
-  const renameFile = useRenameFile()
+  const renameFile = useRenameFileHook()
   const resizerRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const { supabase } = useSupabase()
