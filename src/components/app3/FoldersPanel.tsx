@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useRef, useEffect, KeyboardEvent } from 'react'
+import { ReactNode, useRef, useEffect, KeyboardEvent, useState } from 'react'
 import { FileText, BookOpen, ChevronLeft, ChevronRight, Inbox } from 'lucide-react'
 import { useFoldersList, useCreateFolder, useRenameFolder, useDeleteFolder } from '@/hooks/useFolders'
 import { formatVersion } from '@/lib/version'
@@ -75,10 +75,7 @@ function DefaultFoldersContent({ selection, onSelectionChange, onMobileAdvance, 
   
 
   const handleCreateFolder = () => {
-    const name = prompt('Enter folder name:')
-    if (name && name.trim()) {
-      createFolder.mutate({ name: name.trim() })
-    }
+    createFolder.mutate({ name: 'New Folder' })
   }
 
 
@@ -158,15 +155,41 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
   const deleteFolder = useDeleteFolder()
   
   const listboxRef = useRef<HTMLDivElement>(null)
+  const editInputRef = useRef<HTMLInputElement>(null)
+  
+  // State for inline editing
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null)
+  const [editingName, setEditingName] = useState('')
   
   // Check feature flag - default to true if not set
   const isFeatureEnabled = process.env.NEXT_PUBLIC_FEATURE_FOLDERS !== 'false'
 
 
   const handleRenameFolder = (folderId: string, currentName: string) => {
-    const name = prompt('Enter new folder name:', currentName)
-    if (name && name.trim() && name.trim() !== currentName) {
-      renameFolder.mutate({ id: folderId, name: name.trim() })
+    setEditingFolderId(folderId)
+    setEditingName(currentName)
+  }
+
+  const handleSaveRename = () => {
+    if (editingFolderId && editingName.trim()) {
+      renameFolder.mutate({ id: editingFolderId, name: editingName.trim() })
+    }
+    setEditingFolderId(null)
+    setEditingName('')
+  }
+
+  const handleCancelRename = () => {
+    setEditingFolderId(null)
+    setEditingName('')
+  }
+
+  const handleEditKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSaveRename()
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      handleCancelRename()
     }
   }
 
@@ -176,6 +199,14 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
       deleteFolder.mutate(folderId)
     }
   }
+
+  // Auto-focus and select text when editing starts
+  useEffect(() => {
+    if (editingFolderId && editInputRef.current) {
+      editInputRef.current.focus()
+      editInputRef.current.select()
+    }
+  }, [editingFolderId])
 
   // Edge case: Validate current selection against available folders
   useEffect(() => {
@@ -445,18 +476,34 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
               <svg className={`w-4 h-4 ${selection.folderId === folder.id ? 'text-white' : 'text-gray-500 dark:text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
               </svg>
-              {!isCollapsed && <span className="font-medium transition-opacity duration-300">{folder.name}</span>}
+              {!isCollapsed && (
+                editingFolderId === folder.id ? (
+                  <input
+                    ref={editInputRef}
+                    type="text"
+                    value={editingName}
+                    onChange={(e) => setEditingName(e.target.value)}
+                    onKeyDown={handleEditKeyDown}
+                    onBlur={handleSaveRename}
+                    className="font-medium bg-transparent border-none outline-none text-current placeholder-current/50 flex-1 min-w-0"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                ) : (
+                  <span className="font-medium transition-opacity duration-300">{folder.name}</span>
+                )
+              )}
             </button>
             
-            {/* Context menu for folder actions - hide when collapsed */}
-            {!isCollapsed && (
+            {/* Context menu for folder actions - hide when collapsed or editing */}
+            {!isCollapsed && editingFolderId !== folder.id && (
             <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   handleRenameFolder(folder.id, folder.name)
                 }}
-                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-500 dark:text-text-secondary hover:text-gray-700 dark:hover:text-gray-200"
+                disabled={renameFolder.isPending}
+                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-500 dark:text-text-secondary hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-50"
                 title="Rename folder"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

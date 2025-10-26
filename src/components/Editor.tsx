@@ -576,7 +576,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
                 setScrollTop(e.currentTarget.scrollTop)
               }}
               className={cn(
-                'flex-1 h-full px-4 py-4 bg-bg-secondary text-text-primary',
+                'flex-1 h-full px-4 py-4 bg-bg-secondary text-text-primary editor-content',
                 'text-sm leading-relaxed',
                 'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
                 'resize-none placeholder:text-text-secondary',
@@ -584,7 +584,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
                 !user && 'opacity-50 cursor-not-allowed',
                 readOnly && 'opacity-75 cursor-default bg-bg-secondary'
               )}
-              placeholder={!user ? "Please sign in to edit your notes..." : readOnly ? "This file is read-only..." : "Start writing in Markdown..."}
+              placeholder={!user ? "Please sign in to edit your notes..." : readOnly ? "This file is read-only..." : "Start writing..."}
               disabled={!user}
               readOnly={readOnly}
               aria-label={readOnly ? "Markdown editor (read-only)" : "Markdown editor"}
@@ -605,7 +605,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
             onSelect={handleSelectionChange}
             onClick={handleSelectionChange}
             className={cn(
-              'w-full h-full p-4 bg-bg-secondary text-text-primary',
+              'w-full h-full p-4 bg-bg-secondary text-text-primary editor-content',
               'text-sm leading-relaxed',
               'border-0 outline-none ring-0 focus:ring-2 focus:ring-blue-400/50 focus:ring-offset-0',
               'resize-none placeholder:text-text-secondary',
@@ -613,7 +613,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
               !user && 'opacity-50 cursor-not-allowed',
               readOnly && 'opacity-75 cursor-default bg-bg-secondary'
             )}
-            placeholder={!user ? "Please sign in to edit your notes..." : readOnly ? "This file is read-only..." : "Start writing in Markdown..."}
+            placeholder={!user ? "Please sign in to edit your notes..." : readOnly ? "This file is read-only..." : "Start writing..."}
             disabled={!user}
             readOnly={readOnly}
             aria-label={readOnly ? "Markdown editor (read-only)" : "Markdown editor"}

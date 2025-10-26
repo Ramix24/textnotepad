@@ -123,4 +123,22 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Fix numbered lists in editor */
+  .editor-content ol {
+    counter-reset: list-counter;
+  }
+  
+  .editor-content ol li {
+    counter-increment: list-counter;
+    list-style: none;
+    position: relative;
+  }
+  
+  .editor-content ol li::before {
+    content: counter(list-counter) ". ";
+    position: absolute;
+    left: -1.5em;
+    font-weight: 500;
+  }
 }
