@@ -145,20 +145,20 @@ function FileItem({
                   e.stopPropagation()
                   handleDoubleClick()
                 }}
-                className="p-1.5 hover:bg-blue-100 rounded"
+                className="p-1.5 hover:bg-blue-100 dark:hover:bg-blue-900 rounded"
                 title="Rename file"
               >
-                <Edit2 className="w-4 h-4 text-gray-600 hover:text-blue-600" />
+                <Edit2 className="w-4 h-4 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" />
               </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   onDelete(file.id)
                 }}
-                className="p-1.5 hover:bg-red-100 rounded"
+                className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900 rounded"
                 title="Delete file"
               >
-                <Trash2 className="w-4 h-4 text-gray-600 hover:text-red-600" />
+                <Trash2 className="w-4 h-4 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400" />
               </button>
             </div>
           </div>
