@@ -53,6 +53,46 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
       setProtectedFileContent(file.content)
     }
   }, [file.content]) // textareaRef is a ref and doesn't need to be in deps
+
+  // Auto-renumber ordered lists function
+  const autoRenumberOrderedLists = useCallback((text: string): string => {
+    const lines = text.split('\n')
+    const result: string[] = []
+    let currentListNumber = 0
+    let inOrderedList = false
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]
+      const orderedListMatch = line.match(/^(\s*)(\d+)\.\s(.*)$/)
+      
+      if (orderedListMatch) {
+        const [, indent, , content] = orderedListMatch
+        
+        // Check if this is the start of a new list (different indentation or after non-list line)
+        const prevLine = i > 0 ? lines[i - 1] : ''
+        const prevIsOrderedList = prevLine.match(/^(\s*)\d+\.\s/)
+        const prevIndent = prevIsOrderedList ? prevIsOrderedList[1] : ''
+        
+        if (!inOrderedList || indent !== prevIndent) {
+          currentListNumber = 1
+          inOrderedList = true
+        } else {
+          currentListNumber++
+        }
+        
+        result.push(`${indent}${currentListNumber}. ${content}`)
+      } else {
+        // Reset list tracking for non-list lines
+        if (line.trim() === '' || !line.match(/^\s*$/)) {
+          inOrderedList = false
+          currentListNumber = 0
+        }
+        result.push(line)
+      }
+    }
+    
+    return result.join('\n')
+  }, [])
   
   // Markdown editor hook with keyboard shortcuts
   const { 
@@ -430,6 +470,28 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     // Handle markdown shortcuts first
     handleMarkdownKeyDown(event)
     
+    // Auto-renumber lists when user presses Enter after a numbered list item
+    if (event.key === 'Enter') {
+      // Small delay to let the Enter key take effect first
+      setTimeout(() => {
+        const currentContent = textareaRef.current?.value || content
+        const renumberedContent = autoRenumberOrderedLists(currentContent)
+        
+        if (renumberedContent !== currentContent) {
+          const cursorPos = textareaRef.current?.selectionStart || 0
+          setContent(renumberedContent)
+          setProtectedFileContent(renumberedContent)
+          
+          // Restore cursor position after renumbering
+          setTimeout(() => {
+            if (textareaRef.current) {
+              textareaRef.current.setSelectionRange(cursorPos, cursorPos)
+            }
+          }, 0)
+        }
+      }, 0)
+    }
+    
     // Ctrl/Cmd + S for force save
     if ((event.ctrlKey || event.metaKey) && event.key === 's') {
       event.preventDefault()
@@ -438,7 +500,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         await forceSave()
       }
     }
-  }, [isSaving, forceSave, handleMarkdownKeyDown])
+  }, [isSaving, forceSave, handleMarkdownKeyDown, content, setContent, autoRenumberOrderedLists])
 
   // Simplified - no need to manually track cursor position
   const handleSelectionChange = useCallback(() => {
@@ -448,6 +510,15 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
 
   // Save on blur only if there are pending changes and user has stopped typing
   const handleBlur = useCallback(async () => {
+    // Auto-renumber ordered lists when user finishes editing
+    const currentContent = textareaRef.current?.value || content
+    const renumberedContent = autoRenumberOrderedLists(currentContent)
+    
+    if (renumberedContent !== currentContent) {
+      setContent(renumberedContent)
+      setProtectedFileContent(renumberedContent)
+    }
+    
     // Only save if there are actually pending changes and user isn't actively typing
     if (hasPendingChanges && !isActivelyTypingRef.current && !isSaving) {
       // Add a small delay to prevent save storms from rapid focus changes
@@ -457,7 +528,7 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         }
       }, 500)
     }
-  }, [hasPendingChanges, isSaving, forceSave])
+  }, [hasPendingChanges, isSaving, forceSave, content, setContent, autoRenumberOrderedLists])
 
   // Update dirty state based on content changes
   useEffect(() => {
