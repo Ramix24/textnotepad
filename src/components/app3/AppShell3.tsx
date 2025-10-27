@@ -30,7 +30,8 @@ export function AppShell3({
   const layout = useColumnsLayout()
   const createFile = useCreateFile()
   const renameFile = useRenameFileHook()
-  const resizerRef = useRef<HTMLDivElement>(null)
+  const col1ResizerRef = useRef<HTMLDivElement>(null)
+  const col2ResizerRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const { supabase } = useSupabase()
   const { user } = useAuthSession()
@@ -40,8 +41,8 @@ export function AppShell3({
   const listRef = useRef<HTMLDivElement>(null)
   const detailRef = useRef<HTMLDivElement>(null)
 
-  // Mouse resize handling
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  // C1 resize handling (between C1 and C2)
+  const handleCol1MouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
     layout.actions.setIsResizing(true)
 
@@ -49,7 +50,31 @@ export function AppShell3({
       if (!containerRef.current) return
       
       const containerRect = containerRef.current.getBoundingClientRect()
-      const newWidth = e.clientX - containerRect.left - layout.columnWidths.col1
+      const newWidth = e.clientX - containerRect.left
+      
+      layout.actions.setCol1Width(newWidth)
+    }
+
+    const handleMouseUp = () => {
+      layout.actions.setIsResizing(false)
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }, [layout])
+
+  // C2 resize handling (between C2 and C3)
+  const handleCol2MouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    layout.actions.setIsResizing(true)
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current) return
+      
+      const containerRect = containerRef.current.getBoundingClientRect()
+      const newWidth = e.clientX - containerRect.left - layout.state.col1Width
       
       layout.actions.setCol2Width(newWidth)
     }
@@ -64,8 +89,19 @@ export function AppShell3({
     document.addEventListener('mouseup', handleMouseUp)
   }, [layout])
 
-  // Keyboard resize handling
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+  // C1 keyboard resize handling
+  const handleCol1KeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault()
+      layout.actions.setCol1Width(layout.state.col1Width - 16)
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault() 
+      layout.actions.setCol1Width(layout.state.col1Width + 16)
+    }
+  }, [layout])
+
+  // C2 keyboard resize handling
+  const handleCol2KeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'ArrowLeft') {
       e.preventDefault()
       layout.actions.setCol2Width(layout.state.col2Width - 16)
@@ -421,7 +457,7 @@ export function AppShell3({
             className="flex-shrink-0 outline-none focus:ring-2 focus:ring-primary/50 focus:ring-inset transition-all duration-300 ease-in-out"
             style={{ 
               width: layout.breakpoint === 'desktop' 
-                ? (layout.state.isCol1Collapsed ? layout.columnWidths.col1Collapsed : layout.columnWidths.col1)
+                ? (layout.state.isCol1Collapsed ? layout.columnWidths.col1Collapsed : layout.state.col1Width)
                 : '100%' 
             }}
             data-testid="folders-column"
@@ -437,6 +473,21 @@ export function AppShell3({
               {sectionsContent}
             </FoldersPanel>
           </div>
+        )}
+
+        {/* C1 Resizer (desktop only) - hide when C1 is collapsed */}
+        {layout.breakpoint === 'desktop' && layout.showSections && layout.showList && !layout.state.isCol1Collapsed && (
+          <div
+            ref={col1ResizerRef}
+            role="separator"
+            aria-orientation="vertical"
+            tabIndex={0}
+            className={`w-1 bg-border-dark hover:bg-text-secondary cursor-col-resize flex-shrink-0 transition-colors ${
+              layout.state.isResizing ? 'bg-accent-blue' : ''
+            }`}
+            onMouseDown={handleCol1MouseDown}
+            onKeyDown={handleCol1KeyDown}
+          />
         )}
 
         {/* Column 2: Context List */}
@@ -465,18 +516,18 @@ export function AppShell3({
           </div>
         )}
 
-        {/* Resizer (desktop only) - hide when C2 is collapsed */}
+        {/* C2 Resizer (desktop only) - hide when C2 is collapsed */}
         {layout.breakpoint === 'desktop' && layout.showList && layout.showDetail && !layout.state.isCol2Collapsed && (
           <div
-            ref={resizerRef}
+            ref={col2ResizerRef}
             role="separator"
             aria-orientation="vertical"
             tabIndex={0}
             className={`w-1 bg-border-dark hover:bg-text-secondary cursor-col-resize flex-shrink-0 transition-colors ${
               layout.state.isResizing ? 'bg-accent-blue' : ''
             }`}
-            onMouseDown={handleMouseDown}
-            onKeyDown={handleKeyDown}
+            onMouseDown={handleCol2MouseDown}
+            onKeyDown={handleCol2KeyDown}
           />
         )}
 

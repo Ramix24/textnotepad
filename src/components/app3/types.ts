@@ -17,6 +17,7 @@ export interface ColumnWidths {
 export interface LayoutState {
   breakpoint: 'mobile' | 'tablet' | 'desktop'
   activePanel: 'sections' | 'list' | 'detail' // For tablet/mobile switching
+  col1Width: number
   col2Width: number
   isResizing: boolean
   isCol1Collapsed: boolean // Whether C1 is collapsed to icon-only view
@@ -25,6 +26,7 @@ export interface LayoutState {
 
 export interface LayoutActions {
   setActivePanel: (panel: LayoutState['activePanel']) => void
+  setCol1Width: (width: number) => void
   setCol2Width: (width: number) => void
   setIsResizing: (resizing: boolean) => void
   toggleCol1Collapsed: () => void

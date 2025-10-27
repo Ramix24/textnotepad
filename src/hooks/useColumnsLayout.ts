@@ -19,6 +19,8 @@ const DEFAULT_BREAKPOINTS: BreakpointConfig = {
 }
 
 // Width constraints
+const COL1_MIN = 180
+const COL1_MAX = 480
 const COL2_MIN = 260
 const COL2_MAX = 560
 
@@ -40,6 +42,7 @@ const DEFAULT_SELECTION: AppSelection = {
 }
 
 const STORAGE_KEYS = {
+  COL1_WIDTH: 'layout:c1w',
   COL2_WIDTH: 'layout:c2w',
   ACTIVE_PANEL: 'layout:active-panel', 
   SELECTION: 'tnp:selection', // New key for folder-based selection
@@ -102,6 +105,10 @@ export function useColumnsLayout(
   const searchParams = useSearchParams()
   
   // Initialize state from localStorage
+  const [col1Width, setCol1Width] = useState(() => 
+    getPreference(STORAGE_KEYS.COL1_WIDTH, columnWidths.col1)
+  )
+  
   const [col2Width, setCol2Width] = useState(() => 
     getPreference(STORAGE_KEYS.COL2_WIDTH, columnWidths.col2)
   )
@@ -139,6 +146,11 @@ export function useColumnsLayout(
   })
 
   // Debounced persistence
+  const debouncedSetCol1Width = useMemo(
+    () => createDebouncedSetter<number>(STORAGE_KEYS.COL1_WIDTH, 150),
+    []
+  )
+  
   const debouncedSetCol2Width = useMemo(
     () => createDebouncedSetter<number>(STORAGE_KEYS.COL2_WIDTH, 150),
     []
@@ -156,6 +168,15 @@ export function useColumnsLayout(
       // Persist immediately for panel switches
       setTimeout(() => getPreference(STORAGE_KEYS.ACTIVE_PANEL, panel), 0)
     }, []),
+
+    setCol1Width: useCallback((width: number) => {
+      const clampedWidth = Math.max(
+        COL1_MIN,
+        Math.min(COL1_MAX, width)
+      )
+      setCol1Width(clampedWidth)
+      debouncedSetCol1Width(clampedWidth)
+    }, [debouncedSetCol1Width]),
 
     setCol2Width: useCallback((width: number) => {
       const clampedWidth = Math.max(
@@ -236,6 +257,7 @@ export function useColumnsLayout(
   const state: LayoutState = {
     breakpoint,
     activePanel,
+    col1Width,
     col2Width,
     isResizing,
     isCol1Collapsed,

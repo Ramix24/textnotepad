@@ -513,7 +513,7 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
                     onChange={(e) => setEditingName(e.target.value)}
                     onKeyDown={handleEditKeyDown}
                     onBlur={handleSaveRename}
-                    className="w-full text-sm font-medium bg-white text-gray-900 border border-primary/20 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                    className="w-full text-sm font-medium bg-gray-800 dark:bg-gray-700 text-white border border-primary/20 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     onClick={(e) => e.stopPropagation()}
                     maxLength={120}
                   />
