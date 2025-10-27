@@ -156,10 +156,10 @@ export function MarkdownToolbar({ textareaRef, setContent, insertLink, clearForm
     <div className="h-10 bg-bg-secondary border-b border-border-dark flex items-center gap-1 px-3 overflow-x-auto">
       {/* Undo/Redo - always visible */}
       <ToolbarButton onClick={handleUndo} disabled={disabled} title="Undo (Ctrl+Z)">
-        ↶
+        <span className="text-lg">↶</span>
       </ToolbarButton>
       <ToolbarButton onClick={handleRedo} disabled={disabled} title="Redo (Ctrl+Y)">
-        ↷
+        <span className="text-lg">↷</span>
       </ToolbarButton>
 
       <Separator />

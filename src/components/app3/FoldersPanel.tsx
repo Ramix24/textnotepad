@@ -513,8 +513,9 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
                     onChange={(e) => setEditingName(e.target.value)}
                     onKeyDown={handleEditKeyDown}
                     onBlur={handleSaveRename}
-                    className="font-medium bg-transparent border-none outline-none text-current placeholder-current/50 flex-1 min-w-0"
+                    className="w-full text-sm font-medium bg-white text-gray-900 border border-primary/20 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                     onClick={(e) => e.stopPropagation()}
+                    maxLength={120}
                   />
                 ) : (
                   <span className="font-medium transition-opacity duration-300">{folder.name}</span>
@@ -531,10 +532,10 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
                   handleRenameFolder(folder.id, folder.name)
                 }}
                 disabled={renameFolder.isPending}
-                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-500 dark:text-text-secondary hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-50"
+                className="p-1.5 hover:bg-blue-100 dark:hover:bg-blue-900 rounded text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:opacity-50"
                 title="Rename folder"
               >
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </button>
@@ -543,10 +544,10 @@ function FoldersList({ selection, onInboxSelect, onFolderSelect, onTrashSelect, 
                   e.stopPropagation()
                   handleDeleteFolder(folder.id, folder.name)
                 }}
-                className="p-1 hover:bg-red-100 dark:hover:bg-red-900 rounded text-gray-500 dark:text-text-secondary hover:text-red-600 dark:hover:text-red-400"
+                className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900 rounded text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
                 title="Delete folder"
               >
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </button>
