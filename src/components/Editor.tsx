@@ -170,11 +170,6 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
     }
   })
 
-  // Handle file name changes
-  const handleNameChange = useCallback((newName: string) => {
-    if (readOnly) return
-    onFileUpdate?.({ ...file, name: newName })
-  }, [readOnly, file, onFileUpdate])
 
   // Handle print functionality
   const handlePrint = useCallback(() => {
@@ -531,7 +526,6 @@ export function Editor({ file, className, onFileUpdate, onDirtyChange, readOnly 
         savedAt={formatTime(file.updated_at)}
         saving={isSaving}
         isDirty={isDirty}
-        onNameChange={handleNameChange}
         viewMode={viewMode}
         onViewModeChange={setMode}
         readOnly={readOnly}

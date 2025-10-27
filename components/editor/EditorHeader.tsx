@@ -8,7 +8,6 @@ interface EditorHeaderProps {
   savedAt?: string
   saving?: boolean
   isDirty?: boolean
-  onNameChange: (name: string) => void
   viewMode?: 'edit' | 'preview'
   onViewModeChange?: (mode: 'edit' | 'preview') => void
   readOnly?: boolean
@@ -24,7 +23,6 @@ export function EditorHeader({
   savedAt,
   saving,
   isDirty,
-  onNameChange,
   viewMode = 'edit',
   onViewModeChange,
   readOnly = false,
@@ -56,13 +54,9 @@ export function EditorHeader({
 
   return (
     <div className="h-12 bg-bg-secondary border-b border-border-dark flex items-center gap-3 px-4">
-      <input
-        className="bg-transparent outline-none text-base font-medium flex-1 text-text-primary"
-        value={name}
-        onChange={(e) => onNameChange(e.target.value)}
-        placeholder="Untitled"
-        readOnly={readOnly}
-      />
+      <div className="text-base font-medium flex-1 text-text-primary truncate">
+        {name || "Untitled"}
+      </div>
       <div className="flex items-center gap-3">
         {/* Edit/Preview Toggle */}
         {onViewModeChange && (
