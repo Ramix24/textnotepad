@@ -134,7 +134,7 @@ function FileItem({
                     title="Unsaved changes"
                   />
                 )}
-                <p className="text-sm font-medium text-foreground truncate">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-gray-100 truncate">
                   {file.name}
                 </p>
               </div>

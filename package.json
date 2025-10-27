@@ -1,6 +1,6 @@
 {
   "name": "textnotepad",
-  "version": "0.5.179",
+  "version": "0.5.180",
   "private": true,
   "scripts": {
     "dev": "next dev",
